@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graphe charge/capacité — Camille Adam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --color-canvas:          #FFF6BE;
+  --color-canvas-soft:     #FFFADC;
+  --color-surface-card:    #F5EDA0;
+  --color-surface-dark:    #1C1A14;
+  --color-surface-dark-el: #272520;
+  --color-ink:             #1C1A14;
+  --color-body:            #3D3A32;
+  --color-muted:           #6E6A60;
+  --color-muted-soft:      #9E9A90;
+  --color-hairline:        #E8E080;
+  --color-hairline-soft:   #F0ECA0;
+  --color-on-dark:         #FFF6BE;
+  --color-on-dark-soft:    #9E9A90;
+
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --space-xs:  8px;
+  --space-sm:  12px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-xxl: 48px;
+  --space-section: 96px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ---------- Fade in ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .fade-up-1 { animation-delay: 0.05s; }
+  .fade-up-2 { animation-delay: 0.15s; }
+  .fade-up-3 { animation-delay: 0.25s; }
+  .fade-up-4 { animation-delay: 0.35s; }
+}
+
+/* ============================================
+   LAYOUT — sticky rail + content
+   ============================================ */
+.shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: var(--space-section);
+  align-items: start;
+}
+
+/* ---------- Rail ---------- */
+.rail {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xxl) 0;
+}
+
+.rail-sig {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--color-ink);
+  letter-spacing: -0.3px;
+  margin-bottom: var(--space-xl);
+}
+.rail-sig span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+
+/* ---- Language switch (pinned top-right header) ---- */
+.pagehead {
+  position: fixed;
+  bottom: var(--space-lg);
+  left: var(--space-xxl);
+  z-index: 50;
+}
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.lang-switch button {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-soft);
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.lang-switch button:hover { color: var(--color-muted); }
+.lang-switch button.active { color: var(--color-ink); }
+.lang-sep { color: var(--color-muted-soft); font-size: 11px; }
+
+.rail-back {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+  margin-bottom: var(--space-xxl);
+  cursor: pointer;
+}
+.rail-back:hover { color: var(--color-ink); }
+
+.rail-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+  margin-bottom: var(--space-md);
+}
+
+.rail-nav {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.rail-nav a {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: baseline;
+  gap: var(--space-xs);
+  padding: 9px 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  transition: color 0.15s ease;
+  cursor: pointer;
+  position: relative;
+}
+.rail-nav a .n {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-muted-soft);
+  transition: color 0.15s ease;
+}
+.rail-nav a:hover { color: var(--color-ink); }
+.rail-nav a.active { color: var(--color-ink); font-weight: 500; }
+.rail-nav a.active .n { color: var(--color-ink); }
+.rail-nav a.active::before {
+  content: '✦';
+  position: absolute;
+  left: -20px;
+  top: 9px;
+  font-size: 11px;
+  color: var(--color-ink);
+}
+
+.rail-foot {
+  margin-top: auto;
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-hairline);
+}
+.rail-contact {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+}
+.rail-contact:hover { color: var(--color-ink); }
+
+/* ---------- Content column ---------- */
+.content {
+  max-width: 720px;
+  padding: var(--space-section) 0 var(--space-xxl);
+}
+
+/* ---------- Hero ---------- */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: var(--space-lg);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(40px, 5vw, 60px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -1.2px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-xl);
+}
+
+.hero-context {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.6;
+  margin-bottom: var(--space-xxl);
+}
+
+/* ---------- Meta ---------- */
+.meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--color-hairline);
+  border-bottom: 1px solid var(--color-hairline);
+}
+.meta-cell {
+  padding: var(--space-lg) var(--space-lg) var(--space-lg) 0;
+}
+.meta-cell + .meta-cell { padding-left: var(--space-lg); border-left: 1px solid var(--color-hairline); }
+.meta-key {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+  margin-bottom: var(--space-xs);
+}
+.meta-val {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink);
+  line-height: 1.45;
+}
+
+.method {
+  border-bottom: 1px solid var(--color-hairline);
+  padding: var(--space-lg) 0;
+  margin-bottom: var(--space-section);
+}
+.method .meta-key { margin-bottom: var(--space-sm); }
+.method-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) 10px;
+}
+.method-step {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  padding: 5px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.method-arrow { color: var(--color-muted-soft); font-size: 13px; }
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section { padding-top: var(--space-section); scroll-margin-top: var(--space-xl); }
+.section:first-of-type { padding-top: 0; }
+
+.sec-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-md);
+}
+.sec-eyebrow .num { color: var(--color-muted-soft); }
+.sec-eyebrow .sep { color: var(--color-muted-soft); }
+
+.sec-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.6px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-lg);
+}
+
+.prose {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.65;
+}
+.prose + .prose { margin-top: var(--space-md); }
+
+/* ---------- Editorial image plate ---------- */
+.plate { margin-top: var(--space-xl); }
+.plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-hairline);
+}
+.plate-cap {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  margin-top: var(--space-sm);
+}
+
+/* ---------- Needs list ---------- */
+.needs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+.need {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--space-md);
+  align-items: start;
+  background: var(--color-canvas-soft);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+.need-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 24px;
+  color: var(--color-ink);
+  line-height: 1;
+  opacity: 0.55;
+}
+.need-title {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+.need-desc {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.55;
+}
+
+/* ---------- Insight callout ---------- */
+.insight {
+  margin-top: var(--space-xl);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl) var(--space-xxl);
+}
+.insight-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-sm);
+}
+.insight-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.4px;
+  color: var(--color-ink);
+}
+
+/* ---------- Quote ---------- */
+.quote {
+  margin-top: var(--space-xxl);
+}
+.quote-glyph {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 48px;
+  line-height: 0.4;
+  color: var(--color-ink);
+  opacity: 0.25;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+.quote-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(22px, 2.8vw, 30px);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.4px;
+  color: var(--color-ink);
+  max-width: 640px;
+  margin-bottom: var(--space-lg);
+}
+.quote-cite {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.01em;
+}
+.quote-cite .role { color: var(--color-muted-soft); font-weight: 400; }
+
+/* ---------- Research meta strip ---------- */
+.rmeta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--color-hairline);
+  border-bottom: 1px solid var(--color-hairline);
+}
+.rmeta-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--color-ink);
+  letter-spacing: -1px;
+}
+.rmeta-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.4;
+  max-width: 360px;
+}
+
+/* ---------- Reframe (demande → besoin réel) ---------- */
+.reframe {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-hairline);
+  display: grid;
+  grid-template-columns: 1fr 28px 1fr 28px 1fr;
+  align-items: stretch;
+  gap: var(--space-sm);
+}
+.reframe-card {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-hairline);
+  background: var(--color-canvas-soft);
+  padding: var(--space-xl);
+}
+.reframe-card.is-real {
+  background: var(--color-surface-card);
+}
+.reframe-card.is-insight {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+}
+.reframe-card.is-insight .reframe-key { color: var(--color-hairline); }
+.reframe-card.is-insight .reframe-val { color: var(--color-canvas); }
+.reframe-key {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-sm);
+}
+.reframe-card.is-real .reframe-key { color: var(--color-ink); }
+.reframe-val {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+  color: var(--color-ink);
+}
+.reframe-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 22px;
+  color: var(--color-muted-soft);
+}
+
+/* ---------- Verbatim cluster ---------- */
+.verbatims-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: var(--space-xxl) 0 var(--space-md);
+}
+.verbatim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+.verbatim {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-hairline);
+  background: var(--color-canvas-soft);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.verbatim-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.55;
+}
+.verbatim-tag {
+  margin-top: auto;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+}
+
+/* ---------- Benchmark table ---------- */
+.bench {
+  margin-top: var(--space-xl);
+  border-top: 1px solid var(--color-hairline);
+}
+.bench-row {
+  display: grid;
+  grid-template-columns: 130px 1.3fr 1fr;
+  gap: var(--space-lg);
+  padding: var(--space-lg) 0;
+  border-bottom: 1px solid var(--color-hairline);
+  align-items: start;
+}
+.bench-head {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+.bench-head .bh {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+}
+.bench-tool {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.bench-obs {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.5;
+}
+.bench-take {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+.bench-take strong {
+  display: block;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin-top: 4px;
+}
+.bench-take .arr { color: var(--color-muted-soft); }
+
+/* ---------- Solution showcase ---------- */
+.showcase {
+  margin-top: var(--space-xl);
+  background: var(--color-surface-dark);
+  border-radius: 24px;
+  padding: var(--space-xxl) var(--space-xxl) var(--space-xl);
+}
+.showcase-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-on-dark-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-lg);
+}
+.showcase-eyebrow .star { color: var(--color-on-dark); font-size: 13px; }
+.showcase-window {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 32px 64px -24px rgba(0, 0, 0, 0.55);
+  background: #fff;
+}
+.showcase-chrome {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 15px;
+  background: #F3F1EA;
+  border-bottom: 1px solid rgba(28, 26, 20, 0.07);
+}
+.showcase-chrome .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(28, 26, 20, 0.16);
+}
+.showcase-tablabel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #8A857B;
+  white-space: nowrap;
+}
+.showcase-img { display: block; width: 100%; height: auto; }
+.showcase-cap {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-on-dark-soft);
+  margin-top: var(--space-md);
+}
+
+/* ---------- Solution columns ---------- */
+.sol-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
+}
+.sol-card {
+  background: var(--color-canvas-soft);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+}
+.sol-tag {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-md);
+}
+.sol-head {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.3px;
+}
+.sol-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); }
+.sol-list li {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.5;
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 6px;
+}
+.sol-list li::before { content: '◆'; color: var(--color-muted-soft); font-size: 9px; line-height: 1.6; }
+
+.sol-video { margin-top: var(--space-lg); }
+.sol-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-hairline);
+  background: var(--color-surface-dark);
+}
+.sol-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.sol-video-cap {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  margin-top: var(--space-sm);
+}
+
+/* ---------- Results (dark band) ---------- */
+.results {
+  margin-top: var(--space-section);
+  background: var(--color-surface-dark);
+  border-radius: 24px;
+  padding: var(--space-section) var(--space-xxl);
+  scroll-margin-top: var(--space-xl);
+}
+.results .sec-eyebrow { color: var(--color-on-dark-soft); }
+.results .sec-eyebrow .num, .results .sec-eyebrow .sep { color: var(--color-on-dark-soft); }
+.results .sec-title { color: var(--color-on-dark); margin-bottom: var(--space-xxl); }
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xl);
+}
+.kpi { border-top: 1px solid rgba(255,246,190,0.18); padding-top: var(--space-md); }
+.kpi-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(48px, 6vw, 68px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--color-on-dark);
+  margin-bottom: var(--space-sm);
+}
+.kpi-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-on-dark-soft);
+  line-height: 1.5;
+}
+
+/* ---------- Closing footer ---------- */
+.closer {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  padding-bottom: var(--space-xxl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+.closer-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--color-ink);
+}
+.closer-name span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+.closer-links { display: flex; gap: var(--space-lg); flex-wrap: wrap; }
+.closer-links a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  transition: color 0.15s ease;
+}
+.closer-links a:hover { color: var(--color-ink); }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 920px) {
+  .shell { grid-template-columns: 1fr; gap: 0; padding: 0 var(--space-lg); }
+  .rail {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md) var(--space-lg);
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .rail-sig { margin-bottom: 0; }
+  .pagehead { bottom: var(--space-md); left: var(--space-lg); }
+  .rail-back { margin-bottom: 0; }
+  .rail-label { display: none; }
+  .rail-nav { flex-direction: row; flex-wrap: wrap; gap: 0 var(--space-md); width: 100%; }
+  .rail-nav a { padding: 6px 0; }
+  .rail-nav a.active::before { display: none; }
+  .rail-foot { display: none; }
+  .content { padding-top: var(--space-xxl); }
+  .meta { grid-template-columns: 1fr; }
+  .meta-cell + .meta-cell { border-left: none; border-top: 1px solid var(--color-hairline); padding-left: 0; }
+  .reframe { grid-template-columns: 1fr; }
+  .reframe-arrow { transform: rotate(90deg); height: 28px; }
+  .verbatim-grid { grid-template-columns: 1fr; }
+  .bench-row { grid-template-columns: 1fr; gap: var(--space-xs); }
+  .sol-grid { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: 1fr; gap: var(--space-lg); }
+  .results { padding: var(--space-xxl) var(--space-lg); }
+}
+
+/* ---------- Placeholder image plate ---------- */
+.plate-empty { margin-top: var(--space-xl); }
+.plate-empty .ph {
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-xl);
+  border: 1.5px dashed rgba(110,106,96,0.30);
+  background: var(--color-canvas-soft);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--space-sm); text-align: center; padding: var(--space-lg);
+}
+.plate-empty .ph-glyph { font-family: var(--font-display); font-style: italic; font-size: 38px; color: var(--color-muted-soft); line-height: 1; }
+.plate-empty .ph-label { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted-soft); }
+.sol-card .plate-empty { margin-top: var(--space-lg); }
+.sol-card .plate-empty .ph { background: var(--color-canvas); aspect-ratio: 16 / 9; }
+
+/* ---------- Results impact statement + note ---------- */
+.results .prose { color: var(--color-on-dark-soft); margin-bottom: var(--space-xxl); max-width: 620px; }
+.kpis.kpis-2 { grid-template-columns: repeat(2, 1fr); max-width: 560px; }
+.results-note {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(255,246,190,0.18);
+  font-family: var(--font-body);
+  font-size: 13px; color: var(--color-on-dark-soft); line-height: 1.55;
+  display: flex; gap: 8px; align-items: baseline; max-width: 620px;
+}
+.results-note .g { color: var(--color-on-dark); }
+
+/* ---------- Learnings ---------- */
+.learnings { display: flex; flex-direction: column; gap: var(--space-xl); margin-top: var(--space-xl); }
+.learn { display: grid; grid-template-columns: 26px 1fr; gap: var(--space-md); align-items: start; }
+.learn-glyph { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-ink); opacity: 0.55; line-height: 1.5; }
+.learn-title { font-family: var(--font-display); font-style: italic; font-size: clamp(20px, 2.4vw, 24px); line-height: 1.3; letter-spacing: -0.4px; color: var(--color-ink); margin-bottom: var(--space-xs); }
+.learn-body { font-family: var(--font-body); font-size: 16px; color: var(--color-muted); line-height: 1.6; }
+@media (max-width: 920px) { .kpis.kpis-2 { grid-template-columns: 1fr; } }
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ RAIL ============ -->
+  <aside class="rail">
+    <a href="index.html" class="rail-sig">Camille Adam<span>✦</span></a>
+
+    <div class="rail-label" data-i18n="rail.toc">Sommaire</div>
+    <ul class="rail-nav" id="railnav">
+      <li><a data-anchor="contexte"><span class="n">01</span><span data-i18n="rail.contexte">Contexte</span></a></li>
+      <li><a data-anchor="recherche"><span class="n">02</span><span data-i18n="rail.recherche">Recherche</span></a></li>
+      <li><a data-anchor="solution"><span class="n">03</span><span data-i18n="rail.solution">Solution</span></a></li>
+      <li><a data-anchor="impact"><span class="n">04</span><span data-i18n="rail.impact">Impact</span></a></li>
+      <li><a data-anchor="apprentissages"><span class="n">05</span><span data-i18n="rail.appr">Apprentissages</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- ============ CONTENT ============ -->
+  <div class="content" data-screen-label="Étude de cas — Graphe charge/capacité">
+
+    <!-- HERO -->
+    <div class="eyebrow fade-up fade-up-1" data-i18n="hero.eyebrow">Étude de cas ✦ Oplit ∗ Planification de production</div>
+    <h1 class="hero-title fade-up fade-up-2" data-i18n="hero.title">D'un graphe figé à un outil de pilotage flexible</h1>
+    <p class="hero-context fade-up fade-up-3" data-i18n="hero.context">
+      Le graphe charge/capacité est l'écran central des planificateurs d'Oplit — et il était figé.
+      J'ai conçu trois améliorations pour en faire un outil de pilotage vraiment flexible, du choix
+      des axes à l'ajout de courbes de référence.
+    </p>
+
+    <figure class="plate fade-up fade-up-4" style="margin-bottom: var(--space-xxl);">
+      <div style="border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); overflow: hidden; aspect-ratio: 16 / 9;">
+        <img src="img/charge-capa-hero.png" alt="Le graphe charge/capacité affiché en réunion avec un planificateur" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; transform: scale(1.28); border: 0; border-radius: 0;">
+      </div>
+      <figcaption class="plate-cap" data-i18n="ph.hero">Le graphe charge/capacité en usage réel — revue de planification chez un industriel</figcaption>
+    </figure>
+
+    <div class="meta fade-up fade-up-4">
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.date">Livré</div>
+        <div class="meta-val" data-i18n="meta.dateVal">Décembre 2025</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.role">Rôle</div>
+        <div class="meta-val" data-i18n="meta.roleVal">Product Designer</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.team">Équipe</div>
+        <div class="meta-val" data-i18n="meta.teamVal">PDP · Oplit</div>
+      </div>
+    </div>
+
+    <div class="method fade-up fade-up-4">
+      <div class="meta-key" data-i18n="meta.scope">Périmètre</div>
+      <div class="method-flow">
+        <span class="method-step" data-i18n="scope.s1">Recherche</span><span class="method-arrow">→</span>
+        <span class="method-step">UX</span><span class="method-arrow">→</span>
+        <span class="method-step">UI</span>
+      </div>
+    </div>
+
+    <!-- 01 — CONTEXTE -->
+    <section class="section" id="contexte">
+      <div class="sec-eyebrow"><span class="num">01</span><span class="sep">∗</span> <span data-i18n="sec.contexte">Contexte</span></div>
+      <h2 class="sec-title" data-i18n="contexte.title">L'écran central des planificateurs</h2>
+      <p class="prose" data-i18n="contexte.p1">
+        Oplit est une solution de planification de production pour les industriels. Le graphe
+        charge/capacité est l'écran où les planificateurs visualisent si leurs ateliers sont en sur
+        ou sous-charge et prennent leurs décisions d'ajustement.
+      </p>
+      <p class="prose" data-i18n="contexte.p2">
+        Le graphe existant était rigide : un seul axe temporel, un seul type de visualisation, peu de
+        courbes de référence.
+      </p>
+
+      <figure class="plate">
+        <img src="img/charge-capa-before.jpg" alt="Panneau d'affichage des données : groupement, unités, courbes de tendance">
+        <figcaption class="plate-cap" data-i18n="ph.contexte">Le panneau d'affichage — regroupement, unités et courbes de tendance configurables</figcaption>
+      </figure>
+    </section>
+
+    <!-- 02 — RECHERCHE -->
+    <section class="section" id="recherche">
+      <div class="sec-eyebrow"><span class="num">02</span><span class="sep">∗</span> <span data-i18n="sec.recherche">Recherche</span></div>
+      <h2 class="sec-title" data-i18n="recherche.title">Trois frustrations remontées du terrain</h2>
+      <p class="prose" data-i18n="recherche.p1">
+        Nous étions partis du principe que les clients voulaient un graphe entièrement personnalisable.
+        Les entretiens terrain ont nuancé ce postulat : leurs besoins n'allaient pas si loin, mais
+        trois manques fondamentaux revenaient systématiquement.
+      </p>
+
+      <div class="needs">
+        <div class="need">
+          <div class="need-num">01</div>
+          <div>
+            <div class="need-title" data-i18n="need1.title">Axes figés</div>
+            <div class="need-desc" data-i18n="need1.desc">Impossible de comparer la charge entre plusieurs postes similaires pour redistribuer la capacité. Les planificateurs faisaient ce travail mentalement ou dans Excel.</div>
+          </div>
+        </div>
+        <div class="need">
+          <div class="need-num">02</div>
+          <div>
+            <div class="need-title" data-i18n="need2.title">Type de graphique unique</div>
+            <div class="need-desc" data-i18n="need2.desc">La capacité ne pouvait s'afficher qu'en courbe. Pour certains usages, notamment quand les secteurs sont en abscisse, les barres seraient bien plus lisibles.</div>
+          </div>
+        </div>
+        <div class="need">
+          <div class="need-num">03</div>
+          <div>
+            <div class="need-title" data-i18n="need3.title">Des valeurs de référence manquantes</div>
+            <div class="need-desc" data-i18n="need3.desc">Aucune courbe de capacité standard, cible ou moyenne pour contextualiser la charge. Impossible d'identifier rapidement un écart par rapport à un seuil.</div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="plate">
+        <img src="img/charge-capa-ref-client.jpg" alt="Deux graphes Excel réalisés par des clients : charge des postes côte à côte et courbe de charge moyenne">
+        <figcaption class="plate-cap" data-i18n="ph.recherche">Des graphes que les clients construisaient à côté d'Oplit, dans leurs rapports de production — ils ont révélé ce qui manquait au graphe natif.</figcaption>
+      </figure>
+    </section>
+
+    <!-- 03 — SOLUTION -->
+    <section class="section" id="solution">
+      <div class="sec-eyebrow"><span class="num">03</span><span class="sep">∗</span> <span data-i18n="sec.solution">Solution</span></div>
+      <h2 class="sec-title" data-i18n="solution.title">Trois améliorations, un graphe enfin flexible</h2>
+      <p class="prose" data-i18n="solution.p1">
+        Trois leviers de flexibilité, choisis pour couvrir les besoins les plus fréquents sans
+        alourdir l'interface.
+      </p>
+
+      <div class="sol-grid">
+        <div class="sol-card">
+          <div class="sol-tag" data-i18n="f01.tag">◆ Feature 01</div>
+          <div class="sol-head" data-i18n="f01.head">Changement des axes</div>
+          <p class="bench-obs" style="margin-bottom: var(--space-md);" data-i18n="f01.desc">L'axe des abscisses devient configurable : par article, par client ou par poste de charge. Les planificateurs peuvent enfin comparer la charge de postes similaires pour décider où redistribuer la charge en fonction de la capacité.</p>
+          <figure class="plate">
+            <img src="img/charge-capa-axes.jpg" alt="Panneau de configuration des axes : valeur de l'axe X (secteur, client, référence article)">
+            <figcaption class="plate-cap" data-i18n="f01.cap">La valeur de chaque axe se choisit dans un menu — ici la charge par poste, comparée par secteur</figcaption>
+          </figure>
+        </div>
+
+        <div class="sol-card">
+          <div class="sol-tag" data-i18n="f02.tag">◆ Feature 02</div>
+          <div class="sol-head" data-i18n="f02.head">Changement du type de graphique</div>
+          <p class="bench-obs" style="margin-bottom: var(--space-md);" data-i18n="f02.desc">La capacité peut désormais être affichée en courbe ou en barres verticales, au choix de l'utilisateur. Ce paramètre change la lisibilité selon le contexte — notamment quand les secteurs de production sont positionnés en abscisse.</p>
+          <figure class="plate">
+            <img src="img/charge-capa-type.jpg" alt="Panneau de capacité simulée : bascule entre affichage en courbe et en barres">
+            <figcaption class="plate-cap" data-i18n="f02.cap">Un simple sélecteur bascule la capacité entre courbe et barres, selon la lecture voulue</figcaption>
+          </figure>
+        </div>
+
+        <div class="sol-card">
+          <div class="sol-tag" data-i18n="f03.tag">◆ Feature 03</div>
+          <div class="sol-head" data-i18n="f03.head">Courbes informatives</div>
+          <p class="bench-obs" style="margin-bottom: var(--space-md);" data-i18n="f03.desc">De nouvelles courbes superposables permettent de contextualiser la charge en un coup d'œil :</p>
+          <ul class="sol-list">
+            <li><span data-i18n="f03.l1"><strong>Capacité standard</strong> — la capacité sans aucune modification, pour mesurer l'impact des événements.</span></li>
+            <li><span data-i18n="f03.l2"><strong>Capacité cible</strong> — un seuil de référence choisi par l'utilisateur.</span></li>
+            <li><span data-i18n="f03.l3"><strong>Moyenne de la charge</strong> — pour visualiser la tendance sur la période.</span></li>
+          </ul>
+          <figure class="plate">
+            <img src="img/charge-capa-courbes.jpg" alt="Panneau des courbes de référence : capacité simulée, théorique et seuil configurable">
+            <figcaption class="plate-cap" data-i18n="f03.cap">Chaque courbe de référence — simulée, théorique, seuil — s'active et se règle depuis le panneau Affichage</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 — IMPACT -->
+    <section class="results section" id="impact">
+      <div class="sec-eyebrow"><span class="num">04</span><span class="sep">∗</span> <span data-i18n="sec.impact">Impact</span></div>
+      <h2 class="sec-title" data-i18n="impact.title">Trois améliorations en production</h2>
+      <p class="prose" data-i18n="impact.statement">
+        Trois améliorations livrées dans une seule release en décembre 2025, couvrant les besoins
+        les plus fréquents remontés en entretiens.
+      </p>
+      <div class="kpis kpis-2">
+        <div class="kpi">
+          <div class="kpi-num">3</div>
+          <div class="kpi-label" data-i18n="impact.kpi1">améliorations de flexibilité livrées</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-num" data-i18n="impact.kpi2num">Déc. 2025</div>
+          <div class="kpi-label" data-i18n="impact.kpi2">déployées en une seule release</div>
+        </div>
+      </div>
+      <div class="results-note"><span class="g">✦</span> <span data-i18n="impact.note">Métriques d'adoption (NPS, retours clients, usage des nouvelles options) en cours de mesure.</span></div>
+    </section>
+
+    <!-- 05 — APPRENTISSAGES -->
+    <section class="section" id="apprentissages">
+      <div class="sec-eyebrow"><span class="num">05</span><span class="sep">∗</span> <span data-i18n="sec.appr">Apprentissages</span></div>
+      <h2 class="sec-title" data-i18n="appr.title">Ce que j'ai appris</h2>
+      <div class="learnings">
+        <div class="learn">
+          <div class="learn-glyph">✦</div>
+          <div>
+            <div class="learn-title" data-i18n="appr1.title">La flexibilité ne veut pas dire tout laisser paramétrer.</div>
+            <div class="learn-body" data-i18n="appr1.body">Rendre le graphe « customisable » aurait pu aboutir à une interface surchargée. Le défi a été d'identifier les quelques axes de liberté qui couvrent l'essentiel des besoins sans complexifier l'UI pour les autres.</div>
+          </div>
+        </div>
+        <div class="learn">
+          <div class="learn-glyph">✦</div>
+          <div>
+            <div class="learn-title" data-i18n="appr2.title">Les verbatims d'interview orientent mieux que les specs.</div>
+            <div class="learn-body" data-i18n="appr2.body">La phrase « on perd 10 minutes à chaque réunion à reconfigurer l'affichage » a été plus décisive pour prioriser certaines fonctionnalités que n'importe quelle spec technique.</div>
+          </div>
+        </div>
+        <div class="learn">
+          <div class="learn-glyph">✦</div>
+          <div>
+            <div class="learn-title" data-i18n="appr3.title">Un graphe industriel s'adresse à des experts.</div>
+            <div class="learn-body" data-i18n="appr3.body">Les planificateurs comprennent vite des interfaces denses — le risque était la sous-information plutôt que la surcharge. Calibrer la densité pour un profil expert a changé plusieurs décisions de design.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- CLOSER -->
+  <div class="closer">
+    <a href="index.html" class="closer-name">Camille Adam<span>✦</span></a>
+    <div class="closer-links">
+      <a href="index.html#projets" data-i18n="closer.all">← Tous les projets</a>
+      <a href="mailto:c.adam.design@gmail.com">c.adam.design@gmail.com ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var LANG_KEY = 'ca-site-lang';
+  var DOC_TITLE = { fr: "Étude de cas — Graphe charge/capacité", en: "Case study — Load/capacity chart" };
+  var I18N = {
+    fr: {
+      "rail.toc": "Sommaire",
+      "rail.contexte": "Contexte", "rail.recherche": "Recherche", "rail.solution": "Solution",
+      "rail.impact": "Impact", "rail.appr": "Apprentissages",
+      "hero.eyebrow": "Étude de cas ✦ Oplit ∗ Planification de production",
+      "hero.title": "D'un graphe figé à un outil de pilotage flexible",
+      "hero.context": "Le graphe charge/capacité est l'écran central des planificateurs d'Oplit — et il était figé. J'ai conçu trois améliorations pour en faire un outil de pilotage vraiment flexible, du choix des axes à l'ajout de courbes de référence.",
+      "ph.hero": "Le graphe charge/capacité en usage réel — revue de planification chez un industriel",
+      "meta.date": "Livré", "meta.dateVal": "Décembre 2025",
+      "meta.role": "Rôle", "meta.roleVal": "Product Designer",
+      "meta.team": "Équipe", "meta.teamVal": "PDP · Oplit",
+      "meta.scope": "Périmètre", "scope.s1": "Recherche",
+      "sec.contexte": "Contexte", "sec.recherche": "Recherche", "sec.solution": "Solution",
+      "sec.impact": "Impact", "sec.appr": "Apprentissages",
+      "contexte.title": "L'écran central des planificateurs",
+      "contexte.p1": "Oplit est une solution de planification de production pour les industriels. Le graphe charge/capacité est l'écran où les planificateurs visualisent si leurs ateliers sont en sur ou sous-charge et prennent leurs décisions d'ajustement.",
+      "contexte.p2": "Le graphe existant était rigide : un seul axe temporel, un seul type de visualisation, peu de courbes de référence.",
+      "ph.contexte": "Le panneau d'affichage — regroupement, unités et courbes de tendance configurables",
+      "recherche.title": "Trois frustrations remontées du terrain",
+      "recherche.p1": "Nous étions partis du principe que les clients voulaient un graphe entièrement personnalisable. Les entretiens terrain ont nuancé ce postulat : leurs besoins n'allaient pas si loin, mais trois manques fondamentaux revenaient systématiquement.",
+      "need1.title": "Axes figés", "need1.desc": "Impossible de comparer la charge entre plusieurs postes similaires pour redistribuer la capacité. Les planificateurs faisaient ce travail mentalement ou dans Excel.",
+      "need2.title": "Type de graphique unique", "need2.desc": "La capacité ne pouvait s'afficher qu'en courbe. Pour certains usages, notamment quand les secteurs sont en abscisse, les barres seraient bien plus lisibles.",
+      "need3.title": "Des valeurs de référence manquantes", "need3.desc": "Aucune courbe de capacité standard, cible ou moyenne pour contextualiser la charge. Impossible d'identifier rapidement un écart par rapport à un seuil.",
+      "recherche.quote": "On perd 10 minutes à chaque réunion à reconfigurer l'affichage.",
+      "recherche.quoteCite": "∗ Planificateur · Entretien terrain",
+      "ph.recherche": "Des graphes que les clients construisaient à côté d'Oplit, dans leurs rapports de production — ils ont révélé ce qui manquait au graphe natif.",
+      "solution.title": "Trois améliorations, un graphe enfin flexible",
+      "solution.p1": "Trois leviers de flexibilité, choisis pour couvrir les besoins les plus fréquents sans alourdir l'interface.",
+      "f01.tag": "◆ Feature 01", "f01.head": "Changement des axes",
+      "f01.desc": "L'axe des abscisses devient configurable : par article, par client ou par poste de charge. Les planificateurs peuvent enfin comparer la charge de postes similaires pour décider où redistribuer la charge en fonction de la capacité.",
+      "f01.cap": "La valeur de chaque axe se choisit dans un menu — ici la charge par poste, comparée par secteur",
+      "f02.tag": "◆ Feature 02", "f02.head": "Changement du type de graphique",
+      "f02.desc": "La capacité peut désormais être affichée en courbe ou en barres verticales, au choix de l'utilisateur. Ce paramètre change la lisibilité selon le contexte — notamment quand les secteurs de production sont positionnés en abscisse.",
+      "f02.cap": "Un simple sélecteur bascule la capacité entre courbe et barres, selon la lecture voulue",
+      "f03.tag": "◆ Feature 03", "f03.head": "Courbes informatives",
+      "f03.desc": "De nouvelles courbes superposables permettent de contextualiser la charge en un coup d'œil :",
+      "f03.l1": "<strong>Capacité standard</strong> — la capacité sans aucune modification, pour mesurer l'impact des événements.",
+      "f03.l2": "<strong>Capacité cible</strong> — un seuil de référence choisi par l'utilisateur.",
+      "f03.l3": "<strong>Moyenne de la charge</strong> — pour visualiser la tendance sur la période.",
+      "f03.cap": "Chaque courbe de référence — simulée, théorique, seuil — s'active et se règle depuis le panneau Affichage",
+      "impact.title": "Trois améliorations en production",
+      "impact.statement": "Trois améliorations livrées dans une seule release en décembre 2025, couvrant les besoins les plus fréquents remontés en entretiens.",
+      "impact.kpi1": "améliorations de flexibilité livrées",
+      "impact.kpi2num": "Déc. 2025", "impact.kpi2": "déployées en une seule release",
+      "impact.note": "Métriques d'adoption (NPS, retours clients, usage des nouvelles options) en cours de mesure.",
+      "appr.title": "Ce que j'ai appris",
+      "appr1.title": "La flexibilité ne veut pas dire tout laisser paramétrer.",
+      "appr1.body": "Rendre le graphe « customisable » aurait pu aboutir à une interface surchargée. Le défi a été d'identifier les quelques axes de liberté qui couvrent l'essentiel des besoins sans complexifier l'UI pour les autres.",
+      "appr2.title": "Les verbatims d'interview orientent mieux que les specs.",
+      "appr2.body": "La phrase « on perd 10 minutes à chaque réunion à reconfigurer l'affichage » a été plus décisive pour prioriser certaines fonctionnalités que n'importe quelle spec technique.",
+      "appr3.title": "Un graphe industriel s'adresse à des experts.",
+      "appr3.body": "Les planificateurs comprennent vite des interfaces denses — le risque était la sous-information plutôt que la surcharge. Calibrer la densité pour un profil expert a changé plusieurs décisions de design.",
+      "closer.all": "← Tous les projets"
+    },
+    en: {
+      "rail.toc": "Contents",
+      "rail.contexte": "Context", "rail.recherche": "Research", "rail.solution": "Solution",
+      "rail.impact": "Impact", "rail.appr": "Learnings",
+      "hero.eyebrow": "Case study ✦ Oplit ∗ Production planning",
+      "hero.title": "From a frozen chart to a flexible steering tool",
+      "hero.context": "The load/capacity chart is the central screen for Oplit's planners — and it was frozen. I designed three improvements to turn it into a genuinely flexible steering tool, from choosing the axes to adding reference curves.",
+      "ph.hero": "The load/capacity chart in real use — a planning review at a manufacturer",
+      "meta.date": "Shipped", "meta.dateVal": "December 2025",
+      "meta.role": "Role", "meta.roleVal": "Product Designer",
+      "meta.team": "Team", "meta.teamVal": "PDP · Oplit",
+      "meta.scope": "Scope", "scope.s1": "Research",
+      "sec.contexte": "Context", "sec.recherche": "Research", "sec.solution": "Solution",
+      "sec.impact": "Impact", "sec.appr": "Learnings",
+      "contexte.title": "The planners' central screen",
+      "contexte.p1": "Oplit is a production-planning solution for manufacturers. The load/capacity chart is the screen where planners see whether their workshops are over- or under-loaded and make their adjustment decisions.",
+      "contexte.p2": "The existing chart was rigid: a single time axis, a single visualization type, no reference curve. Users couldn't adapt the display to their business context.",
+      "ph.contexte": "The display panel — configurable grouping, units and trend curves",
+      "recherche.title": "Three frustrations surfaced from the field",
+      "recherche.p1": "We had assumed customers wanted a fully customizable chart. Field interviews tempered that assumption: their needs weren't that far-reaching, but three fundamental gaps came up again and again.",
+      "need1.title": "Frozen axes", "need1.desc": "No way to compare load across several similar workstations to redistribute capacity. Planners did this work mentally or in Excel.",
+      "need2.title": "A single chart type", "need2.desc": "Capacity could only be shown as a line. For some uses — especially when sectors are on the x-axis — bars would be far more legible.",
+      "need3.title": "No reference values", "need3.desc": "No standard, target or average capacity curve to put the load in context. No quick way to spot a gap against a threshold.",
+      "recherche.quote": "We lose 10 minutes in every meeting reconfiguring the display.",
+      "recherche.quoteCite": "∗ Planner · Field interview",
+      "ph.recherche": "Charts customers built alongside Oplit, in their production reports — they revealed what the native chart was missing.",
+      "solution.title": "Three improvements, a chart that's finally flexible",
+      "solution.p1": "Three levers of flexibility, chosen to cover the most frequent needs without weighing down the interface.",
+      "f01.tag": "◆ Feature 01", "f01.head": "Switching the axes",
+      "f01.desc": "The x-axis becomes configurable: by item, by customer or by workstation. Planners can finally compare the load of similar workstations to decide where to redistribute load against capacity.",
+      "f01.cap": "Each axis value is picked from a menu — here, load per workstation compared by sector",
+      "f02.tag": "◆ Feature 02", "f02.head": "Switching the chart type",
+      "f02.desc": "Capacity can now be shown as a line or as vertical bars, at the user's choice. This setting changes legibility depending on context — especially when production sectors are placed on the x-axis.",
+      "f02.cap": "A single toggle switches capacity between a line and bars, depending on the reading you need",
+      "f03.tag": "◆ Feature 03", "f03.head": "Informative curves",
+      "f03.desc": "New overlayable curves put the load in context at a glance:",
+      "f03.l1": "<strong>Standard capacity</strong> — capacity with no changes, to measure the impact of events.",
+      "f03.l2": "<strong>Target capacity</strong> — a reference threshold chosen by the user.",
+      "f03.l3": "<strong>Average load</strong> — to see the trend over the period.",
+      "f03.cap": "Each reference curve — simulated, theoretical, threshold — is toggled and tuned from the Display panel",
+      "impact.title": "Three improvements in production",
+      "impact.statement": "Three improvements shipped in a single release in December 2025, covering the most frequent needs raised in interviews.",
+      "impact.kpi1": "flexibility improvements shipped",
+      "impact.kpi2num": "Dec. 2025", "impact.kpi2": "deployed in a single release",
+      "impact.note": "Adoption metrics (NPS, client feedback, usage of the new options) currently being measured.",
+      "appr.title": "What I learned",
+      "appr1.title": "Flexibility doesn't mean making everything configurable.",
+      "appr1.body": "Making the chart “customizable” could have led to a cluttered interface. The challenge was finding the few degrees of freedom that cover most needs without complicating the UI for everyone else.",
+      "appr2.title": "Interview verbatims guide better than specs.",
+      "appr2.body": "The line “we lose 10 minutes in every meeting reconfiguring the display” was more decisive for prioritization than any technical spec.",
+      "appr3.title": "An industrial chart is built for experts.",
+      "appr3.body": "Planners quickly grasp dense interfaces — the risk was under-information rather than overload. Calibrating density for an expert profile changed several design decisions.",
+      "closer.all": "← All projects"
+    }
+  };
+
+  function applyLang(lang) {
+    var dict = I18N[lang] || I18N.fr;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] != null) el.innerHTML = dict[key];
+    });
+    document.documentElement.lang = lang;
+    if (DOC_TITLE[lang]) document.title = DOC_TITLE[lang];
+    document.querySelectorAll('.lang-switch button').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.lang-switch button');
+    if (b) { applyLang(b.getAttribute('data-lang')); }
+  });
+
+  (function () {
+    var saved = 'fr';
+    try { var s = localStorage.getItem(LANG_KEY); if (s === 'fr' || s === 'en') saved = s; } catch (e) {}
+    applyLang(saved);
+  })();
+
+  var OFFSET = 32;
+  function scroller() { return document.scrollingElement || document.documentElement; }
+
+  function goTo(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var sc = scroller();
+    var y = el.getBoundingClientRect().top + sc.scrollTop - OFFSET;
+    sc.scrollTo({ top: y, behavior: 'smooth' });
+  }
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-anchor]');
+    if (a) { e.preventDefault(); goTo(a.getAttribute('data-anchor')); }
+  });
+
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#railnav a'));
+    var map = {};
+    links.forEach(function (l) { map[l.getAttribute('data-anchor')] = l; });
+    var ids = Object.keys(map);
+    var sections = ids.map(function (id) { return document.getElementById(id); });
+
+    function setActive(id) {
+      links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('data-anchor') === id); });
+    }
+
+    function onScroll() {
+      var best = ids[0], bestTop = -Infinity;
+      for (var j = 0; j < sections.length; j++) {
+        if (!sections[j]) continue;
+        var top = sections[j].getBoundingClientRect().top - OFFSET - 130;
+        if (top <= 0 && top > bestTop) { bestTop = top; best = ids[j]; }
+      }
+      setActive(best);
+    }
+
+    setActive(ids[0]);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  setTimeout(function () {
+    document.querySelectorAll('.fade-up').forEach(function (el) {
+      (el.getAnimations ? el.getAnimations() : []).forEach(function (a) { try { a.finish(); } catch (e) {} });
+    });
+  }, 900);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camille Adam — Product Designer</title>
+<template id="__bundler_thumbnail" data-bg-color="#f4f2ec">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#f4f2ec"/>
+    <text x="600" y="380" font-family="Georgia, serif" font-size="120" fill="#1a1a1a" text-anchor="middle">Camille Adam</text>
+    <text x="600" y="470" font-family="Georgia, serif" font-size="60" fill="#8a8a82" text-anchor="middle">✦</text>
+  </svg>
+</template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+
+/* =============================================
+   DESIGN SYSTEM TOKENS
+   ============================================= */
+:root {
+  --color-canvas:          #FFF6BE;
+  --color-canvas-soft:     #FFFADC;
+  --color-surface-card:    #F5EDA0;
+  --color-surface-dark:    #1C1A14;
+  --color-surface-dark-el: #272520;
+  --color-ink:             #1C1A14;
+  --color-body:            #3D3A32;
+  --color-muted:           #6E6A60;
+  --color-muted-soft:      #9E9A90;
+  --color-hairline:        #E8E080;
+  --color-hairline-soft:   #F0ECA0;
+  --color-on-dark:         #FFF6BE;
+  --color-on-dark-soft:    #9E9A90;
+
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --space-xs:  8px;
+  --space-sm:  12px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-xxl: 48px;
+  --space-section: 96px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+html { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+
+a { text-decoration: none; color: inherit; }
+
+/* =============================================
+   FADE-IN ANIMATION
+   ============================================= */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .fade-up-1 { animation-delay: 0.05s; }
+  .fade-up-2 { animation-delay: 0.15s; }
+  .fade-up-3 { animation-delay: 0.25s; }
+  .fade-up-4 { animation-delay: 0.35s; }
+  .fade-up-5 { animation-delay: 0.45s; }
+}
+
+/* =============================================
+   LAYOUT
+   ============================================= */
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+/* =============================================
+   NAV
+   ============================================= */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--color-canvas);
+  border-bottom: 1px solid var(--color-hairline-soft);
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--color-ink);
+  letter-spacing: -0.3px;
+}
+
+.nav-logo span {
+  font-size: 0.5em;
+  vertical-align: super;
+  margin-left: 3px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  transition: color 0.15s ease;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.nav-links a:hover,
+.nav-links a.active { color: var(--color-ink); }
+
+/* ---- Language switch ---- */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: var(--space-sm);
+  margin-left: calc(var(--space-xl) - var(--space-sm));
+  border-left: 1px solid var(--color-hairline);
+}
+
+.lang-switch button {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-soft);
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.lang-switch button:hover { color: var(--color-muted); }
+.lang-switch button.active { color: var(--color-ink); }
+.lang-sep { color: var(--color-muted-soft); font-size: 11px; }
+
+/* =============================================
+   HERO
+   ============================================= */
+.hero {
+  padding-top: calc(56px + var(--space-section));
+  padding-bottom: var(--space-section);
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: var(--space-xxl);
+  align-items: start;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(44px, 5.5vw, 72px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -1.5px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-xl);
+}
+
+.hero-title .glyph {
+  font-size: 0.38em;
+  vertical-align: super;
+  margin-left: 8px;
+  letter-spacing: 0;
+}
+
+.hero-sub {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.6;
+  max-width: 480px;
+  margin-bottom: var(--space-xl);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 20px;
+  border-radius: var(--radius-md);
+  transition: opacity 0.15s ease;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-ghost {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-ghost:hover { color: var(--color-ink); }
+
+/* =============================================
+   TIMELINE (droite du hero)
+   ============================================= */
+.timeline-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+  margin-bottom: var(--space-lg);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-year {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--color-muted-soft);
+  text-transform: uppercase;
+  padding: var(--space-sm) 0 var(--space-xs);
+  border-top: 1px solid var(--color-hairline);
+  margin-top: var(--space-sm);
+}
+
+.timeline-year:first-child { margin-top: 0; }
+
+.timeline-item {
+  padding: var(--space-xs) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline-company {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.timeline-role {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+/* =============================================
+   DIVIDER
+   ============================================= */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--color-hairline);
+  margin: 0;
+}
+
+/* =============================================
+   PROJETS
+   ============================================= */
+.projects-section {
+  padding: var(--space-section) 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-xxl);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--color-ink);
+  letter-spacing: -0.5px;
+}
+
+.section-link {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+  cursor: pointer;
+}
+
+.section-link:hover { color: var(--color-ink); }
+
+/* Project grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.project-card {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.project-card:hover { transform: translateY(-3px); }
+
+.project-card-large {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.project-visual {
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card-large .project-visual {
+  aspect-ratio: auto;
+  min-height: 420px;
+}
+
+/* Visuals par projet */
+.visual-1 { background: var(--color-surface-dark); }
+
+.visual-1-inner {
+  width: 80%;
+  height: 70%;
+  background: var(--color-surface-dark-el);
+  border-radius: var(--radius-lg);
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  gap: var(--space-sm);
+}
+
+.mock-bar { height: 8px; border-radius: 4px; background: #333; }
+.mock-bar-short { width: 40%; }
+.mock-bar-med   { width: 65%; }
+.mock-bar-long  { width: 85%; }
+
+.mock-row { display: flex; gap: 8px; margin-top: auto; }
+
+.mock-pill {
+  height: 24px;
+  border-radius: 12px;
+  background: #2a2820;
+  border: 1px solid #3a3830;
+  flex: 1;
+}
+
+.mock-pill-yellow {
+  background: rgba(255, 246, 190, 0.15);
+  border-color: rgba(255, 246, 190, 0.3);
+}
+
+.visual-2 { background: #E8E4D8; }
+
+.visual-2-inner {
+  width: 75%;
+  height: 65%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mock-card-light {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.mock-dot-row { display: flex; gap: 5px; margin-bottom: 4px; }
+.mock-dot { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
+.mock-dot-yellow { background: var(--color-surface-card); }
+.mock-line { height: 6px; border-radius: 3px; background: #eee; }
+
+.visual-4 { background: #2A4858; }
+
+.visual-4-inner {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mock-flow-item {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mock-flow-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-canvas);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.mock-flow-line {
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.15);
+  flex: 1;
+}
+
+.visual-3 { background: #e9ebfb; }
+.visual-3 { overflow: hidden; }
+.visual-5 { background: #cfe8dd; overflow: hidden; }
+.visual-5-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transform: scale(1);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.project-card:hover .visual-5-img { transform: scale(1.05); }
+
+/* Visual 7 — verbatim "voices" wall */
+.visual-7 { background: var(--color-canvas-soft); }
+.visual-7-inner {
+  width: 84%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.v7-quote {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.v7-quote:nth-child(2) { transform: translateX(8%); }
+.project-card:hover .v7-quote:nth-child(1) { transform: translateX(3%); }
+.project-card:hover .v7-quote:nth-child(2) { transform: translateX(5%); }
+.v7-mark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 0.2;
+  color: var(--color-ink);
+  opacity: 0.3;
+}
+.v7-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+  color: var(--color-ink);
+}
+.v7-tag {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+}
+.visual-3-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transform: scale(1);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.project-card:hover .visual-3-img { transform: scale(1.05); }
+
+/* Visual 8 — co-design board (FigJam-style) */
+.visual-8 { background: var(--color-canvas-soft); }
+.visual-8-inner { position: relative; width: 86%; height: 74%; }
+.v8-note { position: absolute; border-radius: 6px; padding: 9px 10px; box-shadow: 0 2px 8px rgba(28,26,20,0.10); transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); }
+.v8-note .l { display: block; height: 4px; border-radius: 2px; background: rgba(28,26,20,0.28); }
+.v8-note .l + .l { margin-top: 4px; }
+.v8-note .l.s { width: 60%; }
+.v8-n1 { top: 4%; left: 2%; width: 34%; background: var(--color-surface-card); transform: rotate(-4deg); }
+.v8-n2 { top: 2%; right: 4%; width: 30%; background: #EFE7C6; transform: rotate(3deg); }
+.v8-n3 { top: 40%; left: 8%; width: 32%; background: #F3ECC0; transform: rotate(2deg); }
+.v8-n4 { top: 46%; right: 2%; width: 34%; background: var(--color-surface-card); transform: rotate(-3deg); }
+.v8-n5 { bottom: 2%; left: 26%; width: 34%; background: #EDE4BE; transform: rotate(-1deg); }
+.project-card:hover .v8-n1 { transform: rotate(-4deg) translateY(-4px); }
+.project-card:hover .v8-n2 { transform: rotate(3deg) translateY(-4px); }
+.project-card:hover .v8-n4 { transform: rotate(-3deg) translateY(-4px); }
+.v8-votes { position: absolute; top: 42%; left: 47%; display: flex; gap: 4px; }
+.v8-votes span { width: 8px; height: 8px; border-radius: 50%; background: var(--color-ink); opacity: 0.55; }
+.v8-votes span:nth-child(2) { opacity: 0.35; }
+.v8-votes span:nth-child(3) { opacity: 0.2; }
+.visual-3-inner {
+  width: 78%;
+  height: 62%;
+  background: var(--color-surface-dark-el);
+  border: 1px solid #333;
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+  position: relative;
+}
+.mock-chart-bar { flex: 1; border-radius: 3px 3px 0 0; background: #333; }
+.mock-chart-bar.is-accent { background: rgba(255, 246, 190, 0.35); }
+.mock-chart-line {
+  position: absolute;
+  left: var(--space-md);
+  right: var(--space-md);
+  top: 40%;
+  height: 2px;
+  background: rgba(255, 246, 190, 0.55);
+}
+
+/* Project info */
+.project-info {
+  padding: var(--space-xl);
+  background: var(--color-canvas-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.project-card-large .project-info { padding: var(--space-xxl); justify-content: center; }
+
+.project-tag {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+  margin-bottom: var(--space-sm);
+}
+
+.project-title {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--color-ink);
+  line-height: 1.3;
+  margin-bottom: var(--space-xs);
+}
+
+.project-card-large .project-title {
+  font-size: 22px;
+  margin-bottom: var(--space-sm);
+}
+
+.project-desc {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.55;
+  margin-bottom: var(--space-md);
+}
+
+.project-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--color-ink);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.project-card:hover .project-cta,
+.project-card:focus-visible .project-cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (hover: none) {
+  .project-cta { opacity: 1; transform: none; }
+}
+
+/* Impact / KPIs on the large card */
+.project-impact {
+  display: flex;
+  gap: var(--space-lg);
+  margin: 0 0 var(--space-lg);
+}
+
+.impact-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.impact-num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-ink);
+  letter-spacing: -0.5px;
+}
+
+.impact-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-muted);
+}
+
+/* =============================================
+   ABOUT BAND
+   ============================================= */
+.about-band {
+  background: var(--color-surface-dark);
+  border-radius: 24px;
+  padding: var(--space-section) var(--space-xxl);
+  margin: 0 0 var(--space-section);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xxl);
+  align-items: center;
+}
+
+.about-eyebrow {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-on-dark-soft);
+  margin-bottom: var(--space-lg);
+}
+
+.about-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(32px, 3.5vw, 48px);
+  font-weight: 400;
+  color: var(--color-on-dark);
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  margin-bottom: var(--space-lg);
+}
+
+.about-body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-on-dark-soft);
+  line-height: 1.65;
+  margin-bottom: var(--space-xl);
+}
+
+.about-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 20px;
+  border-radius: var(--radius-md);
+  transition: opacity 0.15s ease;
+}
+
+.about-btn:hover { opacity: 0.85; }
+
+.about-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.skill-item {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface-dark-el);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.skill-name {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-on-dark);
+}
+
+.skill-tags { display: flex; gap: var(--space-xs); }
+
+.skill-tag {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-on-dark-soft);
+  background: rgba(255,255,255,0.06);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+footer {
+  background: var(--color-surface-dark);
+  padding: var(--space-xxl) 0;
+}
+
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.footer-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--color-on-dark);
+  letter-spacing: -0.3px;
+}
+
+.footer-name span {
+  font-size: 0.45em;
+  vertical-align: super;
+  margin-left: 4px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-on-dark-soft);
+  letter-spacing: 0.05em;
+  transition: color 0.15s ease;
+}
+
+.footer-links a:hover { color: var(--color-on-dark); }
+
+.footer-copy {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-on-dark-soft);
+  opacity: 0.5;
+}
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .project-card-large { grid-column: span 1; grid-template-columns: 1fr; }
+  .about-band { grid-template-columns: 1fr; padding: var(--space-xxl); }
+  .page { padding: 0 var(--space-lg); }
+  .footer-inner { flex-direction: column; align-items: flex-start; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- =============================================
+   NAV
+   ============================================= -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" data-scroll="top">Camille Adam<span>✦</span></a>
+    <ul class="nav-links">
+      <li><a class="active" data-scroll="projets" data-i18n="nav.work">Projets</a></li>
+      <li><a data-scroll="about" data-i18n="nav.about">À propos</a></li>
+      <li><a data-scroll="contact" data-i18n="nav.contact">Contact</a></li>
+      <li><a href="https://drive.google.com/file/d/1BTTyKD2TBDqA-Z4eFI9YWGJgLX60CRYh/view?usp=sharing" target="_blank" rel="noopener" data-i18n="nav.cv">CV →</a></li>
+      <li>
+        <div class="lang-switch" role="group" aria-label="Langue / Language">
+          <button type="button" data-lang="fr" class="active" aria-pressed="true">FR</button>
+          <span class="lang-sep" aria-hidden="true">·</span>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- =============================================
+   HERO
+   ============================================= -->
+<div class="page">
+  <section class="hero">
+
+    <div class="hero-left">
+      <h1 class="hero-title fade-up fade-up-1">
+        <span data-i18n="hero.title">Product designer basée à Paris.</span><span class="glyph">✦</span>
+      </h1>
+      <p class="hero-sub fade-up fade-up-2" data-i18n="hero.sub">
+        UX research et conception d'interfaces B2B. Je travaille à la jonction entre la compréhension des utilisateurs et la conception de produits complexes, utiles et bien pensés.
+      </p>
+      <div class="hero-actions fade-up fade-up-3">
+        <a class="btn-primary" data-scroll="projets" data-i18n="hero.ctaProjects">Voir les projets →</a>
+        <a href="mailto:c.adam.design@gmail.com" class="btn-ghost" data-i18n="hero.ctaContact">Me contacter ↗</a>
+      </div>
+    </div>
+
+    <div class="hero-right fade-up fade-up-5">
+      <div class="timeline-label" data-i18n="hero.expLabel">Expériences</div>
+      <div class="timeline">
+
+        <div class="timeline-year" data-i18n="tl0.year">Sept 2024 — Aujourd'hui</div>
+        <div class="timeline-item">
+          <span class="timeline-company">Oplit · Paris</span>
+          <span class="timeline-role" data-i18n="tl0.role">UX/UI Designer</span>
+        </div>
+
+        <div class="timeline-year" data-i18n="tl1.year">Juin 2022 — Août 2023</div>
+        <div class="timeline-item">
+          <span class="timeline-company">Praticable · LIRIS — Paris/Lyon</span>
+          <span class="timeline-role" data-i18n="tl1.role">UX/UI Designer & chercheuse</span>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<hr class="section-divider">
+
+<!-- =============================================
+   PROJETS
+   ============================================= -->
+<div class="page" id="projets">
+  <section class="projects-section">
+
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="proj.title">Projets sélectionnés</h2>
+    </div>
+
+    <div class="projects-grid">
+
+      <!-- Projet 1 — Large -->
+      <a href="Etude de cas - Filtres et Vues.html" class="project-card project-card-large">
+        <div class="project-visual visual-1">
+          <img src="img/uc1-filtres.png" alt="Ordonnanceur Oplit sur tablette devant un écran de planification en atelier" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+        </div>
+        <div class="project-info" data-comment-anchor="21b534e54c-div">
+          <div class="project-tag" data-i18n="p1.tag">Oplit ∗ 2025 — 2026</div>
+          <div class="project-title" data-i18n="p1.title">De la refonte des filtres aux vues partagées</div>
+          <div class="project-desc" data-i18n="p1.desc">Refonte du système de filtres et introduction des vues sauvegardées pour permettre aux opérateurs industriels de retrouver instantanément leur contexte de travail.</div>
+          <div class="project-impact">
+            <div class="impact-item">
+              <div class="impact-num">2×</div>
+              <div class="impact-label" data-i18n="p1.kpi1">plus d'utilisation des filtres</div>
+            </div>
+            <div class="impact-item">
+              <div class="impact-num">20</div>
+              <div class="impact-label" data-i18n="p1.kpi2">clients équipés des vues sauvegardées</div>
+            </div>
+          </div>
+          <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
+        </div>
+      </a>
+
+      <!-- Projet 2 -->
+      <a href="Etude de cas - Graphe charge capa.html" class="project-card">
+        <div class="project-visual visual-3">
+          <img src="img/charge-capa-card.jpg" alt="Graphe équilibre charge / capacité" class="visual-3-img">
+        </div>
+        <div class="project-info">
+          <div class="project-tag" data-i18n="p4.tag">Oplit ∗ 2025</div>
+          <div class="project-title" data-i18n="p4.title">Un graphe charge/capacité enfin flexible</div>
+          <div class="project-desc" data-i18n="p4.desc">Trois améliorations — axes configurables, type de graphique au choix et courbes de référence — pour transformer l'écran central des planificateurs en véritable outil de pilotage.</div>
+          <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
+        </div>
+      </a>
+
+      <!-- Projet — Limites Numériques -->
+      <a href="Etude de cas - Limites Numeriques.html" class="project-card">
+        <div class="project-visual visual-5">
+          <img src="img/limites-num-hero.png" alt="Maquettes de paramètres éco-conçus sur une série de smartphones" class="visual-5-img">
+        </div>
+        <div class="project-info">
+          <div class="project-tag" data-i18n="p5.tag">Praticable ∗ Recherche & design</div>
+          <div class="project-title" data-i18n="p5.title">Imaginer des paramètres éco-conçus</div>
+          <div class="project-desc" data-i18n="p5.desc">Projet de recherche entre design et informatique sur l'empreinte environnementale du numérique — de la récolte de données à des maquettes de paramètres écologiques.</div>
+          <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
+        </div>
+      </a>
+
+      <!-- Projet — Atelier de co-conception — MASQUÉ (conservé mais non affiché) -->
+      <a href="Etude de cas - Atelier co-conception.html" class="project-card" style="display:none">
+        <div class="project-visual visual-8">
+          <div class="visual-8-inner">
+            <div class="v8-note v8-n1"><span class="l"></span><span class="l s"></span></div>
+            <div class="v8-note v8-n2"><span class="l"></span><span class="l s"></span></div>
+            <div class="v8-note v8-n3"><span class="l"></span><span class="l s"></span></div>
+            <div class="v8-note v8-n4"><span class="l"></span><span class="l s"></span></div>
+            <div class="v8-note v8-n5"><span class="l"></span><span class="l s"></span></div>
+            <div class="v8-votes"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+        <div class="project-info">
+          <div class="project-tag" data-i18n="p7.tag">Design Thinking ∗ Facilitation</div>
+          <div class="project-title" data-i18n="p7.title">Préparer et animer un atelier de co-conception</div>
+          <div class="project-desc" data-i18n="p7.desc">Cadrer, inviter et faciliter un atelier de co-conception pour Caféo — du canevas de préparation à une experience map construite à plusieurs mains.</div>
+          <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+</div>
+
+<hr class="section-divider">
+
+<!-- =============================================
+   ABOUT BAND
+   ============================================= -->
+<div class="page" id="about">
+  <div style="padding: var(--space-section) 0;">
+    <div class="about-band">
+      <div class="about-left">
+        <div class="about-eyebrow" data-i18n="about.eyebrow">À propos ✦</div>
+        <h2 class="about-title" data-i18n="about.title">UX research et conception d'interfaces B2B.</h2>
+        <p class="about-body" data-i18n="about.body">
+          Je suis Camille, product designer basée à Paris. Je conçois des interfaces pour des contextes complexes — SaaS industriel, outils métier — en m'appuyant sur une pratique rigoureuse de la recherche utilisateur.
+        </p>
+        <a href="mailto:c.adam.design@gmail.com" class="about-btn">c.adam.design@gmail.com →</a>
+      </div>
+
+      <div class="about-right">
+        <div class="skill-item">
+          <span class="skill-name" data-i18n="skill0">Recherche utilisateur</span>
+          <div class="skill-tags"><span class="skill-tag">Discovery</span></div>
+        </div>
+        <div class="skill-item">
+          <span class="skill-name" data-i18n="skill1">Design d'interface</span>
+          <div class="skill-tags"><span class="skill-tag">Figma</span></div>
+        </div>
+        <div class="skill-item">
+          <span class="skill-name" data-i18n="skill2">Design system</span>
+          <div class="skill-tags"><span class="skill-tag">Tokens</span></div>
+        </div>
+        <div class="skill-item">
+          <span class="skill-name" data-i18n="skill3">Maquettage & prototypage</span>
+          <div class="skill-tags">
+            <span class="skill-tag">Notion</span>
+            <span class="skill-tag">Mixpanel</span>
+          </div>
+        </div>
+        <div class="skill-item">
+          <span class="skill-name" data-i18n="skill4">Graphisme & édition</span>
+          <div class="skill-tags"><span class="skill-tag">Print</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+   FOOTER
+   ============================================= -->
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-name">Camille Adam<span>✦</span></div>
+    <ul class="footer-links">
+      <li><a href="#">LinkedIn ↗</a></li>
+      <li><a href="https://drive.google.com/file/d/1BTTyKD2TBDqA-Z4eFI9YWGJgLX60CRYh/view?usp=sharing" target="_blank" rel="noopener">CV.pdf ↗</a></li>
+      <li><a href="mailto:c.adam.design@gmail.com">c.adam.design@gmail.com ↗</a></li>
+      <li><a href="tel:0787069911">07 87 06 99 11</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Camille Adam</div>
+  </div>
+</footer>
+
+<script>
+  /* ---- FR / EN translations ---- */
+  var I18N = {
+    fr: {
+      "nav.work": "Projets", "nav.about": "À propos", "nav.contact": "Contact", "nav.cv": "CV →",
+      "hero.title": "Product designer basée à Paris.",
+      "hero.sub": "UX research et conception d'interfaces B2B. Je travaille à la jonction entre la compréhension des utilisateurs et la conception de produits complexes, utiles et bien pensés.",
+      "hero.ctaProjects": "Voir les projets →",
+      "hero.ctaContact": "Me contacter ↗",
+      "hero.expLabel": "Expériences",
+      "tl0.year": "Sept 2024 — Aujourd'hui", "tl0.role": "UX/UI Designer",
+      "tl1.year": "Juin 2022 — Août 2023", "tl1.role": "UX/UI Designer & chercheuse",
+      "proj.title": "Projets sélectionnés", "proj.all": "Tous les projets →", "proj.cta": "Lire l'étude de cas →",
+      "p1.tag": "Oplit ∗ 2025 — 2026",
+      "p1.title": "De la refonte des filtres aux vues partagées",
+      "p1.desc": "Refonte du système de filtres et introduction des vues sauvegardées pour permettre aux opérateurs industriels de retrouver instantanément leur contexte de travail.",
+      "p1.kpi1": "plus d'utilisation des filtres",
+      "p1.kpi2": "clients équipés des vues sauvegardées",
+      "p1.kpi3": "ticket de support sur le parcours",
+      "p2.tag": "Recherche utilisateur ∗ 2022 — 2023",
+      "p2.title": "UX Research & conception B2B — Praticable · LIRIS",
+      "p2.desc": "Recherche utilisateur et conception d'interfaces dans un contexte académique et industriel, en binôme chercheurs/designers.",
+      "p3.tag": "Design system ∗ En cours",
+      "p3.title": "Conception d'un design system pour interfaces industrielles",
+      "p3.desc": "Tokens, composants et documentation pour une équipe produit opérant dans des contextes d'usage exigeants.",
+      "p4.tag": "Oplit ∗ 2025",
+      "p4.title": "Un graphe charge/capacité enfin flexible",
+      "p4.desc": "Trois améliorations — axes configurables, type de graphique au choix et courbes de référence — pour transformer l'écran central des planificateurs en véritable outil de pilotage.",
+      "p5.tag": "Praticable ∗ Recherche & design",
+      "p5.title": "Imaginer des paramètres éco-conçus",
+      "p5.desc": "Projet de recherche entre design et informatique sur l'empreinte environnementale du numérique — de la récolte de données à des maquettes de paramètres écologiques.",
+      "p6.tag": "Parcours UX ∗ Recherche utilisateur",
+      "p6.title": "Comprendre les humains derrière chaque trajet",
+      "p6.desc": "Étude terrain sur l'achat de billets de train — observation en gare, entretiens semi-directifs, verbatims et personas. Écouter les voyageurs avant de concevoir.",
+      "p7.tag": "Design Thinking ∗ Facilitation",
+      "p7.title": "Préparer et animer un atelier de co-conception",
+      "p7.desc": "Cadrer, inviter et faciliter un atelier de co-conception pour Caféo — du canevas de préparation à une experience map construite à plusieurs mains.",
+      "about.eyebrow": "À propos ✦",
+      "about.title": "UX research et conception d'interfaces B2B.",
+      "about.body": "Je suis Camille, product designer basée à Paris. Je conçois des interfaces pour des contextes complexes — SaaS industriel, outils métier — en m'appuyant sur une pratique rigoureuse de la recherche utilisateur.",
+      "skill0": "Recherche utilisateur", "skill1": "Design d'interface", "skill2": "Design system",
+      "skill3": "Maquettage & prototypage", "skill4": "Graphisme & édition"
+    },
+    en: {
+      "nav.work": "Work", "nav.about": "About", "nav.contact": "Contact", "nav.cv": "CV →",
+      "hero.title": "Product designer based in Paris.",
+      "hero.sub": "UX research and B2B interface design. I work at the intersection of understanding users and designing complex, useful, well-considered products.",
+      "hero.ctaProjects": "View projects →",
+      "hero.ctaContact": "Get in touch ↗",
+      "hero.expLabel": "Experience",
+      "tl0.year": "Sept 2024 — Present", "tl0.role": "UX/UI Designer",
+      "tl1.year": "June 2022 — Aug 2023", "tl1.role": "UX/UI Designer & researcher",
+      "proj.title": "Selected projects", "proj.all": "All projects →", "proj.cta": "Read the case study →",
+      "p1.tag": "SaaS editor ∗ 2025 — 2026",
+      "p1.title": "From filter redesign to shared views",
+      "p1.desc": "Redesigning the filter system and introducing saved views so industrial operators instantly recover their working context.",
+      "p1.kpi1": "more usage on the filters",
+      "p1.kpi2": "clients using saved views",
+      "p1.kpi3": "support tickets on the flow",
+      "p2.tag": "User research ∗ 2022 — 2023",
+      "p2.title": "UX Research & B2B design — Praticable · LIRIS",
+      "p2.desc": "User research and interface design in an academic and industrial context, pairing researchers and designers.",
+      "p3.tag": "Design system ∗ Ongoing",
+      "p3.title": "Designing a design system for industrial interfaces",
+      "p3.desc": "Tokens, components and documentation for a product team operating in demanding use contexts.",
+      "p4.tag": "SaaS editor ∗ 2025",
+      "p4.title": "A load/capacity chart that's finally flexible",
+      "p4.desc": "Three improvements — configurable axes, switchable chart type and reference curves — turning the planners' central screen into a real steering tool.",
+      "p5.tag": "Praticable ∗ Research & design",
+      "p5.title": "Designing eco-conscious settings",
+      "p5.desc": "A research project between design and computer science on the environmental footprint of digital technology — from data collection to mockups of ecological settings.",
+      "p6.tag": "UX track ∗ User research",
+      "p6.title": "Understanding the people behind each journey",
+      "p6.desc": "Field study on buying train tickets — in-station observation, semi-structured interviews, verbatims and personas. Listening to travelers before designing.",
+      "p7.tag": "Design Thinking ∗ Facilitation",
+      "p7.title": "Preparing and running a co-design workshop",
+      "p7.desc": "Framing, inviting and facilitating a co-design workshop for Caféo — from the preparation canvas to an experience map built by many hands.",
+      "about.eyebrow": "About ✦",
+      "about.title": "UX research and B2B interface design.",
+      "about.body": "I'm Camille, a product designer based in Paris. I design interfaces for complex contexts — industrial SaaS, business tools — grounded in a rigorous user-research practice.",
+      "skill0": "User research", "skill1": "Interface design", "skill2": "Design system",
+      "skill3": "Wireframing & prototyping", "skill4": "Graphic & editorial design"
+    }
+  };
+
+  var LANG_KEY = 'ca-site-lang';
+  var CURRENT_LANG = 'fr';
+
+  function applyLang(lang) {
+    CURRENT_LANG = (lang === 'en') ? 'en' : 'fr';
+    var dict = I18N[lang] || I18N.fr;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] != null) el.textContent = dict[key];
+    });
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang-switch button').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  }
+
+  /* ---- Smooth scroll with sticky-nav offset ---- */
+  function scrollTo(target) {
+    var scroller = document.scrollingElement || document.documentElement;
+    if (target === 'top') { scroller.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    var el = document.getElementById(target);
+    if (el) {
+      var y = el.getBoundingClientRect().top + scroller.scrollTop - 56;
+      scroller.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    var s = e.target.closest('[data-scroll]');
+    if (s) { e.preventDefault(); scrollTo(s.getAttribute('data-scroll')); return; }
+    var b = e.target.closest('.lang-switch button');
+    if (b) { applyLang(b.getAttribute('data-lang')); }
+  });
+
+  /* ---- Init ---- */
+  (function () {
+    var saved = 'fr';
+    try { var s = localStorage.getItem(LANG_KEY); if (s === 'fr' || s === 'en') saved = s; } catch (e) {}
+    applyLang(saved);
+  })();
+
+  /* Safety net: if the animation clock is frozen (throttled preview),
+     force entrance animations to their end state so content is never hidden. */
+  function ensureVisible() {
+    document.querySelectorAll('.fade-up').forEach(function (el) {
+      (el.getAnimations ? el.getAnimations() : []).forEach(function (a) {
+        try { a.finish(); } catch (e) {}
+      });
+    });
+  }
+  setTimeout(ensureVisible, 900);
+</script>
+
+</body>
+</html>

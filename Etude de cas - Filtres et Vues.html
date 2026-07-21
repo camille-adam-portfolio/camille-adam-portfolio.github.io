@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De la refonte des filtres aux vues partagées — Camille Adam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --color-canvas:          #FFF6BE;
+  --color-canvas-soft:     #FFFADC;
+  --color-surface-card:    #F5EDA0;
+  --color-surface-dark:    #1C1A14;
+  --color-surface-dark-el: #272520;
+  --color-ink:             #1C1A14;
+  --color-body:            #3D3A32;
+  --color-muted:           #6E6A60;
+  --color-muted-soft:      #9E9A90;
+  --color-hairline:        #E8E080;
+  --color-hairline-soft:   #F0ECA0;
+  --color-on-dark:         #FFF6BE;
+  --color-on-dark-soft:    #9E9A90;
+
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --space-xs:  8px;
+  --space-sm:  12px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-xxl: 48px;
+  --space-section: 96px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ---------- Fade in ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .fade-up-1 { animation-delay: 0.05s; }
+  .fade-up-2 { animation-delay: 0.15s; }
+  .fade-up-3 { animation-delay: 0.25s; }
+  .fade-up-4 { animation-delay: 0.35s; }
+}
+
+/* ============================================
+   LAYOUT — sticky rail + content
+   ============================================ */
+.shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: var(--space-section);
+  align-items: start;
+}
+
+/* ---------- Rail ---------- */
+.rail {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xxl) 0;
+}
+
+.rail-sig {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--color-ink);
+  letter-spacing: -0.3px;
+  margin-bottom: var(--space-xl);
+}
+.rail-sig span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+
+/* ---- Language switch (pinned top-right header) ---- */
+.pagehead {
+  position: fixed;
+  bottom: var(--space-lg);
+  left: var(--space-xxl);
+  z-index: 50;
+}
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.lang-switch button {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-soft);
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.lang-switch button:hover { color: var(--color-muted); }
+.lang-switch button.active { color: var(--color-ink); }
+.lang-sep { color: var(--color-muted-soft); font-size: 11px; }
+
+.rail-back {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+  margin-bottom: var(--space-xxl);
+  cursor: pointer;
+}
+.rail-back:hover { color: var(--color-ink); }
+
+.rail-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+  margin-bottom: var(--space-md);
+}
+
+.rail-nav {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.rail-nav a {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: baseline;
+  gap: var(--space-xs);
+  padding: 9px 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  transition: color 0.15s ease;
+  cursor: pointer;
+  position: relative;
+}
+.rail-nav a .n {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-muted-soft);
+  transition: color 0.15s ease;
+}
+.rail-nav a:hover { color: var(--color-ink); }
+.rail-nav a.active { color: var(--color-ink); font-weight: 500; }
+.rail-nav a.active .n { color: var(--color-ink); }
+.rail-nav a.active::before {
+  content: '✦';
+  position: absolute;
+  left: -20px;
+  top: 9px;
+  font-size: 11px;
+  color: var(--color-ink);
+}
+
+.rail-foot {
+  margin-top: auto;
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-hairline);
+}
+.rail-contact {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+}
+.rail-contact:hover { color: var(--color-ink); }
+
+/* ---------- Content column ---------- */
+.content {
+  max-width: 720px;
+  padding: var(--space-section) 0 var(--space-xxl);
+}
+
+/* ---------- Hero ---------- */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: var(--space-lg);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(40px, 5vw, 60px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -1.2px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-xl);
+}
+
+.hero-context {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.6;
+  margin-bottom: var(--space-xxl);
+}
+
+/* ---------- Meta ---------- */
+.meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--color-hairline);
+  border-bottom: 1px solid var(--color-hairline);
+}
+.meta-cell {
+  padding: var(--space-lg) var(--space-lg) var(--space-lg) 0;
+}
+.meta-cell + .meta-cell { padding-left: var(--space-lg); border-left: 1px solid var(--color-hairline); }
+.meta-key {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+  margin-bottom: var(--space-xs);
+}
+.meta-val {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink);
+  line-height: 1.45;
+}
+
+.method {
+  border-bottom: 1px solid var(--color-hairline);
+  padding: var(--space-lg) 0;
+  margin-bottom: var(--space-section);
+}
+.method .meta-key { margin-bottom: var(--space-sm); }
+.method-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) 10px;
+}
+.method-step {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  padding: 5px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.method-arrow { color: var(--color-muted-soft); font-size: 13px; }
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section { padding-top: var(--space-section); scroll-margin-top: var(--space-xl); }
+.section:first-of-type { padding-top: 0; }
+
+.sec-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-md);
+}
+.sec-eyebrow .num { color: var(--color-muted-soft); }
+.sec-eyebrow .sep { color: var(--color-muted-soft); }
+
+.sec-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.6px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-lg);
+}
+
+.prose {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.65;
+}
+.prose + .prose { margin-top: var(--space-md); }
+
+/* ---------- Editorial image plate ---------- */
+.plate { margin-top: var(--space-xl); }
+.plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-hairline);
+}
+.plate-cap {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  margin-top: var(--space-sm);
+}
+
+/* ---------- Needs list ---------- */
+.needs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+.need {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--space-md);
+  align-items: start;
+  background: var(--color-canvas-soft);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+.need-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 24px;
+  color: var(--color-ink);
+  line-height: 1;
+  opacity: 0.55;
+}
+.need-title {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+.need-desc {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.55;
+}
+
+/* ---------- Insight callout ---------- */
+.insight {
+  margin-top: var(--space-xl);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl) var(--space-xxl);
+}
+.insight-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-sm);
+}
+.insight-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.4px;
+  color: var(--color-ink);
+}
+
+/* ---------- Quote ---------- */
+.quote {
+  margin-top: var(--space-xxl);
+}
+.quote-glyph {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 48px;
+  line-height: 0.4;
+  color: var(--color-ink);
+  opacity: 0.25;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+.quote-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(22px, 2.8vw, 30px);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.4px;
+  color: var(--color-ink);
+  max-width: 640px;
+  margin-bottom: var(--space-lg);
+}
+.quote-cite {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.01em;
+}
+.quote-cite .role { color: var(--color-muted-soft); font-weight: 400; }
+
+/* ---------- Research meta strip ---------- */
+.rmeta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--color-hairline);
+  border-bottom: 1px solid var(--color-hairline);
+}
+.rmeta-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--color-ink);
+  letter-spacing: -1px;
+}
+.rmeta-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.4;
+  max-width: 360px;
+}
+
+/* ---------- Reframe (demande → besoin réel) ---------- */
+.reframe {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-hairline);
+  display: grid;
+  grid-template-columns: 1fr 28px 1fr 28px 1fr;
+  align-items: stretch;
+  gap: var(--space-sm);
+}
+.reframe-card {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-hairline);
+  background: var(--color-canvas-soft);
+  padding: var(--space-xl);
+}
+.reframe-card.is-real {
+  background: var(--color-surface-card);
+}
+.reframe-card.is-insight {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+}
+.reframe-card.is-insight .reframe-key { color: var(--color-hairline); }
+.reframe-card.is-insight .reframe-val { color: var(--color-canvas); }
+.reframe-key {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-sm);
+}
+.reframe-card.is-real .reframe-key { color: var(--color-ink); }
+.reframe-val {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+  color: var(--color-ink);
+}
+.reframe-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 22px;
+  color: var(--color-muted-soft);
+}
+
+/* ---------- Verbatim cluster ---------- */
+.verbatims-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: var(--space-xxl) 0 var(--space-md);
+}
+.verbatim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+.verbatim {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-hairline);
+  background: var(--color-canvas-soft);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.verbatim-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.55;
+}
+.verbatim-tag {
+  margin-top: auto;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+}
+
+/* ---------- Benchmark table ---------- */
+.bench {
+  margin-top: var(--space-xl);
+  border-top: 1px solid var(--color-hairline);
+}
+.bench-row {
+  display: grid;
+  grid-template-columns: 130px 1.3fr 1fr;
+  gap: var(--space-lg);
+  padding: var(--space-lg) 0;
+  border-bottom: 1px solid var(--color-hairline);
+  align-items: start;
+}
+.bench-head {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+.bench-head .bh {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft);
+}
+.bench-tool {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.bench-obs {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.5;
+}
+.bench-take {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+.bench-take strong {
+  display: block;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin-top: 4px;
+}
+.bench-take .arr { color: var(--color-muted-soft); }
+
+/* ---------- Solution showcase ---------- */
+.showcase {
+  margin-top: var(--space-xl);
+  background: var(--color-surface-dark);
+  border-radius: 24px;
+  padding: var(--space-xxl) var(--space-xxl) var(--space-xl);
+}
+.showcase-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-on-dark-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-lg);
+}
+.showcase-eyebrow .star { color: var(--color-on-dark); font-size: 13px; }
+.showcase-window {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 32px 64px -24px rgba(0, 0, 0, 0.55);
+  background: #fff;
+}
+.showcase-chrome {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 15px;
+  background: #F3F1EA;
+  border-bottom: 1px solid rgba(28, 26, 20, 0.07);
+}
+.showcase-chrome .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(28, 26, 20, 0.16);
+}
+.showcase-tablabel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #8A857B;
+  white-space: nowrap;
+}
+.showcase-img { display: block; width: 100%; height: auto; }
+.showcase-cap {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-on-dark-soft);
+  margin-top: var(--space-md);
+}
+
+/* ---------- Solution columns ---------- */
+.sol-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
+}
+.sol-card {
+  background: var(--color-canvas-soft);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+}
+.sol-tag {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-md);
+}
+.sol-head {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.3px;
+}
+.sol-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); }
+.sol-list li {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-body);
+  line-height: 1.5;
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 6px;
+}
+.sol-list li::before { content: '◆'; color: var(--color-muted-soft); font-size: 9px; line-height: 1.6; }
+
+.sol-video { margin-top: var(--space-lg); }
+.sol-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-hairline);
+  background: var(--color-surface-dark);
+}
+.sol-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.sol-video-cap {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  margin-top: var(--space-sm);
+}
+
+/* ---------- Results (dark band) ---------- */
+.results {
+  margin-top: var(--space-section);
+  background: var(--color-surface-dark);
+  border-radius: 24px;
+  padding: var(--space-section) var(--space-xxl);
+  scroll-margin-top: var(--space-xl);
+}
+.results .sec-eyebrow { color: var(--color-on-dark-soft); }
+.results .sec-eyebrow .num, .results .sec-eyebrow .sep { color: var(--color-on-dark-soft); }
+.results .sec-title { color: var(--color-on-dark); margin-bottom: var(--space-xxl); }
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xl);
+}
+.kpi { border-top: 1px solid rgba(255,246,190,0.18); padding-top: var(--space-md); }
+.kpi-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(48px, 6vw, 68px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--color-on-dark);
+  margin-bottom: var(--space-sm);
+}
+.kpi-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-on-dark-soft);
+  line-height: 1.5;
+}
+
+/* ---------- Closing footer ---------- */
+.closer {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  padding-bottom: var(--space-xxl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+.closer-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--color-ink);
+}
+.closer-name span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+.closer-links { display: flex; gap: var(--space-lg); flex-wrap: wrap; }
+.closer-links a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  transition: color 0.15s ease;
+}
+.closer-links a:hover { color: var(--color-ink); }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 920px) {
+  .shell { grid-template-columns: 1fr; gap: 0; padding: 0 var(--space-lg); }
+  .rail {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md) var(--space-lg);
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .rail-sig { margin-bottom: 0; }
+  .pagehead { bottom: var(--space-md); left: var(--space-lg); }
+  .rail-back { margin-bottom: 0; }
+  .rail-label { display: none; }
+  .rail-nav { flex-direction: row; flex-wrap: wrap; gap: 0 var(--space-md); width: 100%; }
+  .rail-nav a { padding: 6px 0; }
+  .rail-nav a.active::before { display: none; }
+  .rail-foot { display: none; }
+  .content { padding-top: var(--space-xxl); }
+  .meta { grid-template-columns: 1fr; }
+  .meta-cell + .meta-cell { border-left: none; border-top: 1px solid var(--color-hairline); padding-left: 0; }
+  .reframe { grid-template-columns: 1fr; }
+  .reframe-arrow { transform: rotate(90deg); height: 28px; }
+  .verbatim-grid { grid-template-columns: 1fr; }
+  .bench-row { grid-template-columns: 1fr; gap: var(--space-xs); }
+  .sol-grid { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: 1fr; gap: var(--space-lg); }
+  .results { padding: var(--space-xxl) var(--space-lg); }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ RAIL ============ -->
+  <aside class="rail">
+    <a href="index.html" class="rail-sig">Camille Adam<span>✦</span></a>
+
+    <div class="rail-label" data-i18n="rail.toc">Sommaire</div>
+    <ul class="rail-nav" id="railnav">
+      <li><a data-anchor="contexte"><span class="n">01</span><span data-i18n="rail.contexte">Contexte</span></a></li>
+      <li><a data-anchor="probleme"><span class="n">02</span><span data-i18n="rail.probleme">Problème</span></a></li>
+      <li><a data-anchor="recherche"><span class="n">03</span><span data-i18n="rail.recherche">Recherche</span></a></li>
+      <li><a data-anchor="ideation"><span class="n">04</span><span data-i18n="rail.ideation">Idéation</span></a></li>
+      <li><a data-anchor="solution"><span class="n">05</span><span data-i18n="rail.solution">Solution</span></a></li>
+      <li><a data-anchor="resultats"><span class="n">06</span><span data-i18n="rail.resultats">Résultats</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- ============ CONTENT ============ -->
+  <div class="content">
+
+    <!-- HERO -->
+    <div class="eyebrow fade-up fade-up-1" data-i18n="hero.eyebrow">Étude de cas ✦ Oplit ∗ Éditeur SaaS</div>
+    <h1 class="hero-title fade-up fade-up-2" data-i18n="hero.title">De la refonte des filtres aux vues partagées</h1>
+    <p class="hero-context fade-up fade-up-3" data-i18n="hero.context">
+      Refonte du système de filtres d'Oplit, logiciel B2B de gestion industrielle, et introduction des
+      vues sauvegardées. Derrière un simple besoin de filtrage plus flexible, la recherche a révélé un
+      enjeu plus large — permettre aux utilisateurs de retrouver leur contexte de travail complet en une
+      seule action — pour un résultat de deux fois plus d'utilisation des filtres et un usage adopté par
+      20 clients.
+    </p>
+
+    <figure class="plate fade-up fade-up-4" style="margin-bottom: var(--space-xxl);">
+      <img src="img/uc1-contexte-atelier.png" alt="Opérateur en atelier consultant Oplit sur une tablette, devant un grand écran d'ordonnancement de la production." loading="lazy">
+      <figcaption class="plate-cap" data-i18n="hero.plateCap">Oplit en atelier ◇ pilotage des ordres de fabrication au plus près de la production</figcaption>
+    </figure>
+
+    <div class="meta fade-up fade-up-4">
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.date">Date</div>
+        <div class="meta-val" data-i18n="meta.dateVal">Mai – Juillet 2025</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.role">Rôle</div>
+        <div class="meta-val" data-i18n="meta.roleVal">Product designer, en binôme avec le PM</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.team">Équipe</div>
+        <div class="meta-val" data-i18n="meta.teamVal">Product manager, Dev Full Stack</div>
+      </div>
+    </div>
+
+    <div class="method fade-up fade-up-4">
+      <div class="meta-key" data-i18n="meta.method">Méthodologie</div>
+      <div class="method-flow">
+        <span class="method-step">Discovery</span><span class="method-arrow">→</span>
+        <span class="method-step">Research</span><span class="method-arrow">→</span>
+        <span class="method-step">Ideation</span><span class="method-arrow">→</span>
+        <span class="method-step">Design</span><span class="method-arrow">→</span>
+        <span class="method-step">Tests</span><span class="method-arrow">→</span>
+        <span class="method-step">Specs</span><span class="method-arrow">→</span>
+        <span class="method-step">Delivery</span><span class="method-arrow">→</span>
+        <span class="method-step">Analytics</span>
+      </div>
+    </div>
+
+    <!-- 01 — CONTEXTE -->
+    <section class="section" id="contexte">
+      <div class="sec-eyebrow"><span class="num">01</span><span class="sep">∗</span> <span data-i18n="sec.contexte">Contexte</span></div>
+      <h2 class="sec-title" data-i18n="contexte.title">Un outil métier utilisé au quotidien</h2>
+      <p class="prose" data-i18n="contexte.p1">
+        Oplit est un logiciel B2B de gestion industrielle. Les ordonnanceurs et responsables de production
+        l'utilisent quotidiennement pour piloter les ordres de fabrication, suivre les retards et analyser
+        la capacité.
+      </p>
+      <p class="prose" data-i18n="contexte.p2">
+        Ce projet a été mené dans un cadre professionnel chez Oplit. Conçu de bout en bout, il a été
+        développé puis déployé en production — et utilisé chaque jour par les utilisateurs de l'outil.
+      </p>
+
+      <figure class="plate">
+        <img src="img/uc1-contexte-tannerie.jpg" alt="Opérateur en tannerie travaillant sur une machine, l'écran Oplit d'ordonnancement affiché au-dessus du poste." loading="lazy">
+        <figcaption class="plate-cap" data-i18n="contexte.plateCap">Sur le terrain ◇ Oplit affiché au poste de travail chez un client en tannerie</figcaption>
+      </figure>
+    </section>
+
+    <!-- 02 — PROBLÈME -->
+    <section class="section" id="probleme">
+      <div class="sec-eyebrow"><span class="num">02</span><span class="sep">∗</span> <span data-i18n="sec.probleme">Problème</span></div>
+      <h2 class="sec-title" data-i18n="probleme.title">Un système de filtrage peu flexible</h2>
+      <p class="prose" data-i18n="probleme.p1">
+        Les filtres d'Oplit étaient trop rigides : un seul comportement possible et aucune adaptation
+        au type de donnée manipulée. Les utilisateurs étaient bloqués. Quatre besoins sont remontés
+        du terrain.
+      </p>
+
+      <div class="needs">
+        <div class="need">
+          <div class="need-num">01</div>
+          <div>
+            <div class="need-title" data-i18n="need1.title">Voir quels filtres sont actifs</div>
+            <div class="need-desc" data-i18n="need1.desc">Pour ne plus confondre « pas de données » et « données masquées ».</div>
+          </div>
+        </div>
+        <div class="need">
+          <div class="need-num">02</div>
+          <div>
+            <div class="need-title" data-i18n="need2.title">Exclure des valeurs</div>
+            <div class="need-desc" data-i18n="need2.desc">2 clients ne veulent pas voir certaines opérations taggées.</div>
+          </div>
+        </div>
+        <div class="need">
+          <div class="need-num">03</div>
+          <div>
+            <div class="need-title" data-i18n="need3.title">Des filtres adaptés au type de donnée</div>
+            <div class="need-desc" data-i18n="need3.desc">On ne filtre pas une date comme un texte comme un nombre.</div>
+          </div>
+        </div>
+        <div class="need">
+          <div class="need-num">04</div>
+          <div>
+            <div class="need-title" data-i18n="need4.title">Sauvegarder une configuration</div>
+            <div class="need-desc" data-i18n="need4.desc">3 clients principaux demandent à ne plus tout reconfigurer à chaque session.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 — RECHERCHE -->
+    <section class="section" id="recherche">
+      <div class="sec-eyebrow"><span class="num">03</span><span class="sep">∗</span> <span data-i18n="sec.recherche">Recherche</span></div>
+      <h2 class="sec-title" data-i18n="recherche.title">L'insight qui a tout changé</h2>
+      <p class="prose" data-i18n="recherche.p1">
+        En creusant le besoin de sauvegarde, on a compris que ce n'était pas juste « mémoriser les
+        filtres ». Cinq clients principaux ont été explorés pour cadrer le besoin et confronter les
+        hypothèses.
+      </p>
+
+      <div class="quote">
+        <span class="quote-glyph">”</span>
+        <p class="quote-text" data-i18n="recherche.quote">
+          Il serait intéressant d'enregistrer une vue pour notre gestionnaire matière non précieuse
+          (Marc), car il ne travaille qu'en regardant les OFs concernés par une demande de matière.
+        </p>
+        <div class="quote-cite">Marc <span class="role" data-i18n="recherche.quoteCite">∗ Ordonnanceur · Client en joaillerie</span></div>
+      </div>
+
+      <div class="verbatims-label" data-i18n="recherche.verbatimsLabel">∗ Ce qu'on a entendu sur le terrain</div>
+      <div class="verbatim-grid">
+        <div class="verbatim">
+          <p class="verbatim-text" data-i18n="recherche.v1">
+            « Nous filtrons aussi les numéros d'OFs pour observer plusieurs OFs en même temps selon une
+            liste. Et pour la gestion de l'or, nous filtrons par nom de client. »
+          </p>
+          <div class="verbatim-tag" data-i18n="recherche.v1tag">Filtrer par liste &amp; par client</div>
+        </div>
+        <div class="verbatim">
+          <p class="verbatim-text" data-i18n="recherche.v2">
+            « Je voudrais des filtres spécifiques par secteur — voir le découpage, le tournage… Je veux
+            pouvoir faire des filtres différents sur chaque poste de charge. »
+          </p>
+          <div class="verbatim-tag" data-i18n="recherche.v2tag">Filtres par poste de charge</div>
+        </div>
+      </div>
+
+      <div class="reframe">
+        <div class="reframe-card">
+          <div class="reframe-key" data-i18n="recherche.rkey1">◇ Demande exprimée</div>
+          <div class="reframe-val" data-i18n="recherche.rval1">« Sauvegarder mes filtres »</div>
+        </div>
+        <div class="reframe-arrow">→</div>
+        <div class="reframe-card is-real">
+          <div class="reframe-key" data-i18n="recherche.rkey2">∗ Besoin réel</div>
+          <div class="reframe-val" data-i18n="recherche.rval2">« Retrouver tout mon contexte de travail »</div>
+        </div>
+        <div class="reframe-arrow">→</div>
+        <div class="reframe-card is-insight">
+          <div class="reframe-key" data-i18n="recherche.rkey3">✦ Insight</div>
+          <div class="reframe-val" data-i18n="recherche.rval3">Retrouver leur contexte complet : filtres, tri, affichage, secteurs.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 — IDÉATION -->
+    <section class="section" id="ideation">
+      <div class="sec-eyebrow"><span class="num">04</span><span class="sep">∗</span> <span data-i18n="sec.ideation">Idéation</span></div>
+      <h2 class="sec-title" data-i18n="ideation.title">S'inspirer d'autres contextes pour résoudre un problème métier</h2>
+      <p class="prose" data-i18n="ideation.p1">
+        Trois produits ont nourri la réflexion. Pour chacun, ce qu'on a observé et ce qu'on en a retenu
+        pour Oplit.
+      </p>
+
+      <div class="bench">
+        <div class="bench-head bench-row">
+          <div class="bh" data-i18n="ideation.colTool">Outil</div>
+          <div class="bh" data-i18n="ideation.colObs">Ce qu'on a observé</div>
+          <div class="bh" data-i18n="ideation.colTake">Ce qu'on en a retenu</div>
+        </div>
+        <div class="bench-row">
+          <div class="bench-tool">Notion</div>
+          <div class="bench-obs" data-i18n="ideation.obs1">Filtres visuels organisés par type de champ, avec des opérateurs adaptés.</div>
+          <div class="bench-take"><span data-i18n="ideation.take1">La logique de typage des données </span><span class="arr">→</span><strong data-i18n="ideation.take1b">Filtres flexibles</strong></div>
+        </div>
+        <div class="bench-row">
+          <div class="bench-tool">Airtable</div>
+          <div class="bench-obs" data-i18n="ideation.obs2">Vues multiples sur une même base, nommées et sauvegardées.</div>
+          <div class="bench-take"><span data-i18n="ideation.take2">Le concept de vue nommée et persistante </span><span class="arr">→</span><strong data-i18n="ideation.take2b">Vues sauvegardées</strong></div>
+        </div>
+        <div class="bench-row">
+          <div class="bench-tool">Linear</div>
+          <div class="bench-obs" data-i18n="ideation.obs3">Labels clairs, hiérarchie visuelle épurée pour un usage intensif.</div>
+          <div class="bench-take"><span data-i18n="ideation.take3">La sobriété visuelle dans un contexte dense </span><span class="arr">→</span><strong data-i18n="ideation.take3b">UI industrielle</strong></div>
+        </div>
+      </div>
+
+      <p class="prose" style="margin-top: var(--space-xxl);" data-i18n="ideation.p2">
+        Ces principes ont nourri les premières pistes : d'abord modéliser le typage des champs, puis
+        explorer la barre de filtres et le système de vues.
+      </p>
+
+      <figure class="plate">
+        <img src="img/uc1-ideation-typage.png" alt="Tableau de modélisation associant chaque champ (op_status, tags, incident, fast_track…) à un type de filtre — date, label, nombre, texte." loading="lazy">
+        <figcaption class="plate-cap" data-i18n="ideation.plateCap1">Typage des champs ◇ chaque donnée associée à un type de filtre et un statut</figcaption>
+      </figure>
+
+      <figure class="plate" style="margin-top: var(--space-xl);">
+        <img src="img/uc1-ideation-vues.png" alt="Explorations d'interface : barre de filtres, sélecteur de vues sauvegardées et écran d'ordonnancement Oplit." loading="lazy">
+        <figcaption class="plate-cap" data-i18n="ideation.plateCap2">Pistes d'interface ◇ barre de filtres, sélecteur et gestion des vues sauvegardées</figcaption>
+      </figure>
+    </section>
+
+    <!-- 04 — SOLUTION -->
+    <section class="section" id="solution">
+      <div class="sec-eyebrow"><span class="num">05</span><span class="sep">∗</span> <span data-i18n="sec.solution">Solution</span></div>
+      <h2 class="sec-title" data-i18n="solution.title">Des filtres sauvegardés dans des vues</h2>
+      <p class="prose" data-i18n="solution.p1">
+        Deux chantiers complémentaires : rendre les filtres adaptés et lisibles, puis les capturer dans
+        des vues réutilisables.
+      </p>
+
+      <div class="showcase">
+        <div class="showcase-eyebrow"><span class="star">✦</span> <span data-i18n="solution.showcaseEyebrow">Écran clé</span></div>
+        <div class="showcase-window">
+          <div class="showcase-chrome">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="showcase-tablabel" data-i18n="solution.showcaseTab">Oplit ∗ Ordonnancement</span>
+          </div>
+          <img class="showcase-img" src="img/uc1-solution-ecran.jpg" alt="Écran d'ordonnancement Oplit : plan en colonnes par poste de charge, panneau de filtres par tag ouvert, secteurs, tri et affichage appliqués au-dessus." loading="lazy">
+        </div>
+        <div class="showcase-cap" data-i18n="solution.showcaseCap">Vue « En-cours » ◇ filtre par tag ouvert, secteurs et tri appliqués sur le plan d'ordonnancement</div>
+      </div>
+
+      <div class="sol-grid">
+        <div class="sol-card">
+          <div class="sol-tag" data-i18n="solution.tagFilters">◆ Côté filtres</div>
+          <div class="sol-head" data-i18n="solution.headFilters">Adaptés et lisibles</div>
+          <ul class="sol-list">
+            <li data-i18n="solution.f1">Champs typés — texte, nombre, date, tag — avec composants et opérateurs adaptés.</li>
+            <li data-i18n="solution.f2">Filtres actifs toujours visibles.</li>
+            <li data-i18n="solution.f3">Empty state clair pour distinguer « vide » de « masqué ».</li>
+          </ul>
+          <figure class="sol-video">
+            <div class="sol-video-frame">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/9xa4Lyvio8c?rel=0"
+                title="Démonstration des filtres typés — Oplit"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen></iframe>
+            </div>
+            <figcaption class="sol-video-cap" data-i18n="solution.vcap1">Démonstration ◇ Filtres adaptés au type de donnée</figcaption>
+          </figure>
+        </div>
+        <div class="sol-card">
+          <div class="sol-tag" data-i18n="solution.tagViews">◆ Côté vues</div>
+          <div class="sol-head" data-i18n="solution.headViews">Capturer le contexte</div>
+          <ul class="sol-list">
+            <li data-i18n="solution.v1">Créer, nommer et sauvegarder des vues personnalisées capturant l'état complet de l'écran.</li>
+            <li data-i18n="solution.v2">Vue « En-cours » disponible par défaut.</li>
+            <li data-i18n="solution.v3">Système de droits et de permissions pour les admins.</li>
+          </ul>
+          <figure class="sol-video">
+            <div class="sol-video-frame">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/vx39rwJbmsA?rel=0"
+                title="Démonstration des vues sauvegardées — Oplit"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen></iframe>
+            </div>
+            <figcaption class="sol-video-cap" data-i18n="solution.vcap2">Démonstration ◇ Création et réutilisation d'une vue</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 — RÉSULTATS -->
+    <section class="results section" id="resultats">
+      <div class="sec-eyebrow"><span class="num">06</span><span class="sep">∗</span> <span data-i18n="sec.resultats">Résultats</span></div>
+      <h2 class="sec-title" data-i18n="resultats.title">Un nouvel usage adopté</h2>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-num">2×</div>
+          <div class="kpi-label" data-i18n="resultats.kpi1">plus d'utilisation sur les filtres</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-num">20</div>
+          <div class="kpi-label" data-i18n="resultats.kpi2">clients ont créé au moins 10 vues</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-num">0</div>
+          <div class="kpi-label" data-i18n="resultats.kpi3">message de support sur la compréhension du parcours des vues</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- CLOSER -->
+  <div class="closer">
+    <a href="index.html" class="closer-name">Camille Adam<span>✦</span></a>
+    <div class="closer-links">
+      <a href="index.html#projets" data-i18n="closer.all">← Tous les projets</a>
+      <a href="mailto:c.adam.design@gmail.com">c.adam.design@gmail.com ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---- FR / EN translations ---- */
+  var LANG_KEY = 'ca-site-lang';
+  var DOC_TITLE = { fr: "Étude de cas — De la refonte des filtres aux vues partagées", en: "Case study — From filter redesign to shared views" };
+  var I18N = {
+    fr: {
+      "rail.toc": "Sommaire",
+      "rail.contexte": "Contexte", "rail.probleme": "Problème", "rail.recherche": "Recherche",
+      "rail.ideation": "Idéation", "rail.solution": "Solution", "rail.resultats": "Résultats",
+      "hero.eyebrow": "Étude de cas ✦ Oplit ∗ Éditeur SaaS",
+      "hero.title": "De la refonte des filtres aux vues partagées",
+      "hero.context": "Refonte du système de filtres d'Oplit, logiciel B2B de gestion industrielle, et introduction des vues sauvegardées. Derrière un simple besoin de filtrage plus flexible, la recherche a révélé un enjeu plus large — permettre aux utilisateurs de retrouver leur contexte de travail complet en une seule action — pour un résultat de deux fois plus d'utilisation des filtres et un usage adopté par 20 clients.",
+      "hero.plateCap": "Oplit en atelier ◇ pilotage des ordres de fabrication au plus près de la production",
+      "meta.date": "Date", "meta.dateVal": "Mai – Juillet 2025",
+      "meta.role": "Rôle", "meta.roleVal": "Product designer, en binôme avec le PM",
+      "meta.team": "Équipe", "meta.teamVal": "Product manager, Dev Full Stack",
+      "meta.method": "Méthodologie",
+      "sec.contexte": "Contexte", "sec.probleme": "Problème", "sec.recherche": "Recherche",
+      "sec.ideation": "Idéation", "sec.solution": "Solution", "sec.resultats": "Résultats",
+      "contexte.title": "Un outil métier utilisé au quotidien",
+      "contexte.p1": "Oplit est un logiciel B2B de gestion industrielle. Les ordonnanceurs et responsables de production l'utilisent quotidiennement pour piloter les ordres de fabrication, suivre les retards et analyser la capacité.",
+      "contexte.p2": "Ce projet a été mené dans un cadre professionnel chez Oplit. Conçu de bout en bout, il a été développé puis déployé en production — et utilisé chaque jour par les utilisateurs de l'outil.",
+      "contexte.plateCap": "Sur le terrain ◇ Oplit affiché au poste de travail chez un client en tannerie",
+      "probleme.title": "Un système de filtrage peu flexible",
+      "probleme.p1": "Les filtres d'Oplit étaient trop rigides : un seul comportement possible et aucune adaptation au type de donnée manipulée. Les utilisateurs étaient bloqués. Quatre besoins sont remontés du terrain.",
+      "need1.title": "Voir quels filtres sont actifs", "need1.desc": "Pour ne plus confondre « pas de données » et « données masquées ».",
+      "need2.title": "Exclure des valeurs", "need2.desc": "2 clients ne veulent pas voir certaines opérations taggées.",
+      "need3.title": "Des filtres adaptés au type de donnée", "need3.desc": "On ne filtre pas une date comme un texte comme un nombre.",
+      "need4.title": "Sauvegarder une configuration", "need4.desc": "3 clients principaux demandent à ne plus tout reconfigurer à chaque session.",
+      "recherche.title": "L'insight qui a tout changé",
+      "recherche.p1": "En creusant le besoin de sauvegarde, on a compris que ce n'était pas juste « mémoriser les filtres ». Cinq clients principaux ont été explorés pour cadrer le besoin et confronter les hypothèses.",
+      "recherche.quote": "Il serait intéressant d'enregistrer une vue pour notre gestionnaire matière non précieuse (Marc), car il ne travaille qu'en regardant les OFs concernés par une demande de matière.",
+      "recherche.quoteCite": "∗ Ordonnanceur · Client en joaillerie",
+      "recherche.verbatimsLabel": "∗ Ce qu'on a entendu sur le terrain",
+      "recherche.v1": "« Nous filtrons aussi les numéros d'OFs pour observer plusieurs OFs en même temps selon une liste. Et pour la gestion de l'or, nous filtrons par nom de client. »",
+      "recherche.v1tag": "Filtrer par liste & par client",
+      "recherche.v2": "« Je voudrais des filtres spécifiques par secteur — voir le découpage, le tournage… Je veux pouvoir faire des filtres différents sur chaque poste de charge. »",
+      "recherche.v2tag": "Filtres par poste de charge",
+      "recherche.rkey1": "◇ Demande exprimée", "recherche.rval1": "« Sauvegarder mes filtres »",
+      "recherche.rkey2": "∗ Besoin réel", "recherche.rval2": "« Retrouver tout mon contexte de travail »",
+      "recherche.rkey3": "✦ Insight", "recherche.rval3": "Retrouver leur contexte complet : filtres, tri, affichage, secteurs.",
+      "ideation.title": "S'inspirer d'autres contextes pour résoudre un problème métier",
+      "ideation.p1": "Trois produits ont nourri la réflexion. Pour chacun, ce qu'on a observé et ce qu'on en a retenu pour Oplit.",
+      "ideation.colTool": "Outil", "ideation.colObs": "Ce qu'on a observé", "ideation.colTake": "Ce qu'on en a retenu",
+      "ideation.obs1": "Filtres visuels organisés par type de champ, avec des opérateurs adaptés.",
+      "ideation.take1": "La logique de typage des données ", "ideation.take1b": "Filtres flexibles",
+      "ideation.obs2": "Vues multiples sur une même base, nommées et sauvegardées.",
+      "ideation.take2": "Le concept de vue nommée et persistante ", "ideation.take2b": "Vues sauvegardées",
+      "ideation.obs3": "Labels clairs, hiérarchie visuelle épurée pour un usage intensif.",
+      "ideation.take3": "La sobriété visuelle dans un contexte dense ", "ideation.take3b": "UI industrielle",
+      "ideation.p2": "Ces principes ont nourri les premières pistes : d'abord modéliser le typage des champs, puis explorer la barre de filtres et le système de vues.",
+      "ideation.plateCap1": "Typage des champs ◇ chaque donnée associée à un type de filtre et un statut",
+      "ideation.plateCap2": "Pistes d'interface ◇ barre de filtres, sélecteur et gestion des vues sauvegardées",
+      "solution.title": "Des filtres sauvegardés dans des vues",
+      "solution.p1": "Deux chantiers complémentaires : rendre les filtres adaptés et lisibles, puis les capturer dans des vues réutilisables.",
+      "solution.showcaseEyebrow": "Écran clé", "solution.showcaseTab": "Oplit ∗ Ordonnancement",
+      "solution.showcaseCap": "Vue « En-cours » ◇ filtre par tag ouvert, secteurs et tri appliqués sur le plan d'ordonnancement",
+      "solution.tagFilters": "◆ Côté filtres", "solution.headFilters": "Adaptés et lisibles",
+      "solution.f1": "Champs typés — texte, nombre, date, tag — avec composants et opérateurs adaptés.",
+      "solution.f2": "Filtres actifs toujours visibles.",
+      "solution.f3": "Empty state clair pour distinguer « vide » de « masqué ».",
+      "solution.vcap1": "Démonstration ◇ Filtres adaptés au type de donnée",
+      "solution.tagViews": "◆ Côté vues", "solution.headViews": "Capturer le contexte",
+      "solution.v1": "Créer, nommer et sauvegarder des vues personnalisées capturant l'état complet de l'écran.",
+      "solution.v2": "Vue « En-cours » disponible par défaut.",
+      "solution.v3": "Système de droits et de permissions pour les admins.",
+      "solution.vcap2": "Démonstration ◇ Création et réutilisation d'une vue",
+      "resultats.title": "Un nouvel usage adopté",
+      "resultats.kpi1": "plus d'utilisation sur les filtres",
+      "resultats.kpi2": "clients ont créé au moins 10 vues",
+      "resultats.kpi3": "message de support sur la compréhension du parcours des vues",
+      "closer.all": "← Tous les projets"
+    },
+    en: {
+      "rail.toc": "Contents",
+      "rail.contexte": "Context", "rail.probleme": "Problem", "rail.recherche": "Research",
+      "rail.ideation": "Ideation", "rail.solution": "Solution", "rail.resultats": "Results",
+      "hero.eyebrow": "Case study ✦ Oplit ∗ SaaS editor",
+      "hero.title": "From redesigning filters to shared views",
+      "hero.context": "A redesign of the filtering system in Oplit, a B2B industrial-management software, and the introduction of saved views. Behind a simple need for more flexible filtering, the research revealed a broader challenge — letting users restore their entire work context in a single action — resulting in twice as much filter usage and a feature adopted by 20 clients.",
+      "hero.plateCap": "Oplit on the shop floor ◇ steering manufacturing orders right next to production",
+      "meta.date": "Date", "meta.dateVal": "May – July 2025",
+      "meta.role": "Role", "meta.roleVal": "End-to-end product designer, paired with the PM",
+      "meta.team": "Team", "meta.teamVal": "Product manager, Full-Stack developer",
+      "meta.method": "Methodology",
+      "sec.contexte": "Context", "sec.probleme": "Problem", "sec.recherche": "Research",
+      "sec.ideation": "Ideation", "sec.solution": "Solution", "sec.resultats": "Results",
+      "contexte.title": "A business tool used every day",
+      "contexte.p1": "Oplit is a B2B industrial-management software. Schedulers and production managers use it daily to steer manufacturing orders, track delays and analyze capacity.",
+      "contexte.p2": "This project was carried out in a professional setting at Oplit. Designed end to end, it was developed and then shipped to production — and used every day by the tool's users.",
+      "contexte.plateCap": "In the field ◇ Oplit shown at the workstation of a tannery client",
+      "probleme.title": "A filtering system that wasn't flexible",
+      "probleme.p1": "Oplit's filters were too rigid: a single possible behavior and no adaptation to the type of data being handled. Users were stuck. Four needs surfaced from the field.",
+      "need1.title": "See which filters are active", "need1.desc": "To stop confusing “no data” with “hidden data”.",
+      "need2.title": "Exclude values", "need2.desc": "2 clients don't want to see certain tagged operations.",
+      "need3.title": "Filters adapted to the data type", "need3.desc": "You don't filter a date the way you filter text or a number.",
+      "need4.title": "Save a configuration", "need4.desc": "3 key clients ask to stop reconfiguring everything each session.",
+      "recherche.title": "The insight that changed everything",
+      "recherche.p1": "Digging into the need to save, we realized it wasn't just about “remembering the filters.” Five key clients were explored to frame the need and test the hypotheses.",
+      "recherche.quote": "It would be useful to save a view for our non-precious materials manager (Marc), since he only works by looking at the manufacturing orders tied to a material request.",
+      "recherche.quoteCite": "∗ Scheduler · Jewelry client",
+      "recherche.verbatimsLabel": "∗ What we heard in the field",
+      "recherche.v1": "“We also filter manufacturing-order numbers to watch several orders at once from a list. And for gold management, we filter by client name.”",
+      "recherche.v1tag": "Filter by list & by client",
+      "recherche.v2": "“I'd like filters specific to each sector — see the cutting, the turning… I want to be able to apply different filters on each workstation.”",
+      "recherche.v2tag": "Filters per workstation",
+      "recherche.rkey1": "◇ Stated request", "recherche.rval1": "“Save my filters”",
+      "recherche.rkey2": "∗ Real need", "recherche.rval2": "“Restore my entire work context”",
+      "recherche.rkey3": "✦ Insight", "recherche.rval3": "Restore their full context: filters, sorting, display, sectors.",
+      "ideation.title": "Drawing on other contexts to solve a business problem",
+      "ideation.p1": "Three products informed the thinking. For each, what we observed and what we kept for Oplit.",
+      "ideation.colTool": "Tool", "ideation.colObs": "What we observed", "ideation.colTake": "What we kept",
+      "ideation.obs1": "Visual filters organized by field type, with adapted operators.",
+      "ideation.take1": "The data-typing logic ", "ideation.take1b": "Flexible filters",
+      "ideation.obs2": "Multiple views on the same base, named and saved.",
+      "ideation.take2": "The notion of a named, persistent view ", "ideation.take2b": "Saved views",
+      "ideation.obs3": "Clear labels, a clean visual hierarchy for intensive use.",
+      "ideation.take3": "Visual restraint in a dense context ", "ideation.take3b": "Industrial UI",
+      "ideation.p2": "These principles fed the first directions: first model the field typing, then explore the filter bar and the views system.",
+      "ideation.plateCap1": "Field typing ◇ each piece of data tied to a filter type and a status",
+      "ideation.plateCap2": "Interface directions ◇ filter bar, selector and management of saved views",
+      "solution.title": "Filters saved into views",
+      "solution.p1": "Two complementary workstreams: make the filters adapted and legible, then capture them in reusable views.",
+      "solution.showcaseEyebrow": "Key screen", "solution.showcaseTab": "Oplit ∗ Scheduling",
+      "solution.showcaseCap": "“In-progress” view ◇ tag filter open, sectors and sorting applied to the scheduling board",
+      "solution.tagFilters": "◆ Filters side", "solution.headFilters": "Adapted and legible",
+      "solution.f1": "Typed fields — text, number, date, tag — with adapted components and operators.",
+      "solution.f2": "Active filters always visible.",
+      "solution.f3": "Clear empty state to tell “empty” from “hidden”.",
+      "solution.vcap1": "Demo ◇ Filters adapted to the data type",
+      "solution.tagViews": "◆ Views side", "solution.headViews": "Capture the context",
+      "solution.v1": "Create, name and save custom views that capture the screen's full state.",
+      "solution.v2": "“In-progress” view available by default.",
+      "solution.v3": "Rights and permissions system for admins.",
+      "solution.vcap2": "Demo ◇ Creating and reusing a view",
+      "resultats.title": "A new behavior adopted",
+      "resultats.kpi1": "more usage on the filters",
+      "resultats.kpi2": "clients created at least 10 views",
+      "resultats.kpi3": "support messages about understanding the views flow",
+      "closer.all": "← All projects"
+    }
+  };
+
+  function applyLang(lang) {
+    var dict = I18N[lang] || I18N.fr;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] != null) el.textContent = dict[key];
+    });
+    document.documentElement.lang = lang;
+    if (DOC_TITLE[lang]) document.title = DOC_TITLE[lang];
+    document.querySelectorAll('.lang-switch button').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.lang-switch button');
+    if (b) { applyLang(b.getAttribute('data-lang')); }
+  });
+
+  (function () {
+    var saved = 'fr';
+    try { var s = localStorage.getItem(LANG_KEY); if (s === 'fr' || s === 'en') saved = s; } catch (e) {}
+    applyLang(saved);
+  })();
+
+  var OFFSET = 32;
+  function scroller() { return document.scrollingElement || document.documentElement; }
+
+  function goTo(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var sc = scroller();
+    var y = el.getBoundingClientRect().top + sc.scrollTop - OFFSET;
+    sc.scrollTo({ top: y, behavior: 'smooth' });
+  }
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-anchor]');
+    if (a) { e.preventDefault(); goTo(a.getAttribute('data-anchor')); }
+  });
+
+  /* ---- Scrollspy ---- */
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#railnav a'));
+    var map = {};
+    links.forEach(function (l) { map[l.getAttribute('data-anchor')] = l; });
+    var ids = Object.keys(map);
+    var sections = ids.map(function (id) { return document.getElementById(id); });
+
+    function setActive(id) {
+      links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('data-anchor') === id); });
+    }
+
+    function onScroll() {
+      var best = ids[0], bestTop = -Infinity;
+      for (var j = 0; j < sections.length; j++) {
+        if (!sections[j]) continue;
+        var top = sections[j].getBoundingClientRect().top - OFFSET - 130;
+        if (top <= 0 && top > bestTop) { bestTop = top; best = ids[j]; }
+      }
+      setActive(best);
+    }
+
+    setActive(ids[0]);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  /* ---- Safety net for entrance animation ---- */
+  setTimeout(function () {
+    document.querySelectorAll('.fade-up').forEach(function (el) {
+      (el.getAnimations ? el.getAnimations() : []).forEach(function (a) { try { a.finish(); } catch (e) {} });
+    });
+  }, 900);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Limites Numériques — Camille Adam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --color-canvas:          #FFF6BE;
+  --color-canvas-soft:     #FFFADC;
+  --color-surface-card:    #F5EDA0;
+  --color-surface-dark:    #1C1A14;
+  --color-surface-dark-el: #272520;
+  --color-ink:             #1C1A14;
+  --color-body:            #3D3A32;
+  --color-muted:           #6E6A60;
+  --color-muted-soft:      #9E9A90;
+  --color-hairline:        #E8E080;
+  --color-hairline-soft:   #F0ECA0;
+  --color-on-dark:         #FFF6BE;
+  --color-on-dark-soft:    #9E9A90;
+
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --space-xs:  8px;
+  --space-sm:  12px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-xxl: 48px;
+  --space-section: 96px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ---------- Fade in ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .fade-up-1 { animation-delay: 0.05s; }
+  .fade-up-2 { animation-delay: 0.15s; }
+  .fade-up-3 { animation-delay: 0.25s; }
+  .fade-up-4 { animation-delay: 0.35s; }
+}
+
+/* ============================================
+   LAYOUT — sticky rail + content
+   ============================================ */
+.shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: var(--space-section);
+  align-items: start;
+}
+
+.rail {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xxl) 0;
+}
+.rail-sig {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--color-ink);
+  letter-spacing: -0.3px;
+  margin-bottom: var(--space-xl);
+}
+.rail-sig span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+
+.pagehead { position: fixed; bottom: var(--space-lg); left: var(--space-xxl); z-index: 50; }
+.lang-switch { display: inline-flex; align-items: center; gap: 6px; }
+.lang-switch button {
+  font-family: var(--font-body);
+  font-size: 12px; font-weight: 500; letter-spacing: 0.04em;
+  color: var(--color-muted-soft);
+  background: none; border: none; padding: 2px; cursor: pointer;
+  transition: color 0.15s ease;
+}
+.lang-switch button:hover { color: var(--color-muted); }
+.lang-switch button.active { color: var(--color-ink); }
+.lang-sep { color: var(--color-muted-soft); font-size: 11px; }
+
+.rail-label {
+  font-family: var(--font-body);
+  font-size: 10px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--color-muted-soft);
+  margin-bottom: var(--space-md);
+}
+.rail-nav { display: flex; flex-direction: column; list-style: none; }
+.rail-nav a {
+  display: grid; grid-template-columns: 22px 1fr; align-items: baseline;
+  gap: var(--space-xs); padding: 9px 0;
+  font-family: var(--font-body); font-size: 14px; font-weight: 400;
+  color: var(--color-muted); transition: color 0.15s ease;
+  cursor: pointer; position: relative;
+}
+.rail-nav a .n {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+  color: var(--color-muted-soft); transition: color 0.15s ease;
+}
+.rail-nav a:hover { color: var(--color-ink); }
+.rail-nav a.active { color: var(--color-ink); font-weight: 500; }
+.rail-nav a.active .n { color: var(--color-ink); }
+.rail-nav a.active::before {
+  content: '✦'; position: absolute; left: -20px; top: 9px;
+  font-size: 11px; color: var(--color-ink);
+}
+.rail-foot { margin-top: auto; padding-top: var(--space-lg); border-top: 1px solid var(--color-hairline); }
+.rail-contact {
+  font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  color: var(--color-muted); display: inline-flex; align-items: center; gap: 6px;
+  transition: color 0.15s ease;
+}
+.rail-contact:hover { color: var(--color-ink); }
+
+.content { max-width: 720px; padding: var(--space-section) 0 var(--space-xxl); }
+
+/* ---------- Hero ---------- */
+.eyebrow {
+  font-family: var(--font-body); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted);
+  margin-bottom: var(--space-lg);
+}
+.hero-title {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(40px, 5vw, 60px); font-weight: 400; line-height: 1.05;
+  letter-spacing: -1.2px; color: var(--color-ink); margin-bottom: var(--space-xl);
+}
+.hero-context {
+  font-family: var(--font-body); font-size: 18px; font-weight: 400;
+  color: var(--color-body); line-height: 1.6; margin-bottom: var(--space-xxl);
+}
+
+.meta {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);
+}
+.meta-cell { padding: var(--space-lg) var(--space-lg) var(--space-lg) 0; }
+.meta-cell + .meta-cell { padding-left: var(--space-lg); border-left: 1px solid var(--color-hairline); }
+.meta-key {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted-soft);
+  margin-bottom: var(--space-xs);
+}
+.meta-val { font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--color-ink); line-height: 1.45; }
+
+.method { border-bottom: 1px solid var(--color-hairline); padding: var(--space-lg) 0; margin-bottom: var(--space-section); }
+.method .meta-key { margin-bottom: var(--space-sm); }
+.method-flow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) 10px; }
+.method-step {
+  font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-ink);
+  background: var(--color-surface-card); border: 1px solid var(--color-hairline);
+  padding: 5px 12px; border-radius: 999px; white-space: nowrap;
+}
+.method-arrow { color: var(--color-muted-soft); font-size: 13px; }
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section { padding-top: var(--space-section); scroll-margin-top: var(--space-xl); }
+.section:first-of-type { padding-top: 0; }
+
+.sec-eyebrow {
+  font-family: var(--font-body); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted);
+  display: flex; align-items: center; gap: 10px; margin-bottom: var(--space-md);
+}
+.sec-eyebrow .num, .sec-eyebrow .sep { color: var(--color-muted-soft); }
+
+.sec-title {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(28px, 3.4vw, 40px); font-weight: 400; line-height: 1.1;
+  letter-spacing: -0.6px; color: var(--color-ink); margin-bottom: var(--space-lg);
+}
+
+.prose { font-family: var(--font-body); font-size: 17px; font-weight: 400; color: var(--color-body); line-height: 1.65; }
+.prose + .prose { margin-top: var(--space-md); }
+.prose a { border-bottom: 1px solid var(--color-hairline); }
+.prose a:hover { color: var(--color-ink); }
+
+/* ---------- Image plate ---------- */
+.plate { margin-top: var(--space-xl); }
+.plate img {
+  display: block; width: 100%; height: auto;
+  border-radius: var(--radius-xl); border: 1px solid var(--color-hairline);
+}
+.plate-cap {
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.04em; color: var(--color-muted); margin-top: var(--space-sm);
+}
+.plate-empty { margin-top: var(--space-xl); }
+.plate-empty .ph {
+  aspect-ratio: 16 / 10; border-radius: var(--radius-xl);
+  border: 1.5px dashed rgba(110,106,96,0.30); background: var(--color-canvas-soft);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-sm); text-align: center; padding: var(--space-lg);
+}
+.plate-empty .ph-glyph { font-family: var(--font-display); font-style: italic; font-size: 38px; color: var(--color-muted-soft); line-height: 1; }
+.plate-empty .ph-label { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted-soft); }
+.sol-card .plate-empty { margin-top: var(--space-lg); }
+.sol-card .plate-empty .ph { background: var(--color-canvas); aspect-ratio: 16 / 9; }
+
+/* ---------- Stat grid (context) ---------- */
+.stats {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg) var(--space-xl); margin-top: var(--space-xl);
+}
+.stat { border-top: 1px solid var(--color-hairline); padding-top: var(--space-sm); }
+.stat-num {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(34px, 4.4vw, 48px); font-weight: 400; line-height: 1;
+  letter-spacing: -1.5px; color: var(--color-ink); margin-bottom: var(--space-xs);
+}
+.stat-label { font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--color-muted); line-height: 1.45; }
+
+/* ---------- Insight callout ---------- */
+.insight {
+  margin-top: var(--space-xl); background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline); border-radius: var(--radius-xl);
+  padding: var(--space-xl) var(--space-xxl);
+}
+.insight-label {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted);
+  display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-sm);
+}
+.insight-text {
+  font-family: var(--font-display); font-style: italic; font-size: 24px; font-weight: 400;
+  line-height: 1.35; letter-spacing: -0.4px; color: var(--color-ink);
+}
+
+/* ---------- Objectives / duo cards ---------- */
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-top: var(--space-xl); }
+.duo-card {
+  border-radius: var(--radius-xl); border: 1px solid var(--color-hairline);
+  background: var(--color-canvas-soft); padding: var(--space-xl);
+}
+.duo-key {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted);
+  display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-sm);
+}
+.duo-head { font-family: var(--font-display); font-style: italic; font-size: 22px; letter-spacing: -0.3px; color: var(--color-ink); margin-bottom: var(--space-sm); }
+.duo-body { font-family: var(--font-body); font-size: 14px; color: var(--color-body); line-height: 1.55; }
+
+/* ---------- Process steps (needs) + role card ---------- */
+.proc { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-xl); margin-top: var(--space-xl); align-items: start; }
+.needs { display: flex; flex-direction: column; gap: var(--space-md); }
+.need {
+  display: grid; grid-template-columns: 30px 1fr; gap: var(--space-md); align-items: start;
+  background: var(--color-canvas-soft); border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg); padding: var(--space-lg);
+}
+.need-num { font-family: var(--font-display); font-style: italic; font-size: 22px; color: var(--color-ink); line-height: 1; opacity: 0.55; }
+.need-title { font-family: var(--font-body); font-size: 16px; font-weight: 500; color: var(--color-ink); margin-bottom: 4px; }
+.need-desc { font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--color-muted); line-height: 1.55; }
+.role-card {
+  background: var(--color-surface-card); border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-xl); padding: var(--space-xl); position: sticky; top: var(--space-xl);
+}
+.role-key {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted);
+  display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-md);
+}
+.role-body { font-family: var(--font-body); font-size: 15px; color: var(--color-body); line-height: 1.6; }
+
+/* ---------- Chips ---------- */
+.chips-label {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted);
+  display: flex; align-items: center; gap: 8px; margin: var(--space-xl) 0 var(--space-md);
+}
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.chip {
+  font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-ink);
+  background: var(--color-surface-card); border: 1px solid var(--color-hairline);
+  padding: 6px 13px; border-radius: 999px;
+}
+.chip.is-soft { background: var(--color-canvas-soft); color: var(--color-muted); }
+
+/* ---------- Devices row ---------- */
+.devices { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-top: var(--space-md); }
+.device {
+  border: 1px solid var(--color-hairline); border-radius: var(--radius-lg);
+  background: var(--color-canvas-soft); padding: var(--space-lg);
+}
+.device-glyph { font-family: var(--font-display); font-style: italic; font-size: 22px; color: var(--color-muted-soft); line-height: 1; margin-bottom: var(--space-sm); }
+.device-name { font-family: var(--font-body); font-size: 15px; font-weight: 500; color: var(--color-ink); }
+.device-os { font-family: var(--font-body); font-size: 12px; color: var(--color-muted); margin-top: 2px; }
+
+/* ---------- Learnings / enseignements ---------- */
+.learnings { display: flex; flex-direction: column; gap: var(--space-xl); margin-top: var(--space-xl); }
+.learn { display: grid; grid-template-columns: 26px 1fr; gap: var(--space-md); align-items: start; }
+.learn-glyph { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-ink); opacity: 0.55; line-height: 1.5; }
+.learn-title { font-family: var(--font-display); font-style: italic; font-size: clamp(20px, 2.4vw, 24px); line-height: 1.3; letter-spacing: -0.4px; color: var(--color-ink); margin-bottom: var(--space-xs); }
+.learn-body { font-family: var(--font-body); font-size: 16px; color: var(--color-muted); line-height: 1.6; }
+
+/* ---------- Solution / feature cards ---------- */
+.sol-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-lg); margin-top: var(--space-xl); }
+.sol-card { background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-xl); padding: var(--space-xl); }
+.sol-tag {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted);
+  display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-md);
+}
+.sol-head { font-family: var(--font-display); font-style: italic; font-size: 22px; color: var(--color-ink); margin-bottom: var(--space-md); letter-spacing: -0.3px; }
+.sol-desc { font-family: var(--font-body); font-size: 15px; color: var(--color-body); line-height: 1.6; margin-bottom: var(--space-md); }
+.sol-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); }
+.sol-list li {
+  font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--color-body);
+  line-height: 1.5; display: grid; grid-template-columns: 16px 1fr; gap: 6px;
+}
+.sol-list li::before { content: '◆'; color: var(--color-muted-soft); font-size: 9px; line-height: 1.6; }
+
+/* ---------- Share cards (dark band) ---------- */
+.share {
+  margin-top: var(--space-xl); background: var(--color-surface-dark);
+  border-radius: 24px; padding: var(--space-xxl);
+}
+.share-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-lg); }
+.share-card { display: flex; flex-direction: column; gap: var(--space-sm); }
+.share-tag {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-on-dark);
+  display: flex; align-items: center; gap: 8px;
+}
+.share-head { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-on-dark); letter-spacing: -0.3px; }
+.share-body { font-family: var(--font-body); font-size: 14px; color: var(--color-on-dark-soft); line-height: 1.55; }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 920px) {
+  .shell { grid-template-columns: 1fr; gap: 0; padding: 0 var(--space-lg); }
+  .rail {
+    position: static; height: auto; flex-direction: row; flex-wrap: wrap;
+    align-items: center; gap: var(--space-md) var(--space-lg);
+    padding: var(--space-lg) 0; border-bottom: 1px solid var(--color-hairline);
+  }
+  .rail-sig { margin-bottom: 0; }
+  .pagehead { bottom: var(--space-md); left: var(--space-lg); }
+  .rail-label { display: none; }
+  .rail-nav { flex-direction: row; flex-wrap: wrap; gap: 0 var(--space-md); width: 100%; }
+  .rail-nav a { padding: 6px 0; }
+  .rail-nav a.active::before { display: none; }
+  .rail-foot { display: none; }
+  .content { padding-top: var(--space-xxl); }
+  .meta { grid-template-columns: 1fr; }
+  .meta-cell + .meta-cell { border-left: none; border-top: 1px solid var(--color-hairline); padding-left: 0; }
+  .stats { grid-template-columns: 1fr; }
+  .duo { grid-template-columns: 1fr; }
+  .proc { grid-template-columns: 1fr; }
+  .role-card { position: static; }
+  .devices { grid-template-columns: 1fr; }
+  .share-grid { grid-template-columns: 1fr; gap: var(--space-xl); }
+  .share { padding: var(--space-xl) var(--space-lg); }
+}
+
+.closer {
+  grid-column: 1 / -1; padding-bottom: var(--space-xxl); padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-hairline);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg); flex-wrap: wrap;
+}
+.closer-name { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--color-ink); }
+.closer-name span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+.closer-links { display: flex; gap: var(--space-lg); flex-wrap: wrap; }
+.closer-links a { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-muted); transition: color 0.15s ease; }
+.closer-links a:hover { color: var(--color-ink); }
+
+</style>
+</head>
+<body>
+
+<div class="pagehead">
+  <div class="lang-switch" role="group" aria-label="Langue / Language">
+    <button type="button" data-lang="fr" class="active" aria-pressed="true">FR</button>
+    <span class="lang-sep" aria-hidden="true">·</span>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- ============ RAIL ============ -->
+  <aside class="rail">
+    <a href="index.html" class="rail-sig">Camille Adam<span>✦</span></a>
+
+    <div class="rail-label" data-i18n="rail.toc">Sommaire</div>
+    <ul class="rail-nav" id="railnav">
+      <li><a data-anchor="contexte"><span class="n">01</span><span data-i18n="rail.contexte">Contexte</span></a></li>
+      <li><a data-anchor="processus"><span class="n">02</span><span data-i18n="rail.processus">Processus</span></a></li>
+      <li><a data-anchor="recolte"><span class="n">03</span><span data-i18n="rail.recolte">Récolte</span></a></li>
+      <li><a data-anchor="ideation"><span class="n">04</span><span data-i18n="rail.ideation">Idéation</span></a></li>
+      <li><a data-anchor="partage"><span class="n">05</span><span data-i18n="rail.partage">Partage</span></a></li>
+    </ul>
+
+    <div class="rail-foot">
+      <a href="mailto:c.adam.design@gmail.com" class="rail-contact">c.adam.design@gmail.com ↗</a>
+    </div>
+  </aside>
+
+  <!-- ============ CONTENT ============ -->
+  <div class="content" data-screen-label="Étude de cas — Limites Numériques">
+
+    <!-- HERO -->
+    <div class="eyebrow fade-up fade-up-1" data-i18n="hero.eyebrow">Étude de cas ✦ Praticable ∗ Recherche & design</div>
+    <h1 class="hero-title fade-up fade-up-2" data-i18n="hero.title">Imaginer des paramètres éco-conçus</h1>
+    <p class="hero-context fade-up fade-up-3" data-i18n="hero.context">
+      Limites Numériques est un projet de recherche à la croisée du design et de l'informatique
+      sur l'empreinte environnementale du numérique. En binôme chercheurs / designers, nous avons
+      cherché à imaginer des paramètres qui aident réellement à consommer moins.
+    </p>
+
+    <figure class="plate fade-up fade-up-4" style="margin-bottom: var(--space-xxl);">
+      <img src="img/limites-num-hero.png" alt="Maquettes de paramètres éco-conçus présentées sur une série de smartphones inclinés">
+      <figcaption class="plate-cap" data-i18n="hero.cap">Maquettes de paramètres écologiques — un langage visuel commun décliné sur mobile.</figcaption>
+    </figure>
+
+    <div class="meta fade-up fade-up-4">
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.role">Rôle</div>
+        <div class="meta-val" data-i18n="meta.roleVal">Product Designer · gestion de projet</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.team">Équipe</div>
+        <div class="meta-val" data-i18n="meta.teamVal">Praticable · chercheurs design & informatique</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.type">Terrain</div>
+        <div class="meta-val" data-i18n="meta.typeVal">Mobile · Web · Recherche</div>
+      </div>
+    </div>
+
+    <div class="method fade-up fade-up-4">
+      <div class="meta-key" data-i18n="meta.scope">Périmètre</div>
+      <div class="method-flow">
+        <span class="method-step" data-i18n="scope.s1">Récolte</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s2">Analyse</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s3">Idéation</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s4">Maquettes</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s5">Diffusion</span>
+      </div>
+    </div>
+
+    <!-- 01 — CONTEXTE -->
+    <section class="section" id="contexte">
+      <div class="sec-eyebrow"><span class="num">01</span><span class="sep">∗</span> <span data-i18n="sec.contexte">Contexte</span></div>
+      <h2 class="sec-title" data-i18n="contexte.title">Des paramètres pour moins consommer</h2>
+      <p class="prose" data-i18n="contexte.p1">
+        Limites Numériques est un projet de recherche mené entre le studio et coopérative de design
+        <a href="https://limitesnumeriques.fr" target="_blank" rel="noopener">Praticable</a> et des
+        chercheurs-chercheuses en design et en informatique — Thomas Thibault, Nolwen Maudet et
+        Aurélien Tabard.
+      </p>
+      <p class="prose" data-i18n="contexte.p2">
+        Le point de départ : les principales causes de pollution numérique sont la fabrication des
+        terminaux et l'obsolescence, matérielle comme logicielle. Fabriquer, c'est déjà consommer —
+        il faut 500 fois le poids d'un smartphone en matière première pour le produire.
+      </p>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">1/3</div>
+          <div class="stat-label" data-i18n="stat1">des émissions de CO₂ sont causées par les terminaux.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">53,6 Mt</div>
+          <div class="stat-label" data-i18n="stat2">de déchets en 2019, dont seulement 17 % sont recyclés.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">37 mois</div>
+          <div class="stat-label" data-i18n="stat3">la durée de vie moyenne d'un smartphone en France.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">20 %</div>
+          <div class="stat-label" data-i18n="stat4">des renouvellements sont dus à des problèmes logiciels.</div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <div class="insight-label"><span>◆</span> <span data-i18n="pb.label">Problématique</span></div>
+        <p class="insight-text" data-i18n="pb.text">Comment les applications nous permettent de moduler — ou non — les impacts environnementaux de nos usages numériques ?</p>
+      </div>
+
+      <div class="duo">
+        <div class="duo-card">
+          <div class="duo-key"><span>◎</span> <span data-i18n="obj.label">Objectif 01</span></div>
+          <div class="duo-head" data-i18n="obj1.head">Identifier les paramètres</div>
+          <div class="duo-body" data-i18n="obj1.body">Explorer et identifier, de manière qualitative, les formes, fonctions et paramètres présents — ou absents — dans nos applications.</div>
+        </div>
+        <div class="duo-card">
+          <div class="duo-key"><span>◎</span> <span data-i18n="obj.label2">Objectif 02</span></div>
+          <div class="duo-head" data-i18n="obj2.head">Réduire l'empreinte écologique</div>
+          <div class="duo-body" data-i18n="obj2.body">Cartographier cet état de l'art pour en dégager des pistes de conception qui réduisent, directement ou indirectement, l'empreinte de nos usages.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 — PROCESSUS -->
+    <section class="section" id="processus">
+      <div class="sec-eyebrow"><span class="num">02</span><span class="sep">∗</span> <span data-i18n="sec.processus">Processus</span></div>
+      <h2 class="sec-title" data-i18n="proc.title">Pour y parvenir</h2>
+      <p class="prose" data-i18n="proc.p1">
+        Cinq étapes, de la collecte de données jusqu'à la diffusion publique des résultats.
+      </p>
+
+      <div class="proc">
+        <div class="needs">
+          <div class="need">
+            <div class="need-num">01</div>
+            <div>
+              <div class="need-title" data-i18n="pr1.title">Récolte & analyse de données</div>
+              <div class="need-desc" data-i18n="pr1.desc">Classifier et identifier les catégories selon les fonctions et les impacts recherchés.</div>
+            </div>
+          </div>
+          <div class="need">
+            <div class="need-num">02</div>
+            <div>
+              <div class="need-title" data-i18n="pr2.title">Veille</div>
+              <div class="need-desc" data-i18n="pr2.desc">Voir ce qui existe en matière de paramètres, ailleurs que dans le smartphone.</div>
+            </div>
+          </div>
+          <div class="need">
+            <div class="need-num">03</div>
+            <div>
+              <div class="need-title" data-i18n="pr3.title">Idéation</div>
+              <div class="need-desc" data-i18n="pr3.desc">Déduire et imaginer des axes et une stratégie de conception pour les concepteurs.</div>
+            </div>
+          </div>
+          <div class="need">
+            <div class="need-num">04</div>
+            <div>
+              <div class="need-title" data-i18n="pr4.title">Prototypage</div>
+              <div class="need-desc" data-i18n="pr4.desc">Produire des idées sous forme d'esquisses, de wireframes ou de maquettes pour illustrer les pistes.</div>
+            </div>
+          </div>
+          <div class="need">
+            <div class="need-num">05</div>
+            <div>
+              <div class="need-title" data-i18n="pr5.title">Diffusion</div>
+              <div class="need-desc" data-i18n="pr5.desc">Publier et rendre publics les données et apprentissages du travail réalisé.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="role-card">
+          <div class="role-key"><span>✦</span> <span data-i18n="role.label">Mon rôle</span></div>
+          <p class="role-body" data-i18n="role.body">
+            J'ai collaboré avec l'équipe de Limites Numériques, et particulièrement avec Thomas.
+            Ensemble, nous avons défini le processus à suivre. J'étais en charge de la gestion du
+            projet, de la récolte de données jusqu'à la conception des maquettes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 — RÉCOLTE -->
+    <section class="section" id="recolte">
+      <div class="sec-eyebrow"><span class="num">03</span><span class="sep">∗</span> <span data-i18n="sec.recolte">Récolte & analyse</span></div>
+      <h2 class="sec-title" data-i18n="rec.title">Identifier les paramètres qui réduisent ou non l'empreinte écologique</h2>
+      <p class="prose" data-i18n="rec.p1">
+        L'objectif : enquêter sur différents stores — Play Store, Apple Store, mais aussi des stores
+        libres comme F-Droid — et documenter précisément ces fonctions et paramètres.
+      </p>
+
+      <div class="chips-label"><span>⚙</span> <span data-i18n="rec.paramsLabel">Cadre de l'enquête</span></div>
+      <div class="chips">
+        <span class="chip">Récolte qualitative</span>
+        <span class="chip">Mobile</span>
+        <span class="chip">3 appareils</span>
+        <span class="chip">10 applications</span>
+        <span class="chip">3 OS</span>
+        <span class="chip">Airtable</span>
+      </div>
+
+      <div class="chips-label"><span>◆</span> <span data-i18n="rec.devicesLabel">OS & devices étudiés</span></div>
+      <div class="devices">
+        <div class="device">
+          <div class="device-glyph">▢</div>
+          <div class="device-name">Fairphone 3+</div>
+          <div class="device-os">/e/OS v. 0010 / 0011</div>
+        </div>
+        <div class="device">
+          <div class="device-glyph">▢</div>
+          <div class="device-name">iPhone SE (2ᵉ gen)</div>
+          <div class="device-os">iOS 15.3.1</div>
+        </div>
+        <div class="device">
+          <div class="device-glyph">▭</div>
+          <div class="device-name">Samsung Galaxy Tab S3</div>
+          <div class="device-os">Android 9</div>
+        </div>
+      </div>
+
+      <div class="chips-label"><span>◇</span> <span data-i18n="rec.appsLabel">Applications & environnements</span></div>
+      <div class="chips">
+        <span class="chip is-soft">iOS</span>
+        <span class="chip is-soft">/e/OS</span>
+        <span class="chip is-soft">Android</span>
+        <span class="chip is-soft">NewPipe</span>
+        <span class="chip is-soft">YouTube</span>
+        <span class="chip is-soft">YouTube Kids</span>
+        <span class="chip is-soft">Mastodon</span>
+        <span class="chip is-soft">Twitter</span>
+        <span class="chip is-soft">TikTok</span>
+        <span class="chip is-soft">Google Drive</span>
+        <span class="chip is-soft">NextCloud</span>
+        <span class="chip is-soft">Cozy.io</span>
+      </div>
+
+      <div class="chips-label"><span>?</span> <span data-i18n="rec.findLabel">Nos enseignements</span></div>
+      <div class="learnings">
+        <div class="learn">
+          <div class="learn-glyph">01</div>
+          <div>
+            <div class="learn-title" data-i18n="find1.title">Quand des paramètres écologiques existent, ils sont présentés comme une option dégradée.</div>
+            <div class="learn-body" data-i18n="find1.body">Sur le site de la COP28, la « version bas carbone » est présentée comme une expérience moindre — un choix par défaut vers le plus intensif, jamais valorisé.</div>
+          </div>
+        </div>
+        <div class="learn">
+          <div class="learn-glyph">02</div>
+          <div>
+            <div class="learn-title" data-i18n="find2.title">Les paramètres donnent peu à comprendre de leurs effets.</div>
+            <div class="learn-body" data-i18n="find2.body">Rien ne relie une option à son impact environnemental réel : l'utilisateur ne peut pas mesurer ce qu'il économise en la modifiant.</div>
+          </div>
+        </div>
+        <div class="learn">
+          <div class="learn-glyph">03</div>
+          <div>
+            <div class="learn-title" data-i18n="find3.title">Les choix par défaut sont les plus intensifs.</div>
+            <div class="learn-body" data-i18n="find3.body">Qualité maximale, lecture automatique, synchronisation permanente : le réglage initial pousse presque toujours vers la consommation la plus forte.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 — IDÉATION -->
+    <section class="section" id="ideation">
+      <div class="sec-eyebrow"><span class="num">04</span><span class="sep">∗</span> <span data-i18n="sec.ideation">Idéation</span></div>
+      <h2 class="sec-title" data-i18n="id.title">Imaginer des paramètres écologiques</h2>
+      <p class="prose" data-i18n="id.p1">
+        Nous avons mené des brainstormings et constitué un carnet réunissant tout ce qui, au
+        quotidien, avait un lien plus ou moins proche avec le sujet : croquis, idées, rencontres,
+        discussions, observations. De cet ensemble, plusieurs axes de conception ont émergé.
+      </p>
+
+      <div class="chips-label"><span>✦</span> <span data-i18n="id.axesLabel">Axes explorés</span></div>
+      <div class="chips">
+        <span class="chip">Renommer les modes</span>
+        <span class="chip">Matérialiser ses paramètres</span>
+        <span class="chip">Voir ce qui est du par-défaut</span>
+        <span class="chip">Construire ses modes</span>
+        <span class="chip">Vocabulaire lexical de l'écologie</span>
+        <span class="chip is-soft">Automatiser</span>
+        <span class="chip">Des paramètres réunis au même endroit</span>
+        <span class="chip">Vivre avec une batterie usée</span>
+        <span class="chip">Choisir le destin des applications</span>
+      </div>
+
+      <div class="sol-grid">
+        <div class="sol-card">
+          <div class="sol-tag"><span>⚡</span> <span data-i18n="ax1.tag">Axe 01</span></div>
+          <div class="sol-head" data-i18n="ax1.head">Repenser le par-défaut</div>
+          <p class="sol-desc" data-i18n="ax1.desc">Le choix par défaut est presque toujours l'option la plus consommatrice et la plus performante — laissée à des acteurs dont les intérêts sont économiques. Nous la reprenons en main.</p>
+          <ul class="sol-list">
+            <li><span data-i18n="ax1.l1"><strong>Montrer ce qui est encore par défaut</strong> — faire disparaître un élément, comme un sceau posé sur un objet.</span></li>
+            <li><span data-i18n="ax1.l2"><strong>Un par-défaut choisi</strong> — décider en un geste la qualité de l'ensemble d'une chaîne.</span></li>
+          </ul>
+          <figure class="plate-empty">
+            <div class="ph"><div class="ph-glyph">◷</div><div class="ph-label" data-i18n="ax1.cap">Gestion de la batterie & qualité par chaîne — maquettes</div></div>
+          </figure>
+        </div>
+
+        <div class="sol-card">
+          <div class="sol-tag"><span>⌛</span> <span data-i18n="ax2.tag">Axe 02</span></div>
+          <div class="sol-head" data-i18n="ax2.head">Vivre avec un téléphone vieillissant</div>
+          <p class="sol-desc" data-i18n="ax2.desc">La meilleure action pour réduire son empreinte est de garder son appareil le plus longtemps possible. Des paramètres qui accompagnent cette mission sont donc écologiquement bénéfiques.</p>
+          <ul class="sol-list">
+            <li><span data-i18n="ax2.l1"><strong>S'entraider</strong> — choisir où installer une application, entre son téléphone et celui d'un proche, selon l'écran, le stockage ou la batterie.</span></li>
+            <li><span data-i18n="ax2.l2"><strong>Contourner la casse</strong> — déplacer et redimensionner les éléments pour qu'ils échappent à la partie d'écran cassée.</span></li>
+          </ul>
+          <figure class="plate-empty">
+            <div class="ph"><div class="ph-glyph">◷</div><div class="ph-label" data-i18n="ax2.cap">Installer chez un proche & adapter l'interface — maquettes</div></div>
+          </figure>
+        </div>
+
+        <div class="sol-card">
+          <div class="sol-tag"><span>◎</span> <span data-i18n="ax3.tag">Axe 03</span></div>
+          <div class="sol-head" data-i18n="ax3.head">Un accès plus fréquent et rapide aux paramètres</div>
+          <p class="sol-desc" data-i18n="ax3.desc">De nombreux paramètres permettent déjà des pratiques plus sobres, mais restent difficiles d'accès. Repenser les usages écologiques, c'est aussi repenser les moyens d'y accéder.</p>
+          <ul class="sol-list">
+            <li><span data-i18n="ax3.l1"><strong>Paramétrer la manière de paramétrer</strong> — baisser la luminosité ou la qualité d'une vidéo d'un simple balayage de l'écran.</span></li>
+            <li><span data-i18n="ax3.l2"><strong>Matérialiser les paramètres</strong> — une coque de smartphone qui donne accès physiquement aux réglages les plus utilisés.</span></li>
+          </ul>
+          <figure class="plate-empty">
+            <div class="ph"><div class="ph-glyph">◷</div><div class="ph-label" data-i18n="ax3.cap">Gestes de paramétrage & coque physique — maquettes</div></div>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 — PARTAGE -->
+    <section class="section" id="partage">
+      <div class="sec-eyebrow"><span class="num">05</span><span class="sep">∗</span> <span data-i18n="sec.partage">Partage du résultat</span></div>
+      <h2 class="sec-title" data-i18n="pt.title">Rendre le projet public, en particulier pour les concepteurs</h2>
+      <p class="prose" data-i18n="pt.p1">
+        Pour concrétiser ces idées de paramètres écologiques, nous avons conçu un langage graphique
+        facilement applicable sur diverses maquettes et réutilisable par d'autres concepteurs.
+      </p>
+
+      <div class="share">
+        <div class="share-grid">
+          <div class="share-card">
+            <div class="share-tag"><span>◆</span> <span data-i18n="pt1.tag">Design system</span></div>
+            <div class="share-head" data-i18n="pt1.head">Un langage graphique réutilisable</div>
+            <div class="share-body" data-i18n="pt1.body">Composants, couleurs et styles pensés pour être repris et déclinés librement par la communauté de concepteurs.</div>
+          </div>
+          <div class="share-card">
+            <div class="share-tag"><span>▣</span> <span data-i18n="pt2.tag">Documentation</span></div>
+            <div class="share-head" data-i18n="pt2.head">Un projet vulgarisé</div>
+            <div class="share-body" data-i18n="pt2.body">Documentation du projet dans le CMS Kirby, vulgarisée à l'aide de visuels — images fixes, gifs, illustrations, photos — sur le site officiel.</div>
+          </div>
+          <div class="share-card">
+            <div class="share-tag"><span>✎</span> <span data-i18n="pt3.tag">Diffusion</span></div>
+            <div class="share-head" data-i18n="pt3.head">Sur plusieurs canaux</div>
+            <div class="share-body" data-i18n="pt3.body">Le projet est largement partagé via le site officiel, les réseaux sociaux, la newsletter et lors de conférences.</div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="plate-empty">
+        <div class="ph"><div class="ph-glyph">◷</div><div class="ph-label" data-i18n="pt.cap">Design system, documentation & diffusion — captures à intégrer</div></div>
+      </figure>
+    </section>
+
+  </div>
+
+  <!-- CLOSER -->
+  <div class="closer">
+    <a href="index.html" class="closer-name">Camille Adam<span>✦</span></a>
+    <div class="closer-links">
+      <a href="index.html#projets" data-i18n="closer.all">← Tous les projets</a>
+      <a href="mailto:c.adam.design@gmail.com">c.adam.design@gmail.com ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var LANG_KEY = 'ca-site-lang';
+  var DOC_TITLE = { fr: "Étude de cas — Limites Numériques", en: "Case study — Limites Numériques" };
+  var I18N = {
+    fr: {
+      "rail.toc": "Sommaire",
+      "rail.contexte": "Contexte", "rail.processus": "Processus", "rail.recolte": "Récolte",
+      "rail.ideation": "Idéation", "rail.partage": "Partage",
+      "hero.eyebrow": "Étude de cas ✦ Praticable ∗ Recherche & design",
+      "hero.title": "Imaginer des paramètres éco-conçus",
+      "hero.context": "Limites Numériques est un projet de recherche à la croisée du design et de l'informatique sur l'empreinte environnementale du numérique. En binôme chercheurs / designers, nous avons cherché à imaginer des paramètres qui aident réellement à consommer moins.",
+      "hero.cap": "Maquettes de paramètres écologiques — un langage visuel commun décliné sur mobile.",
+      "meta.role": "Rôle", "meta.roleVal": "Product Designer · gestion de projet",
+      "meta.team": "Équipe", "meta.teamVal": "Praticable · chercheurs design & informatique",
+      "meta.type": "Terrain", "meta.typeVal": "Mobile · Web · Recherche",
+      "meta.scope": "Périmètre",
+      "scope.s1": "Récolte", "scope.s2": "Analyse", "scope.s3": "Idéation", "scope.s4": "Maquettes", "scope.s5": "Diffusion",
+      "sec.contexte": "Contexte", "sec.processus": "Processus", "sec.recolte": "Récolte & analyse",
+      "sec.ideation": "Idéation", "sec.partage": "Partage du résultat",
+      "contexte.title": "Des paramètres pour moins consommer",
+      "contexte.p1": "Limites Numériques est un projet de recherche mené entre le studio et coopérative de design <a href=\"https://limitesnumeriques.fr\" target=\"_blank\" rel=\"noopener\">Praticable</a> et des chercheurs-chercheuses en design et en informatique — Thomas Thibault, Nolwen Maudet et Aurélien Tabard.",
+      "contexte.p2": "Le point de départ : les principales causes de pollution numérique sont la fabrication des terminaux et l'obsolescence, matérielle comme logicielle. Fabriquer, c'est déjà consommer — il faut 500 fois le poids d'un smartphone en matière première pour le produire.",
+      "stat1": "des émissions de CO₂ sont causées par les terminaux.",
+      "stat2": "de déchets en 2019, dont seulement 17 % sont recyclés.",
+      "stat3": "la durée de vie moyenne d'un smartphone en France.",
+      "stat4": "des renouvellements sont dus à des problèmes logiciels.",
+      "pb.label": "Problématique",
+      "pb.text": "Comment les applications nous permettent de moduler — ou non — les impacts environnementaux de nos usages numériques ?",
+      "obj.label": "Objectif 01", "obj.label2": "Objectif 02",
+      "obj1.head": "Identifier les paramètres",
+      "obj1.body": "Explorer et identifier, de manière qualitative, les formes, fonctions et paramètres présents — ou absents — dans nos applications.",
+      "obj2.head": "Réduire l'empreinte écologique",
+      "obj2.body": "Cartographier cet état de l'art pour en dégager des pistes de conception qui réduisent, directement ou indirectement, l'empreinte de nos usages.",
+      "proc.title": "Pour y parvenir",
+      "proc.p1": "Cinq étapes, de la collecte de données jusqu'à la diffusion publique des résultats.",
+      "pr1.title": "Récolte & analyse de données", "pr1.desc": "Classifier et identifier les catégories selon les fonctions et les impacts recherchés.",
+      "pr2.title": "Veille", "pr2.desc": "Voir ce qui existe en matière de paramètres, ailleurs que dans le smartphone.",
+      "pr3.title": "Idéation", "pr3.desc": "Déduire et imaginer des axes et une stratégie de conception pour les concepteurs.",
+      "pr4.title": "Prototypage", "pr4.desc": "Produire des idées sous forme d'esquisses, de wireframes ou de maquettes pour illustrer les pistes.",
+      "pr5.title": "Diffusion", "pr5.desc": "Publier et rendre publics les données et apprentissages du travail réalisé.",
+      "role.label": "Mon rôle",
+      "role.body": "J'ai collaboré avec l'équipe de Limites Numériques, et particulièrement avec Thomas. Ensemble, nous avons défini le processus à suivre. J'étais en charge de la gestion du projet, de la récolte de données jusqu'à la conception des maquettes.",
+      "rec.title": "Identifier les paramètres qui réduisent ou non l'empreinte écologique",
+      "rec.p1": "L'objectif : enquêter sur différents stores — Play Store, Apple Store, mais aussi des stores libres comme F-Droid — et documenter précisément ces fonctions et paramètres.",
+      "rec.paramsLabel": "Cadre de l'enquête",
+      "rec.devicesLabel": "OS & devices étudiés",
+      "rec.appsLabel": "Applications & environnements",
+      "rec.findLabel": "Nos enseignements",
+      "find1.title": "Quand des paramètres écologiques existent, ils sont présentés comme une option dégradée.",
+      "find1.body": "Sur le site de la COP28, la « version bas carbone » est présentée comme une expérience moindre — un choix par défaut vers le plus intensif, jamais valorisé.",
+      "find2.title": "Les paramètres donnent peu à comprendre de leurs effets.",
+      "find2.body": "Rien ne relie une option à son impact environnemental réel : l'utilisateur ne peut pas mesurer ce qu'il économise en la modifiant.",
+      "find3.title": "Les choix par défaut sont les plus intensifs.",
+      "find3.body": "Qualité maximale, lecture automatique, synchronisation permanente : le réglage initial pousse presque toujours vers la consommation la plus forte.",
+      "id.title": "Imaginer des paramètres écologiques",
+      "id.p1": "Nous avons mené des brainstormings et constitué un carnet réunissant tout ce qui, au quotidien, avait un lien plus ou moins proche avec le sujet : croquis, idées, rencontres, discussions, observations. De cet ensemble, plusieurs axes de conception ont émergé.",
+      "id.axesLabel": "Axes explorés",
+      "ax1.tag": "Axe 01", "ax1.head": "Repenser le par-défaut",
+      "ax1.desc": "Le choix par défaut est presque toujours l'option la plus consommatrice et la plus performante — laissée à des acteurs dont les intérêts sont économiques. Nous la reprenons en main.",
+      "ax1.l1": "<strong>Montrer ce qui est encore par défaut</strong> — faire disparaître un élément, comme un sceau posé sur un objet.",
+      "ax1.l2": "<strong>Un par-défaut choisi</strong> — décider en un geste la qualité de l'ensemble d'une chaîne.",
+      "ax1.cap": "Gestion de la batterie & qualité par chaîne — maquettes",
+      "ax2.tag": "Axe 02", "ax2.head": "Vivre avec un téléphone vieillissant",
+      "ax2.desc": "La meilleure action pour réduire son empreinte est de garder son appareil le plus longtemps possible. Des paramètres qui accompagnent cette mission sont donc écologiquement bénéfiques.",
+      "ax2.l1": "<strong>S'entraider</strong> — choisir où installer une application, entre son téléphone et celui d'un proche, selon l'écran, le stockage ou la batterie.",
+      "ax2.l2": "<strong>Contourner la casse</strong> — déplacer et redimensionner les éléments pour qu'ils échappent à la partie d'écran cassée.",
+      "ax2.cap": "Installer chez un proche & adapter l'interface — maquettes",
+      "ax3.tag": "Axe 03", "ax3.head": "Un accès plus fréquent et rapide aux paramètres",
+      "ax3.desc": "De nombreux paramètres permettent déjà des pratiques plus sobres, mais restent difficiles d'accès. Repenser les usages écologiques, c'est aussi repenser les moyens d'y accéder.",
+      "ax3.l1": "<strong>Paramétrer la manière de paramétrer</strong> — baisser la luminosité ou la qualité d'une vidéo d'un simple balayage de l'écran.",
+      "ax3.l2": "<strong>Matérialiser les paramètres</strong> — une coque de smartphone qui donne accès physiquement aux réglages les plus utilisés.",
+      "ax3.cap": "Gestes de paramétrage & coque physique — maquettes",
+      "pt.title": "Rendre le projet public, en particulier pour les concepteurs",
+      "pt.p1": "Pour concrétiser ces idées de paramètres écologiques, nous avons conçu un langage graphique facilement applicable sur diverses maquettes et réutilisable par d'autres concepteurs.",
+      "pt1.tag": "Design system", "pt1.head": "Un langage graphique réutilisable",
+      "pt1.body": "Composants, couleurs et styles pensés pour être repris et déclinés librement par la communauté de concepteurs.",
+      "pt2.tag": "Documentation", "pt2.head": "Un projet vulgarisé",
+      "pt2.body": "Documentation du projet dans le CMS Kirby, vulgarisée à l'aide de visuels — images fixes, gifs, illustrations, photos — sur le site officiel.",
+      "pt3.tag": "Diffusion", "pt3.head": "Sur plusieurs canaux",
+      "pt3.body": "Le projet est largement partagé via le site officiel, les réseaux sociaux, la newsletter et lors de conférences.",
+      "pt.cap": "Design system, documentation & diffusion — captures à intégrer",
+      "closer.all": "← Tous les projets"
+    },
+    en: {
+      "rail.toc": "Contents",
+      "rail.contexte": "Context", "rail.processus": "Process", "rail.recolte": "Research",
+      "rail.ideation": "Ideation", "rail.partage": "Sharing",
+      "hero.eyebrow": "Case study ✦ Praticable ∗ Research & design",
+      "hero.title": "Designing eco-conscious settings",
+      "hero.context": "Limites Numériques is a research project at the crossroads of design and computer science, focused on the environmental footprint of digital technology. Pairing researchers and designers, we set out to imagine settings that genuinely help us consume less.",
+      "hero.cap": "Mockups of ecological settings — a shared visual language applied on mobile.",
+      "meta.role": "Role", "meta.roleVal": "Product Designer · project lead",
+      "meta.team": "Team", "meta.teamVal": "Praticable · design & CS researchers",
+      "meta.type": "Field", "meta.typeVal": "Mobile · Web · Research",
+      "meta.scope": "Scope",
+      "scope.s1": "Collection", "scope.s2": "Analysis", "scope.s3": "Ideation", "scope.s4": "Mockups", "scope.s5": "Sharing",
+      "sec.contexte": "Context", "sec.processus": "Process", "sec.recolte": "Research & analysis",
+      "sec.ideation": "Ideation", "sec.partage": "Sharing the outcome",
+      "contexte.title": "Settings that help us consume less",
+      "contexte.p1": "Limites Numériques is a research project run between the design studio and cooperative <a href=\"https://limitesnumeriques.fr\" target=\"_blank\" rel=\"noopener\">Praticable</a> and researchers in design and computer science — Thomas Thibault, Nolwen Maudet and Aurélien Tabard.",
+      "contexte.p2": "The starting point: the main causes of digital pollution are the manufacturing of devices and obsolescence, both hardware and software. Manufacturing is already consumption — it takes 500 times a smartphone's weight in raw materials to produce it.",
+      "stat1": "of CO₂ emissions are caused by devices.",
+      "stat2": "of waste in 2019, of which only 17% is recycled.",
+      "stat3": "the average lifespan of a smartphone in France.",
+      "stat4": "of replacements are due to software problems.",
+      "pb.label": "Problem",
+      "pb.text": "How do applications let us modulate — or not — the environmental impact of our digital usage?",
+      "obj.label": "Objective 01", "obj.label2": "Objective 02",
+      "obj1.head": "Identify the settings",
+      "obj1.body": "Qualitatively explore and identify the forms, functions and settings present — or absent — in our applications.",
+      "obj2.head": "Reduce the ecological footprint",
+      "obj2.body": "Map this state of the art to draw out design directions that reduce, directly or indirectly, the footprint of our usage.",
+      "proc.title": "How we got there",
+      "proc.p1": "Five steps, from data collection all the way to publicly sharing the results.",
+      "pr1.title": "Data collection & analysis", "pr1.desc": "Classify and identify categories by function and by the impact being sought.",
+      "pr2.title": "Watch", "pr2.desc": "Look at what exists in terms of settings, beyond the smartphone.",
+      "pr3.title": "Ideation", "pr3.desc": "Derive and imagine design directions and a strategy for designers.",
+      "pr4.title": "Prototyping", "pr4.desc": "Produce ideas as sketches, wireframes or mockups to illustrate the directions.",
+      "pr5.title": "Sharing", "pr5.desc": "Publish and make public the data and learnings from the work.",
+      "role.label": "My role",
+      "role.body": "I collaborated with the Limites Numériques team, and particularly with Thomas. Together we defined the process to follow. I led the project, from data collection through to the design of the mockups.",
+      "rec.title": "Identifying the settings that reduce — or don't — the ecological footprint",
+      "rec.p1": "The goal: survey different stores — Play Store, Apple Store, but also open stores like F-Droid — and precisely document their functions and settings.",
+      "rec.paramsLabel": "Study frame",
+      "rec.devicesLabel": "OS & devices studied",
+      "rec.appsLabel": "Apps & environments",
+      "rec.findLabel": "Our findings",
+      "find1.title": "When ecological settings exist, they're framed as a downgraded option.",
+      "find1.body": "On the COP28 website, the “low carbon version” is presented as a lesser experience — a default pull toward the most intensive, never valued.",
+      "find2.title": "Settings reveal little about their effects.",
+      "find2.body": "Nothing ties an option to its real environmental impact: users can't measure what they save by changing it.",
+      "find3.title": "Default choices are the most intensive.",
+      "find3.body": "Maximum quality, autoplay, permanent sync: the initial setting almost always pushes toward the heaviest consumption.",
+      "id.title": "Imagining ecological settings",
+      "id.p1": "We ran brainstorms and kept a notebook gathering everything in daily life that related, closely or loosely, to the topic: sketches, ideas, encounters, discussions, observations. From it, several design directions emerged.",
+      "id.axesLabel": "Directions explored",
+      "ax1.tag": "Direction 01", "ax1.head": "Rethinking the default",
+      "ax1.desc": "The default is almost always the most consuming, most performant option — left to actors whose interests are economic. We take it back.",
+      "ax1.l1": "<strong>Show what's still on default</strong> — make an element fade away, like a seal placed on an object.",
+      "ax1.l2": "<strong>A chosen default</strong> — set the quality of an entire channel in a single gesture.",
+      "ax1.cap": "Battery management & per-channel quality — mockups",
+      "ax2.tag": "Direction 02", "ax2.head": "Living with an ageing phone",
+      "ax2.desc": "The best action to reduce your footprint is keeping your device as long as possible. So settings that support that mission are ecologically beneficial.",
+      "ax2.l1": "<strong>Help each other</strong> — choose where to install an app, between your phone and a friend's, based on screen, storage or battery.",
+      "ax2.l2": "<strong>Work around breakage</strong> — move and resize elements so they escape the broken part of the screen.",
+      "ax2.cap": "Install on a friend's device & adapt the interface — mockups",
+      "ax3.tag": "Direction 03", "ax3.head": "Faster, more frequent access to settings",
+      "ax3.desc": "Many settings already enable more frugal practices, but remain hard to reach. Rethinking ecological usage also means rethinking how we access it.",
+      "ax3.l1": "<strong>Set how you set</strong> — lower brightness or a video's quality with a simple swipe of the screen.",
+      "ax3.l2": "<strong>Materialise the settings</strong> — a phone case that gives physical access to the most-used controls.",
+      "ax3.cap": "Setting gestures & physical case — mockups",
+      "pt.title": "Making the project public, especially for designers",
+      "pt.p1": "To make these ideas for ecological settings concrete, we designed a graphic language easily applicable across mockups and reusable by other designers.",
+      "pt1.tag": "Design system", "pt1.head": "A reusable graphic language",
+      "pt1.body": "Components, colors and styles built to be reused and adapted freely by the community of designers.",
+      "pt2.tag": "Documentation", "pt2.head": "A project made accessible",
+      "pt2.body": "Project documentation in the Kirby CMS, made accessible with visuals — stills, gifs, illustrations, photos — on the official site.",
+      "pt3.tag": "Distribution", "pt3.head": "Across several channels",
+      "pt3.body": "The project is widely shared via the official site, social media, the newsletter and at conferences.",
+      "pt.cap": "Design system, documentation & distribution — screenshots to add",
+      "closer.all": "← All projects"
+    }
+  };
+
+  function applyLang(lang) {
+    var dict = I18N[lang] || I18N.fr;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] != null) el.innerHTML = dict[key];
+    });
+    document.documentElement.lang = lang;
+    if (DOC_TITLE[lang]) document.title = DOC_TITLE[lang];
+    document.querySelectorAll('.lang-switch button').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.lang-switch button');
+    if (b) { applyLang(b.getAttribute('data-lang')); }
+  });
+
+  (function () {
+    var saved = 'fr';
+    try { var s = localStorage.getItem(LANG_KEY); if (s === 'fr' || s === 'en') saved = s; } catch (e) {}
+    applyLang(saved);
+  })();
+
+  var OFFSET = 32;
+  function scroller() { return document.scrollingElement || document.documentElement; }
+  function goTo(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var sc = scroller();
+    var y = el.getBoundingClientRect().top + sc.scrollTop - OFFSET;
+    sc.scrollTo({ top: y, behavior: 'smooth' });
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-anchor]');
+    if (a) { e.preventDefault(); goTo(a.getAttribute('data-anchor')); }
+  });
+
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#railnav a'));
+    var ids = links.map(function (l) { return l.getAttribute('data-anchor'); });
+    var sections = ids.map(function (id) { return document.getElementById(id); });
+    function setActive(id) { links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('data-anchor') === id); }); }
+    function onScroll() {
+      var best = ids[0], bestTop = -Infinity;
+      for (var j = 0; j < sections.length; j++) {
+        if (!sections[j]) continue;
+        var top = sections[j].getBoundingClientRect().top - OFFSET - 130;
+        if (top <= 0 && top > bestTop) { bestTop = top; best = ids[j]; }
+      }
+      setActive(best);
+    }
+    setActive(ids[0]);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  setTimeout(function () {
+    document.querySelectorAll('.fade-up').forEach(function (el) {
+      (el.getAnimations ? el.getAnimations() : []).forEach(function (a) { try { a.finish(); } catch (e) {} });
+    });
+  }, 900);
+
+</script>
+</body>
+</html>
