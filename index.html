@@ -776,8 +776,9 @@ nav {
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255,255,255,0.06);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
 }
 
 .skill-name {
@@ -787,7 +788,7 @@ nav {
   color: var(--color-on-dark);
 }
 
-.skill-tags { display: flex; gap: var(--space-xs); }
+.skill-tags { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 
 .skill-tag {
   font-family: var(--font-body);
@@ -1041,26 +1042,30 @@ footer {
       <div class="about-right">
         <div class="skill-item">
           <span class="skill-name" data-i18n="skill0">Recherche utilisateur</span>
-          <div class="skill-tags"><span class="skill-tag">Discovery</span></div>
-        </div>
-        <div class="skill-item">
-          <span class="skill-name" data-i18n="skill1">Design d'interface</span>
-          <div class="skill-tags"><span class="skill-tag">Figma</span></div>
-        </div>
-        <div class="skill-item">
-          <span class="skill-name" data-i18n="skill2">Design system</span>
-          <div class="skill-tags"><span class="skill-tag">Tokens</span></div>
-        </div>
-        <div class="skill-item">
-          <span class="skill-name" data-i18n="skill3">Maquettage & prototypage</span>
           <div class="skill-tags">
-            <span class="skill-tag">Notion</span>
-            <span class="skill-tag">Mixpanel</span>
+            <span class="skill-tag" data-i18n="skill0.tag1">Enquête de terrain</span>
+            <span class="skill-tag" data-i18n="skill0.tag2">Entretien utilisateur</span>
+            <span class="skill-tag" data-i18n="skill0.tag3">Scénario d'usage</span>
+            <span class="skill-tag" data-i18n="skill0.tag4">Cadrage de problème</span>
           </div>
         </div>
         <div class="skill-item">
-          <span class="skill-name" data-i18n="skill4">Graphisme & édition</span>
-          <div class="skill-tags"><span class="skill-tag">Print</span></div>
+          <span class="skill-name" data-i18n="skill1">Design d'interface</span>
+          <div class="skill-tags">
+            <span class="skill-tag" data-i18n="skill1.tag1">Prototypage</span>
+            <span class="skill-tag" data-i18n="skill1.tag2">Design system</span>
+            <span class="skill-tag" data-i18n="skill1.tag3">UI</span>
+          </div>
+        </div>
+        <div class="skill-item">
+          <span class="skill-name" data-i18n="skill2">Outils</span>
+          <div class="skill-tags">
+            <span class="skill-tag">Figma</span>
+            <span class="skill-tag">Notion</span>
+            <span class="skill-tag">Mixpanel</span>
+            <span class="skill-tag">Miro</span>
+            <span class="skill-tag">Claude</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1123,8 +1128,9 @@ footer {
       "about.eyebrow": "À propos ✦",
       "about.title": "UX research et conception d'interfaces B2B.",
       "about.body": "Je suis Camille, product designer basée à Paris. Je conçois des interfaces pour des contextes complexes — SaaS industriel, outils métier — en m'appuyant sur une pratique rigoureuse de la recherche utilisateur.",
-      "skill0": "Recherche utilisateur", "skill1": "Design d'interface", "skill2": "Design system",
-      "skill3": "Maquettage & prototypage", "skill4": "Graphisme & édition"
+      "skill0": "Recherche utilisateur", "skill1": "Design d'interface", "skill2": "Outils",
+      "skill0.tag1": "Enquête de terrain", "skill0.tag2": "Entretien utilisateur", "skill0.tag3": "Scénario d'usage", "skill0.tag4": "Cadrage de problème",
+      "skill1.tag1": "Prototypage", "skill1.tag2": "Design system", "skill1.tag3": "UI"
     },
     en: {
       "nav.work": "Work", "nav.about": "About", "nav.contact": "Contact", "nav.cv": "CV →",
@@ -1163,8 +1169,9 @@ footer {
       "about.eyebrow": "About ✦",
       "about.title": "UX research and B2B interface design.",
       "about.body": "I'm Camille, a product designer based in Paris. I design interfaces for complex contexts — industrial SaaS, business tools — grounded in a rigorous user-research practice.",
-      "skill0": "User research", "skill1": "Interface design", "skill2": "Design system",
-      "skill3": "Wireframing & prototyping", "skill4": "Graphic & editorial design"
+      "skill0": "User research", "skill1": "Interface design", "skill2": "Tools",
+      "skill0.tag1": "Field research", "skill0.tag2": "User interviews", "skill0.tag3": "Usage scenarios", "skill0.tag4": "Problem framing",
+      "skill1.tag1": "Prototyping", "skill1.tag2": "Design system", "skill1.tag3": "UI"
     }
   };
 
