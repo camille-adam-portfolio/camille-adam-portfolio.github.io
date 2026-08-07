@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animer un atelier de co-conception — Camille Adam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --color-canvas:          #FFF6BE;
+  --color-canvas-soft:     #FFFADC;
+  --color-surface-card:    #F5EDA0;
+  --color-surface-dark:    #1C1A14;
+  --color-surface-dark-el: #272520;
+  --color-ink:             #1C1A14;
+  --color-body:            #3D3A32;
+  --color-muted:           #6E6A60;
+  --color-muted-soft:      #9E9A90;
+  --color-hairline:        #E8E080;
+  --color-hairline-soft:   #F0ECA0;
+  --color-on-dark:         #FFF6BE;
+  --color-on-dark-soft:    #9E9A90;
+
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --space-xs:  8px;
+  --space-sm:  12px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-xxl: 48px;
+  --space-section: 96px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+body {
+  background: var(--color-canvas); color: var(--color-ink);
+  font-family: var(--font-body); font-size: 15px; font-weight: 400; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { text-decoration: none; color: inherit; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .fade-up-1 { animation-delay: 0.05s; } .fade-up-2 { animation-delay: 0.15s; }
+  .fade-up-3 { animation-delay: 0.25s; } .fade-up-4 { animation-delay: 0.35s; }
+}
+
+/* LAYOUT */
+.shell {
+  max-width: 1400px; margin: 0 auto; padding: 0 var(--space-xl);
+  display: grid; grid-template-columns: 232px minmax(0, 1fr);
+  gap: var(--space-section); align-items: start;
+}
+.rail { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: var(--space-xxl) 0; }
+.rail-sig { font-family: var(--font-display); font-style: italic; font-size: 16px; color: var(--color-ink); letter-spacing: -0.3px; margin-bottom: var(--space-xl); }
+.rail-sig span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+
+.pagehead { position: fixed; bottom: var(--space-lg); left: var(--space-xxl); z-index: 50; }
+.lang-switch { display: inline-flex; align-items: center; gap: 6px; }
+.lang-switch button { font-family: var(--font-body); font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: var(--color-muted-soft); background: none; border: none; padding: 2px; cursor: pointer; transition: color 0.15s ease; }
+.lang-switch button:hover { color: var(--color-muted); }
+.lang-switch button.active { color: var(--color-ink); }
+.lang-sep { color: var(--color-muted-soft); font-size: 11px; }
+
+.rail-label { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted-soft); margin-bottom: var(--space-md); }
+.rail-nav { display: flex; flex-direction: column; list-style: none; }
+.rail-nav a { display: grid; grid-template-columns: 22px 1fr; align-items: baseline; gap: var(--space-xs); padding: 9px 0; font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--color-muted); transition: color 0.15s ease; cursor: pointer; position: relative; }
+.rail-nav a .n { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--color-muted-soft); transition: color 0.15s ease; }
+.rail-nav a:hover { color: var(--color-ink); }
+.rail-nav a.active { color: var(--color-ink); font-weight: 500; }
+.rail-nav a.active .n { color: var(--color-ink); }
+.rail-nav a.active::before { content: '✦'; position: absolute; left: -20px; top: 9px; font-size: 11px; color: var(--color-ink); }
+.rail-foot { margin-top: auto; padding-top: var(--space-lg); border-top: 1px solid var(--color-hairline); }
+.rail-contact { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-muted); display: inline-flex; align-items: center; gap: 6px; transition: color 0.15s ease; }
+.rail-contact:hover { color: var(--color-ink); }
+
+.content { max-width: 720px; padding: var(--space-section) 0 var(--space-xxl); }
+
+/* HERO */
+.eyebrow { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: var(--space-lg); }
+.hero-title { font-family: var(--font-display); font-style: italic; font-size: clamp(40px, 5vw, 60px); font-weight: 400; line-height: 1.05; letter-spacing: -1.2px; color: var(--color-ink); margin-bottom: var(--space-xl); }
+.hero-context { font-family: var(--font-body); font-size: 18px; font-weight: 400; color: var(--color-body); line-height: 1.6; margin-bottom: var(--space-xxl); }
+
+.empathy { border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); padding: var(--space-xl) 0; margin-bottom: var(--space-xxl); }
+.empathy-glyph { font-family: var(--font-display); font-style: italic; font-size: 44px; line-height: 0.4; color: var(--color-ink); opacity: 0.22; display: block; margin-bottom: var(--space-md); }
+.empathy-text { font-family: var(--font-display); font-style: italic; font-size: clamp(22px, 2.9vw, 30px); font-weight: 400; line-height: 1.4; letter-spacing: -0.4px; color: var(--color-ink); }
+
+.meta { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); }
+.meta-cell { padding: var(--space-lg) var(--space-lg) var(--space-lg) 0; }
+.meta-cell + .meta-cell { padding-left: var(--space-lg); border-left: 1px solid var(--color-hairline); }
+.meta-key { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted-soft); margin-bottom: var(--space-xs); }
+.meta-val { font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--color-ink); line-height: 1.45; }
+
+.method { border-bottom: 1px solid var(--color-hairline); padding: var(--space-lg) 0; margin-bottom: var(--space-section); }
+.method .meta-key { margin-bottom: var(--space-sm); }
+.method-flow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) 10px; }
+.method-step { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-ink); background: var(--color-surface-card); border: 1px solid var(--color-hairline); padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+.method-arrow { color: var(--color-muted-soft); font-size: 13px; }
+
+/* SECTIONS */
+.section { padding-top: var(--space-section); scroll-margin-top: var(--space-xl); }
+.section:first-of-type { padding-top: 0; }
+.sec-eyebrow { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 10px; margin-bottom: var(--space-md); }
+.sec-eyebrow .num, .sec-eyebrow .sep { color: var(--color-muted-soft); }
+.sec-title { font-family: var(--font-display); font-style: italic; font-size: clamp(28px, 3.4vw, 40px); font-weight: 400; line-height: 1.1; letter-spacing: -0.6px; color: var(--color-ink); margin-bottom: var(--space-lg); }
+.prose { font-family: var(--font-body); font-size: 17px; font-weight: 400; color: var(--color-body); line-height: 1.65; }
+.prose + .prose { margin-top: var(--space-md); }
+
+/* Chips */
+.chips-label { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 8px; margin: var(--space-xl) 0 var(--space-md); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.chip { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-ink); background: var(--color-surface-card); border: 1px solid var(--color-hairline); padding: 6px 13px; border-radius: 999px; }
+.chip.is-soft { background: var(--color-canvas-soft); color: var(--color-muted); }
+
+/* Canevas 7P grid */
+.canvas7 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-top: var(--space-xl); }
+.c7 { border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); background: var(--color-canvas-soft); padding: var(--space-lg); }
+.c7-key { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted-soft); display: flex; align-items: baseline; gap: 8px; margin-bottom: var(--space-sm); }
+.c7-key .n { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--color-ink); opacity: 0.5; letter-spacing: 0; }
+.c7-head { font-family: var(--font-display); font-style: italic; font-size: 19px; letter-spacing: -0.3px; color: var(--color-ink); margin-bottom: var(--space-xs); }
+.c7-body { font-family: var(--font-body); font-size: 14px; color: var(--color-body); line-height: 1.55; }
+
+/* Agenda / déroulé */
+.agenda { display: flex; flex-direction: column; margin-top: var(--space-xl); border-top: 1px solid var(--color-hairline); }
+.ag-row { display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: var(--space-md); padding: var(--space-md) 0; border-bottom: 1px solid var(--color-hairline); }
+.ag-time { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-ink); letter-spacing: -0.4px; }
+.ag-main { display: flex; flex-direction: column; gap: 2px; }
+.ag-title { font-family: var(--font-body); font-size: 15px; font-weight: 500; color: var(--color-ink); }
+.ag-desc { font-family: var(--font-body); font-size: 13px; color: var(--color-muted); line-height: 1.45; }
+.ag-tag { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted-soft); background: var(--color-surface-card); border: 1px solid var(--color-hairline); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.ag-row.is-break { opacity: 0.6; }
+.ag-row.is-break .ag-time, .ag-row.is-break .ag-title { font-style: normal; }
+
+/* Personas (single) */
+.personas { display: flex; flex-direction: column; gap: var(--space-lg); margin-top: var(--space-xl); }
+.persona { background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-xl); padding: var(--space-xl); }
+.persona-top { display: grid; grid-template-columns: 56px 1fr; gap: var(--space-md); align-items: center; margin-bottom: var(--space-md); }
+.persona-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--color-surface-card); border: 1px solid var(--color-hairline); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-style: italic; font-size: 24px; color: var(--color-ink); }
+.persona-name { font-family: var(--font-body); font-size: 18px; font-weight: 500; color: var(--color-ink); }
+.persona-meta { font-family: var(--font-body); font-size: 13px; color: var(--color-muted); }
+.persona-quote { font-family: var(--font-display); font-style: italic; font-size: 19px; line-height: 1.4; letter-spacing: -0.2px; color: var(--color-ink); padding: var(--space-md) 0 var(--space-lg); border-bottom: 1px solid var(--color-hairline); margin-bottom: var(--space-lg); }
+.persona-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+.persona-col-key { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted-soft); margin-bottom: var(--space-sm); }
+.persona-col ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.persona-col li { font-family: var(--font-body); font-size: 13px; color: var(--color-body); line-height: 1.45; display: grid; grid-template-columns: 13px 1fr; gap: 5px; }
+.persona-col li::before { content: '·'; color: var(--color-muted-soft); font-size: 16px; line-height: 1; }
+
+/* Experience map */
+.map-scroll { margin-top: var(--space-xl); overflow-x: auto; padding-bottom: var(--space-sm); }
+.map-grid { display: grid; grid-auto-flow: column; grid-auto-columns: 232px; gap: var(--space-md); min-width: min-content; }
+.map-col { border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); background: var(--color-canvas-soft); padding: var(--space-lg); display: flex; flex-direction: column; gap: var(--space-md); }
+.map-step { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted-soft); }
+.map-phase { font-family: var(--font-display); font-style: italic; font-size: 18px; letter-spacing: -0.3px; color: var(--color-ink); line-height: 1.2; margin-top: -6px; }
+.map-block-key { font-family: var(--font-body); font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted-soft); margin-bottom: 4px; }
+.map-actions { font-family: var(--font-body); font-size: 13px; color: var(--color-body); line-height: 1.5; }
+.map-pain { font-family: var(--font-body); font-size: 13px; color: var(--color-body); line-height: 1.5; }
+.map-opp { font-family: var(--font-body); font-size: 13px; color: var(--color-ink); line-height: 1.5; background: var(--color-surface-card); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; }
+.map-emo { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body); font-size: 11px; font-weight: 500; color: var(--color-muted); }
+.map-emo .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--color-muted-soft); }
+.map-emo.up .dot { background: var(--color-ink); }
+.map-emo.down .dot { background: transparent; border: 1.5px solid var(--color-muted-soft); }
+.map-hint { font-family: var(--font-body); font-size: 12px; color: var(--color-muted-soft); margin-top: var(--space-sm); font-style: italic; }
+
+/* Reco (dark band) */
+.reco { margin-top: var(--space-xl); background: var(--color-surface-dark); border-radius: 24px; padding: var(--space-xxl); }
+.reco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg) var(--space-xl); }
+.reco-card { display: flex; flex-direction: column; gap: var(--space-sm); }
+.reco-num { font-family: var(--font-display); font-style: italic; font-size: 32px; color: var(--color-on-dark); line-height: 1; opacity: 0.55; }
+.reco-head { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-on-dark); letter-spacing: -0.3px; }
+.reco-body { font-family: var(--font-body); font-size: 14px; color: var(--color-on-dark-soft); line-height: 1.55; }
+
+/* Learnings */
+.learnings { display: flex; flex-direction: column; gap: var(--space-xl); margin-top: var(--space-xl); }
+.learn { display: grid; grid-template-columns: 26px 1fr; gap: var(--space-md); align-items: start; }
+.learn-glyph { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-ink); opacity: 0.55; line-height: 1.5; }
+.learn-title { font-family: var(--font-display); font-style: italic; font-size: clamp(20px, 2.4vw, 24px); line-height: 1.3; letter-spacing: -0.4px; color: var(--color-ink); margin-bottom: var(--space-xs); }
+.learn-body { font-family: var(--font-body); font-size: 16px; color: var(--color-muted); line-height: 1.6; }
+
+/* Deliverables duo */
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-top: var(--space-xl); }
+.duo-card { border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); background: var(--color-canvas-soft); padding: var(--space-xl); }
+.duo-key { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-sm); }
+.duo-head { font-family: var(--font-display); font-style: italic; font-size: 20px; letter-spacing: -0.3px; color: var(--color-ink); margin-bottom: var(--space-sm); }
+.duo-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: var(--space-sm); }
+.duo-list li { font-family: var(--font-body); font-size: 14px; color: var(--color-body); line-height: 1.5; display: grid; grid-template-columns: 15px 1fr; gap: 6px; }
+.duo-list li::before { content: '◆'; color: var(--color-muted-soft); font-size: 9px; line-height: 1.6; }
+
+/* Traps — stacked title + description for readability */
+.traps { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-top: var(--space-md); }
+.trap-card { border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); background: var(--color-canvas-soft); padding: var(--space-xl); }
+.trap-key { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-lg); }
+.trap-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-lg); }
+.trap-item { display: grid; grid-template-columns: 22px 1fr; gap: var(--space-sm); align-items: start; }
+.trap-num { font-family: var(--font-display); font-style: italic; font-size: 18px; line-height: 1.2; color: var(--color-ink); opacity: 0.5; }
+.trap-risk { font-family: var(--font-body); font-size: 15px; font-weight: 500; color: var(--color-ink); line-height: 1.35; margin-bottom: 4px; }
+.trap-fix { font-family: var(--font-body); font-size: 14px; color: var(--color-muted); line-height: 1.5; }
+
+/* CLOSER */
+.closer { grid-column: 1 / -1; padding-bottom: var(--space-xxl); padding-top: var(--space-xl); border-top: 1px solid var(--color-hairline); display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg); flex-wrap: wrap; }
+.closer-name { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--color-ink); }
+.closer-name span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+.closer-links { display: flex; gap: var(--space-lg); flex-wrap: wrap; }
+.closer-links a { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-muted); transition: color 0.15s ease; }
+.closer-links a:hover { color: var(--color-ink); }
+
+/* RESPONSIVE */
+@media (max-width: 920px) {
+  .shell { grid-template-columns: 1fr; gap: 0; padding: 0 var(--space-lg); }
+  .rail { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--space-md) var(--space-lg); padding: var(--space-lg) 0; border-bottom: 1px solid var(--color-hairline); }
+  .rail-sig { margin-bottom: 0; }
+  .pagehead { bottom: var(--space-md); left: var(--space-lg); }
+  .rail-label { display: none; }
+  .rail-nav { flex-direction: row; flex-wrap: wrap; gap: 0 var(--space-md); width: 100%; }
+  .rail-nav a { padding: 6px 0; }
+  .rail-nav a.active::before { display: none; }
+  .rail-foot { display: none; }
+  .content { padding-top: var(--space-xxl); }
+  .meta { grid-template-columns: 1fr; }
+  .meta-cell + .meta-cell { border-left: none; border-top: 1px solid var(--color-hairline); padding-left: 0; }
+  .canvas7 { grid-template-columns: 1fr; }
+  .duo { grid-template-columns: 1fr; }
+  .traps { grid-template-columns: 1fr; }
+  .persona-cols { grid-template-columns: 1fr; gap: var(--space-md); }
+  .reco-grid { grid-template-columns: 1fr; gap: var(--space-xl); }
+  .reco { padding: var(--space-xl) var(--space-lg); }
+  .ag-row { grid-template-columns: 62px 1fr; }
+  .ag-tag { grid-column: 2; justify-self: start; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="pagehead">
+  <div class="lang-switch" role="group" aria-label="Langue / Language">
+    <button type="button" data-lang="fr" class="active" aria-pressed="true">FR</button>
+    <span class="lang-sep" aria-hidden="true">·</span>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<div class="shell">
+
+  <aside class="rail">
+    <a href="index.html" class="rail-sig">Camille Adam<span>✦</span></a>
+    <div class="rail-label" data-i18n="rail.toc">Sommaire</div>
+    <ul class="rail-nav" id="railnav">
+      <li><a data-anchor="contexte"><span class="n">01</span><span data-i18n="rail.contexte">Contexte</span></a></li>
+      <li><a data-anchor="cadrage"><span class="n">02</span><span data-i18n="rail.cadrage">Cadrage</span></a></li>
+      <li><a data-anchor="deroule"><span class="n">03</span><span data-i18n="rail.deroule">Déroulé</span></a></li>
+      <li><a data-anchor="jour"><span class="n">04</span><span data-i18n="rail.jour">Le jour J</span></a></li>
+      <li><a data-anchor="parcours"><span class="n">05</span><span data-i18n="rail.parcours">Parcours</span></a></li>
+      <li><a data-anchor="pistes"><span class="n">06</span><span data-i18n="rail.pistes">Pistes</span></a></li>
+    </ul>
+    <div class="rail-foot">
+      <a href="mailto:c.adam.design@gmail.com" class="rail-contact">c.adam.design@gmail.com ↗</a>
+    </div>
+  </aside>
+
+  <div class="content" data-screen-label="Étude de cas — Atelier de co-conception">
+
+    <!-- HERO -->
+    <div class="eyebrow fade-up fade-up-1" data-i18n="hero.eyebrow">Étude de cas ✦ Design Thinking ∗ Atelier de co-conception</div>
+    <h1 class="hero-title fade-up fade-up-2" data-i18n="hero.title">Faire émerger des idées, ensemble</h1>
+    <p class="hero-context fade-up fade-up-3" data-i18n="hero.context">
+      Préparer et animer un atelier de co-conception pour Caféo — un bateau-café itinérant dont
+      l'application ne rend pas encore compte de l'offre. Réunir quatre profils autour d'une même
+      table (virtuelle) et, en deux heures, imaginer le parcours idéal d'un client qui vit
+      l'expérience Caféo à 360°.
+    </p>
+
+    <div class="empathy fade-up fade-up-4">
+      <span class="empathy-glyph">”</span>
+      <p class="empathy-text" data-i18n="hero.empathy">
+        Un bon atelier ne se joue pas le jour J : il se joue dans la préparation. Un objectif clair,
+        les bonnes personnes, une ambiance qui met à l'aise — et les idées viennent d'elles-mêmes.
+      </p>
+    </div>
+
+    <div class="meta fade-up fade-up-4">
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.role">Rôle</div>
+        <div class="meta-val" data-i18n="meta.roleVal">Facilitatrice d'atelier</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.format">Format</div>
+        <div class="meta-val" data-i18n="meta.formatVal">Distanciel · FigJam & Google Meet</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-key" data-i18n="meta.setup">Dispositif</div>
+        <div class="meta-val" data-i18n="meta.setupVal">4 participants · ~2 h</div>
+      </div>
+    </div>
+
+    <div class="method fade-up fade-up-4">
+      <div class="meta-key" data-i18n="meta.scope">Déroulé</div>
+      <div class="method-flow">
+        <span class="method-step" data-i18n="scope.s1">Cadrage</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s2">Ice-breaker</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s3">Brainstorming</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s4">Vote</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s5">Scénario d'usage</span><span class="method-arrow">→</span>
+        <span class="method-step" data-i18n="scope.s6">Parcours utilisateur</span>
+      </div>
+    </div>
+
+    <!-- 01 CONTEXTE -->
+    <section class="section" id="contexte">
+      <div class="sec-eyebrow"><span class="num">01</span><span class="sep">∗</span> <span data-i18n="sec.contexte">Contexte</span></div>
+      <h2 class="sec-title" data-i18n="ctx.title">Caféo, du bateau à l'application</h2>
+      <p class="prose" data-i18n="ctx.p1">
+        Caféo fait vivre une expérience autour du café à bord d'un bateau itinérant. Une application
+        existe déjà, mais elle ne parvient pas à rendre compte de l'offre disponible : horaires,
+        localisation, cafés proposés. L'expérience se joue pourtant sur toute une chaîne — de
+        l'application à la découverte de la boutique physique.
+      </p>
+      <p class="prose" data-i18n="ctx.p2">
+        Plutôt que de dessiner seule une nouvelle interface, j'ai fait le choix d'un atelier de
+        co-conception. L'objectif : travailler ensemble à améliorer l'expérience client de tout le
+        parcours Caféo, et en repartir avec un parcours utilisateur idéal, construit à plusieurs mains.
+      </p>
+    </section>
+
+    <!-- 02 CADRAGE -->
+    <section class="section" id="cadrage">
+      <div class="sec-eyebrow"><span class="num">02</span><span class="sep">∗</span> <span data-i18n="sec.cadrage">Cadrage</span></div>
+      <h2 class="sec-title" data-i18n="cad.title">Le canevas de l'atelier</h2>
+      <p class="prose" data-i18n="cad.p1">
+        Avant de convier qui que ce soit, j'ai cadré l'atelier avec un canevas de préparation :
+        pourquoi, avec qui, pour produire quoi, et quels pièges éviter. Ce document est le vrai
+        livrable de la phase amont — il garde le cap le jour J.
+      </p>
+
+      <div class="canvas7">
+        <div class="c7">
+          <div class="c7-key"><span class="n">01</span><span data-i18n="cad.k1">Pertinence</span></div>
+          <div class="c7-head" data-i18n="cad.h1">Pourquoi cet atelier ?</div>
+          <div class="c7-body" data-i18n="cad.b1">Améliorer l'expérience client de tout le parcours Caféo, de l'application à la découverte du bateau itinérant.</div>
+        </div>
+        <div class="c7">
+          <div class="c7-key"><span class="n">02</span><span data-i18n="cad.k2">Produits</span></div>
+          <div class="c7-head" data-i18n="cad.h2">Ce qu'on repart avec</div>
+          <div class="c7-body" data-i18n="cad.b2">Le parcours utilisateur idéal d'un client vivant l'expérience Caféo à 360°, plus des photos et courtes vidéos de la séance.</div>
+        </div>
+        <div class="c7">
+          <div class="c7-key"><span class="n">03</span><span data-i18n="cad.k3">Préparation</span></div>
+          <div class="c7-head" data-i18n="cad.h3">Matériel & outils</div>
+          <div class="c7-body" data-i18n="cad.b3">Un board FigJam prêt à l'emploi, Google Meet pour le distanciel, et tous les gabarits d'exercices préparés à l'avance.</div>
+        </div>
+        <div class="c7">
+          <div class="c7-key"><span class="n">04</span><span data-i18n="cad.k4">Pratique</span></div>
+          <div class="c7-head" data-i18n="cad.h4">Lieu & suivi</div>
+          <div class="c7-body" data-i18n="cad.b4">Séance en distanciel, un vendredi après-midi. Résultats consignés sur le board, partagés et exploités après l'atelier.</div>
+        </div>
+      </div>
+
+      <div class="chips-label"><span>⚠</span> <span data-i18n="cad.trapsLabel">Les pièges anticipés — et comment y répondre</span></div>
+      <div class="traps">
+        <div class="trap-card">
+          <div class="trap-key"><span>◆</span> <span data-i18n="cad.trapsK1">Risques d'animation</span></div>
+          <ul class="trap-list">
+            <li class="trap-item"><span class="trap-num">01</span><div><div class="trap-risk" data-i18n="cad.t1r">Ne pas savoir où aller</div><div class="trap-fix" data-i18n="cad.t1f">Se donner un objectif clair et le rappeler tout au long de la séance.</div></div></li>
+            <li class="trap-item"><span class="trap-num">02</span><div><div class="trap-risk" data-i18n="cad.t2r">Blocages dans les exercices</div><div class="trap-fix" data-i18n="cad.t2f">Tenir une bonne posture : mettre à l'aise et amener de l'énergie.</div></div></li>
+          </ul>
+        </div>
+        <div class="trap-card">
+          <div class="trap-key"><span>◆</span> <span data-i18n="cad.trapsK2">Risques de groupe</span></div>
+          <ul class="trap-list">
+            <li class="trap-item"><span class="trap-num">03</span><div><div class="trap-risk" data-i18n="cad.t3r">Mauvaise synergie</div><div class="trap-fix" data-i18n="cad.t3f">Choisir des personnes motivées et compatibles entre elles.</div></div></li>
+            <li class="trap-item"><span class="trap-num">04</span><div><div class="trap-risk" data-i18n="cad.t4r">Difficulté à s'immerger</div><div class="trap-fix" data-i18n="cad.t4f">Créer une ambiance qui se prête au sujet.</div></div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 DÉROULÉ -->
+    <section class="section" id="deroule">
+      <div class="sec-eyebrow"><span class="num">03</span><span class="sep">∗</span> <span data-i18n="sec.deroule">Déroulé</span></div>
+      <h2 class="sec-title" data-i18n="der.title">Deux heures, séquencées à la minute</h2>
+      <p class="prose" data-i18n="der.p1">
+        Le déroulé alterne temps d'échauffement, divergence et convergence — avec des pauses et un peu
+        de souplesse au cas où l'ordre du jour bougerait. Chaque bloc a son objectif et son minutage.
+      </p>
+
+      <div class="agenda">
+        <div class="ag-row">
+          <div class="ag-time">10′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a1t">Kick off</div><div class="ag-desc" data-i18n="der.a1d">Rappel de l'objectif, du cadre et des règles du jeu.</div></div>
+          <div class="ag-tag" data-i18n="der.tagOpen">Ouverture</div>
+        </div>
+        <div class="ag-row">
+          <div class="ag-time">5′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a2t">Ice-breaker</div><div class="ag-desc" data-i18n="der.a2d">Détendre le groupe et créer la confiance avant de produire.</div></div>
+          <div class="ag-tag" data-i18n="der.tagOpen">Ouverture</div>
+        </div>
+        <div class="ag-row">
+          <div class="ag-time">5′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a3t">Warm up</div><div class="ag-desc" data-i18n="der.a3d">Se mettre en jambes sur le sujet, activer la créativité.</div></div>
+          <div class="ag-tag" data-i18n="der.tagOpen">Ouverture</div>
+        </div>
+        <div class="ag-row">
+          <div class="ag-time">15′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a4t">Définition de la problématique</div><div class="ag-desc" data-i18n="der.a4d">Cadrer collectivement le « comment pourrait-on… » avant d'idéer.</div></div>
+          <div class="ag-tag" data-i18n="der.tagFrame">Cadrage</div>
+        </div>
+        <div class="ag-row">
+          <div class="ag-time">30′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a5t">Brainstorming</div><div class="ag-desc" data-i18n="der.a5d">Défouloir, reverse brainstorming, puis améliorer les idées des autres.</div></div>
+          <div class="ag-tag" data-i18n="der.tagDiverge">Divergence</div>
+        </div>
+        <div class="ag-row is-break">
+          <div class="ag-time">10′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a6t">Pause</div></div>
+          <div class="ag-tag" data-i18n="der.tagBreak">Pause</div>
+        </div>
+        <div class="ag-row">
+          <div class="ag-time">10′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a7t">Vote</div><div class="ag-desc" data-i18n="der.a7d">Prioriser ensemble les idées à retenir pour la suite.</div></div>
+          <div class="ag-tag" data-i18n="der.tagConverge">Convergence</div>
+        </div>
+        <div class="ag-row">
+          <div class="ag-time">15′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a8t">Scénario d'usage</div><div class="ag-desc" data-i18n="der.a8d">Mettre les idées retenues en situation, dans un parcours concret.</div></div>
+          <div class="ag-tag" data-i18n="der.tagConverge">Convergence</div>
+        </div>
+        <div class="ag-row">
+          <div class="ag-time">5′</div>
+          <div class="ag-main"><div class="ag-title" data-i18n="der.a9t">Debrief</div><div class="ag-desc" data-i18n="der.a9d">Récapituler, remercier, annoncer les prochaines étapes.</div></div>
+          <div class="ag-tag" data-i18n="der.tagClose">Clôture</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 LE JOUR J -->
+    <section class="section" id="jour">
+      <div class="sec-eyebrow"><span class="num">04</span><span class="sep">∗</span> <span data-i18n="sec.jour">Le jour J</span></div>
+      <h2 class="sec-title" data-i18n="jr.title">Les bonnes personnes, invitées comme il faut</h2>
+      <p class="prose" data-i18n="jr.p1">
+        Quatre participants aux profils complémentaires — designers et développeur, buveurs de café
+        assidus ou occasionnels — pour croiser les regards sans diluer l'énergie du groupe.
+      </p>
+
+      <div class="chips-label"><span>◇</span> <span data-i18n="jr.panelLabel">Le panel réuni</span></div>
+      <div class="chips">
+        <span class="chip">Alix · 30 ans · product designer</span>
+        <span class="chip">Julie · 24 ans · product designer</span>
+        <span class="chip">Simon · 32 ans · product designer</span>
+        <span class="chip">Elie · 25 ans · développeur</span>
+        <span class="chip is-soft" data-i18n="jr.facilitator">Camille · facilitatrice</span>
+      </div>
+
+      <div class="duo">
+        <div class="duo-card">
+          <div class="duo-key"><span>✉</span> <span data-i18n="jr.inviteKey">L'invitation</span></div>
+          <div class="duo-head" data-i18n="jr.inviteHead">Un mail qui met dans le bain</div>
+          <ul class="duo-list">
+            <li data-i18n="jr.i1">Objectif rappelé en une phrase : améliorer l'expérience autour du bateau-café.</li>
+            <li data-i18n="jr.i2">Date, horaire (13 h–15 h) et lien de connexion au distanciel.</li>
+            <li data-i18n="jr.i3">Programme détaillé en pièce jointe, durée annoncée (~2 h).</li>
+            <li data-i18n="jr.i4">Un ton chaleureux et une porte ouverte aux questions.</li>
+          </ul>
+        </div>
+        <div class="duo-card">
+          <div class="duo-key"><span>◎</span> <span data-i18n="jr.delivKey">Les livrables</span></div>
+          <div class="duo-head" data-i18n="jr.delivHead">Ce que la séance produit</div>
+          <ul class="duo-list">
+            <li data-i18n="jr.d1">Un parcours utilisateur idéal de l'expérience Caféo à 360°.</li>
+            <li data-i18n="jr.d2">Des idées priorisées, issues du brainstorming et du vote.</li>
+            <li data-i18n="jr.d3">Un scénario d'usage mettant les idées en situation.</li>
+            <li data-i18n="jr.d4">Des photos et courtes vidéos pour garder la trace.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 PARCOURS UTILISATEUR -->
+    <section class="section" id="parcours">
+      <div class="sec-eyebrow"><span class="num">05</span><span class="sep">∗</span> <span data-i18n="sec.parcours">Parcours utilisateur</span></div>
+      <h2 class="sec-title" data-i18n="pc.title">De la Réunion au colis reçu chez soi</h2>
+      <p class="prose" data-i18n="pc.p1">
+        Le fruit de l'atelier : une experience map qui suit Amar, du café dégusté en vacances jusqu'à
+        la réception de sa commande en France. À chaque étape, on lit ses actions, ses craintes — et
+        les opportunités de design qu'elles ouvrent.
+      </p>
+
+      <div class="personas">
+        <div class="persona">
+          <div class="persona-top">
+            <div class="persona-avatar">A</div>
+            <div>
+              <div class="persona-name">Amar · 38 ans</div>
+              <div class="persona-meta" data-i18n="pc.persona.meta">Vit en France · salarié · amateur de café curieux, sensible à la qualité et à l'environnement</div>
+            </div>
+          </div>
+          <p class="persona-quote" data-i18n="pc.persona.quote">« J'aimerais retrouver, chez moi, le café que j'ai adoré sur le bateau — sans en avoir oublié le nom. »</p>
+          <div class="persona-cols">
+            <div class="persona-col">
+              <div class="persona-col-key" data-i18n="pc.motiv">Motivations</div>
+              <ul><li data-i18n="pc.m1">Vivre une expérience immersive</li><li data-i18n="pc.m2">Découvrir de nouvelles variétés</li></ul>
+            </div>
+            <div class="persona-col">
+              <div class="persona-col-key" data-i18n="pc.frust">Frustrations</div>
+              <ul><li data-i18n="pc.fr1">Peu d'informations disponibles</li><li data-i18n="pc.fr2">Une appli imposée en voyage</li></ul>
+            </div>
+            <div class="persona-col">
+              <div class="persona-col-key" data-i18n="pc.att">Attentes</div>
+              <ul><li data-i18n="pc.a1">Être bien conseillé sur le café</li><li data-i18n="pc.a2">Recommander facilement ses favoris</li></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chips-label"><span>→</span> <span data-i18n="pc.mapLabel">Experience map — six étapes du parcours</span></div>
+      <div class="map-scroll">
+        <div class="map-grid">
+          <div class="map-col">
+            <div><div class="map-step" data-i18n="pc.s1.step">Étape 01</div><div class="map-phase" data-i18n="pc.s1.phase">Dans un café à la Réunion</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.act">Actions</div><div class="map-actions" data-i18n="pc.s1.act">Découvre un café local, apprend l'existence du bateau, télécharge l'appli pour le localiser.</div></div>
+            <div class="map-emo down"><span class="dot"></span><span data-i18n="pc.s1.emo">Curieux mais peu informé</span></div>
+            <div><div class="map-block-key" data-i18n="pc.k.pain">Craintes</div><div class="map-pain" data-i18n="pc.s1.pain">Peu d'infos disponibles ; une appli obligatoire à télécharger en plein voyage.</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.opp">Opportunité</div><div class="map-opp" data-i18n="pc.s1.opp">Mieux communiquer sur l'offre ; rendre l'appli optionnelle avec une alternative print.</div></div>
+          </div>
+          <div class="map-col">
+            <div><div class="map-step" data-i18n="pc.s2.step">Étape 02</div><div class="map-phase" data-i18n="pc.s2.phase">Le lendemain matin</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.act">Actions</div><div class="map-actions" data-i18n="pc.s2.act">Accompagne un ami au bateau, vérifie l'appli pour confirmer l'horaire.</div></div>
+            <div class="map-emo down"><span class="dot"></span><span data-i18n="pc.s2.emo">Hésitant</span></div>
+            <div><div class="map-block-key" data-i18n="pc.k.pain">Craintes</div><div class="map-pain" data-i18n="pc.s2.pain">Les informations sur l'application sont peu claires.</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.opp">Opportunité</div><div class="map-opp" data-i18n="pc.s2.opp">Ajouter une section dédiée aux horaires et à la localisation dans l'appli.</div></div>
+          </div>
+          <div class="map-col">
+            <div><div class="map-step" data-i18n="pc.s3.step">Étape 03</div><div class="map-phase" data-i18n="pc.s3.phase">Arrivée sur le bateau</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.act">Actions</div><div class="map-actions" data-i18n="pc.s3.act">Accueilli par un conseiller, déguste un café correspondant à ses préférences.</div></div>
+            <div class="map-emo"><span class="dot"></span><span data-i18n="pc.s3.emo">Rassuré</span></div>
+            <div><div class="map-block-key" data-i18n="pc.k.pain">Craintes</div><div class="map-pain" data-i18n="pc.s3.pain">Trop de choix, un manque d'accompagnement personnalisé.</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.opp">Opportunité</div><div class="map-opp" data-i18n="pc.s3.opp">Proposer un kit « starter pack » avec plusieurs cafés à comparer.</div></div>
+          </div>
+          <div class="map-col">
+            <div><div class="map-step" data-i18n="pc.s4.step">Étape 04</div><div class="map-phase" data-i18n="pc.s4.phase">Sur le bateau</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.act">Actions</div><div class="map-actions" data-i18n="pc.s4.act">Participe à une session de découverte, teste des cafés, note ses préférences dans l'appli.</div></div>
+            <div class="map-emo up"><span class="dot"></span><span data-i18n="pc.s4.emo">Engagé</span></div>
+            <div><div class="map-block-key" data-i18n="pc.k.pain">Craintes</div><div class="map-pain" data-i18n="pc.s4.pain">Difficulté à retenir les cafés préférés après la dégustation.</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.opp">Opportunité</div><div class="map-opp" data-i18n="pc.s4.opp">Un dispositif physique pour comparer le kit ; sauvegarde et recommandations sur mesure.</div></div>
+          </div>
+          <div class="map-col">
+            <div><div class="map-step" data-i18n="pc.s5.step">Étape 05</div><div class="map-phase" data-i18n="pc.s5.phase">De retour en France</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.act">Actions</div><div class="map-actions" data-i18n="pc.s5.act">Raconte son expérience à son entourage, cherche à commander le café qu'il a aimé.</div></div>
+            <div class="map-emo down"><span class="dot"></span><span data-i18n="pc.s5.emo">Frustré</span></div>
+            <div><div class="map-block-key" data-i18n="pc.k.pain">Craintes</div><div class="map-pain" data-i18n="pc.s5.pain">Ne se souvient plus du nom exact des cafés dégustés.</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.opp">Opportunité</div><div class="map-opp" data-i18n="pc.s5.opp">Un rappel des cafés testés, assorti de suggestions de commande.</div></div>
+          </div>
+          <div class="map-col">
+            <div><div class="map-step" data-i18n="pc.s6.step">Étape 06</div><div class="map-phase" data-i18n="pc.s6.phase">À la réception du colis</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.act">Actions</div><div class="map-actions" data-i18n="pc.s6.act">Reçoit sa commande, vérifie la qualité et la conformité des produits.</div></div>
+            <div class="map-emo"><span class="dot"></span><span data-i18n="pc.s6.emo">Satisfait, prudent</span></div>
+            <div><div class="map-block-key" data-i18n="pc.k.pain">Craintes</div><div class="map-pain" data-i18n="pc.s6.pain">Peut oublier ce qu'il avait aimé au moment de racheter.</div></div>
+            <div><div class="map-block-key" data-i18n="pc.k.opp">Opportunité</div><div class="map-opp" data-i18n="pc.s6.opp">Des fiches de dégustation dans chaque commande et un réassort automatique selon ses goûts.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="map-hint" data-i18n="pc.mapHint">→ Faites défiler horizontalement pour suivre les six étapes.</div>
+    </section>
+
+    <!-- 06 PISTES -->
+    <section class="section" id="pistes">
+      <div class="sec-eyebrow"><span class="num">06</span><span class="sep">∗</span> <span data-i18n="sec.pistes">Pistes & enseignements</span></div>
+      <h2 class="sec-title" data-i18n="pi.title">Ce que l'atelier a fait émerger</h2>
+      <p class="prose" data-i18n="pi.p1">
+        Au-delà des idées, l'atelier a dessiné quatre directions de conception qui répondent
+        directement aux craintes lues dans le parcours d'Amar.
+      </p>
+
+      <div class="reco">
+        <div class="reco-grid">
+          <div class="reco-card">
+            <div class="reco-num">01</div>
+            <div class="reco-head" data-i18n="pi.r1h">Ouvrir l'accès à l'information</div>
+            <div class="reco-body" data-i18n="pi.r1b">Horaires, localisation et offre clairs — et une alternative print pour ne pas dépendre de l'appli en voyage.</div>
+          </div>
+          <div class="reco-card">
+            <div class="reco-num">02</div>
+            <div class="reco-head" data-i18n="pi.r2h">Guider la dégustation</div>
+            <div class="reco-body" data-i18n="pi.r2b">Un kit « starter pack » et un accompagnement personnalisé pour transformer le trop-plein de choix en découverte.</div>
+          </div>
+          <div class="reco-card">
+            <div class="reco-num">03</div>
+            <div class="reco-head" data-i18n="pi.r3h">Garder la mémoire du goût</div>
+            <div class="reco-body" data-i18n="pi.r3b">Sauvegarde des préférences, rappel des cafés testés et suggestions — pour que rien ne se perde après le bateau.</div>
+          </div>
+          <div class="reco-card">
+            <div class="reco-num">04</div>
+            <div class="reco-head" data-i18n="pi.r4h">Prolonger l'expérience à la maison</div>
+            <div class="reco-body" data-i18n="pi.r4b">Fiches de dégustation et réassort automatique pour retrouver, chez soi, le café découvert à bord.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chips-label"><span>✦</span> <span data-i18n="pi.learnLabel">Ce que je retiens de la facilitation</span></div>
+      <div class="learnings">
+        <div class="learn"><div class="learn-glyph">✦</div><div>
+          <div class="learn-title" data-i18n="pi.l1t">Un atelier réussi se prépare plus qu'il ne s'anime.</div>
+          <div class="learn-body" data-i18n="pi.l1b">Le canevas, le choix des participants et le board prêt à l'emploi comptent davantage que l'improvisation du jour J.</div>
+        </div></div>
+        <div class="learn"><div class="learn-glyph">✦</div><div>
+          <div class="learn-title" data-i18n="pi.l2t">La posture du facilitateur fait l'énergie du groupe.</div>
+          <div class="learn-body" data-i18n="pi.l2b">Mettre à l'aise, cadrer sans brider, relancer au bon moment : c'est ce qui débloque la créativité collective.</div>
+        </div></div>
+        <div class="learn"><div class="learn-glyph">✦</div><div>
+          <div class="learn-title" data-i18n="pi.l3t">Diverger puis converger, sans mélanger les deux.</div>
+          <div class="learn-body" data-i18n="pi.l3b">Le séquencement — défouloir, vote, scénario — protège les idées naissantes avant de les mettre à l'épreuve.</div>
+        </div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="closer">
+    <a href="index.html" class="closer-name">Camille Adam<span>✦</span></a>
+    <div class="closer-links">
+      <a href="index.html#projets" data-i18n="closer.all">← Tous les projets</a>
+      <a href="mailto:c.adam.design@gmail.com">c.adam.design@gmail.com ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  var LANG_KEY = 'ca-site-lang';
+  var DOC_TITLE = { fr: "Étude de cas — Atelier de co-conception", en: "Case study — Co-design workshop" };
+  var I18N = {
+    fr: {
+      "rail.toc": "Sommaire",
+      "rail.contexte": "Contexte", "rail.cadrage": "Cadrage", "rail.deroule": "Déroulé",
+      "rail.jour": "Le jour J", "rail.parcours": "Parcours", "rail.pistes": "Pistes",
+      "hero.eyebrow": "Étude de cas ✦ Design Thinking ∗ Atelier de co-conception",
+      "hero.title": "Faire émerger des idées, ensemble",
+      "hero.context": "Préparer et animer un atelier de co-conception pour Caféo — un bateau-café itinérant dont l'application ne rend pas encore compte de l'offre. Réunir quatre profils autour d'une même table (virtuelle) et, en deux heures, imaginer le parcours idéal d'un client qui vit l'expérience Caféo à 360°.",
+      "hero.empathy": "Un bon atelier ne se joue pas le jour J : il se joue dans la préparation. Un objectif clair, les bonnes personnes, une ambiance qui met à l'aise — et les idées viennent d'elles-mêmes.",
+      "meta.role": "Rôle", "meta.roleVal": "Facilitatrice d'atelier",
+      "meta.format": "Format", "meta.formatVal": "Distanciel · FigJam & Google Meet",
+      "meta.setup": "Dispositif", "meta.setupVal": "4 participants · ~2 h",
+      "meta.scope": "Déroulé",
+      "scope.s1": "Cadrage", "scope.s2": "Ice-breaker", "scope.s3": "Brainstorming", "scope.s4": "Vote", "scope.s5": "Scénario d'usage", "scope.s6": "Parcours utilisateur",
+      "sec.contexte": "Contexte", "sec.cadrage": "Cadrage", "sec.deroule": "Déroulé",
+      "sec.jour": "Le jour J", "sec.parcours": "Parcours utilisateur", "sec.pistes": "Pistes & enseignements",
+      "ctx.title": "Caféo, du bateau à l'application",
+      "ctx.p1": "Caféo fait vivre une expérience autour du café à bord d'un bateau itinérant. Une application existe déjà, mais elle ne parvient pas à rendre compte de l'offre disponible : horaires, localisation, cafés proposés. L'expérience se joue pourtant sur toute une chaîne — de l'application à la découverte de la boutique physique.",
+      "ctx.p2": "Plutôt que de dessiner seule une nouvelle interface, j'ai fait le choix d'un atelier de co-conception. L'objectif : travailler ensemble à améliorer l'expérience client de tout le parcours Caféo, et en repartir avec un parcours utilisateur idéal, construit à plusieurs mains.",
+      "cad.title": "Le canevas de l'atelier",
+      "cad.p1": "Avant de convier qui que ce soit, j'ai cadré l'atelier avec un canevas de préparation : pourquoi, avec qui, pour produire quoi, et quels pièges éviter. Ce document est le vrai livrable de la phase amont — il garde le cap le jour J.",
+      "cad.k1": "Pertinence", "cad.h1": "Pourquoi cet atelier ?", "cad.b1": "Améliorer l'expérience client de tout le parcours Caféo, de l'application à la découverte du bateau itinérant.",
+      "cad.k2": "Produits", "cad.h2": "Ce qu'on repart avec", "cad.b2": "Le parcours utilisateur idéal d'un client vivant l'expérience Caféo à 360°, plus des photos et courtes vidéos de la séance.",
+      "cad.k3": "Préparation", "cad.h3": "Matériel & outils", "cad.b3": "Un board FigJam prêt à l'emploi, Google Meet pour le distanciel, et tous les gabarits d'exercices préparés à l'avance.",
+      "cad.k4": "Pratique", "cad.h4": "Lieu & suivi", "cad.b4": "Séance en distanciel, un vendredi après-midi. Résultats consignés sur le board, partagés et exploités après l'atelier.",
+      "cad.trapsLabel": "Les pièges anticipés — et comment y répondre",
+      "cad.trapsK1": "Risques d'animation", "cad.trapsK2": "Risques de groupe",
+      "cad.t1r": "Ne pas savoir où aller", "cad.t1f": "Se donner un objectif clair et le rappeler tout au long de la séance.",
+      "cad.t2r": "Blocages dans les exercices", "cad.t2f": "Tenir une bonne posture : mettre à l'aise et amener de l'énergie.",
+      "cad.t3r": "Mauvaise synergie", "cad.t3f": "Choisir des personnes motivées et compatibles entre elles.",
+      "cad.t4r": "Difficulté à s'immerger", "cad.t4f": "Créer une ambiance qui se prête au sujet.",
+      "der.title": "Deux heures, séquencées à la minute",
+      "der.p1": "Le déroulé alterne temps d'échauffement, divergence et convergence — avec des pauses et un peu de souplesse au cas où l'ordre du jour bougerait. Chaque bloc a son objectif et son minutage.",
+      "der.tagOpen": "Ouverture", "der.tagFrame": "Cadrage", "der.tagDiverge": "Divergence", "der.tagBreak": "Pause", "der.tagConverge": "Convergence", "der.tagClose": "Clôture",
+      "der.a1t": "Kick off", "der.a1d": "Rappel de l'objectif, du cadre et des règles du jeu.",
+      "der.a2t": "Ice-breaker", "der.a2d": "Détendre le groupe et créer la confiance avant de produire.",
+      "der.a3t": "Warm up", "der.a3d": "Se mettre en jambes sur le sujet, activer la créativité.",
+      "der.a4t": "Définition de la problématique", "der.a4d": "Cadrer collectivement le « comment pourrait-on… » avant d'idéer.",
+      "der.a5t": "Brainstorming", "der.a5d": "Défouloir, reverse brainstorming, puis améliorer les idées des autres.",
+      "der.a6t": "Pause",
+      "der.a7t": "Vote", "der.a7d": "Prioriser ensemble les idées à retenir pour la suite.",
+      "der.a8t": "Scénario d'usage", "der.a8d": "Mettre les idées retenues en situation, dans un parcours concret.",
+      "der.a9t": "Debrief", "der.a9d": "Récapituler, remercier, annoncer les prochaines étapes.",
+      "jr.title": "Les bonnes personnes, invitées comme il faut",
+      "jr.p1": "Quatre participants aux profils complémentaires — designers et développeur, buveurs de café assidus ou occasionnels — pour croiser les regards sans diluer l'énergie du groupe.",
+      "jr.panelLabel": "Le panel réuni", "jr.facilitator": "Camille · facilitatrice",
+      "jr.inviteKey": "L'invitation", "jr.inviteHead": "Un mail qui met dans le bain",
+      "jr.i1": "Objectif rappelé en une phrase : améliorer l'expérience autour du bateau-café.",
+      "jr.i2": "Date, horaire (13 h–15 h) et lien de connexion au distanciel.",
+      "jr.i3": "Programme détaillé en pièce jointe, durée annoncée (~2 h).",
+      "jr.i4": "Un ton chaleureux et une porte ouverte aux questions.",
+      "jr.delivKey": "Les livrables", "jr.delivHead": "Ce que la séance produit",
+      "jr.d1": "Un parcours utilisateur idéal de l'expérience Caféo à 360°.",
+      "jr.d2": "Des idées priorisées, issues du brainstorming et du vote.",
+      "jr.d3": "Un scénario d'usage mettant les idées en situation.",
+      "jr.d4": "Des photos et courtes vidéos pour garder la trace.",
+      "pc.title": "De la Réunion au colis reçu chez soi",
+      "pc.p1": "Le fruit de l'atelier : une experience map qui suit Amar, du café dégusté en vacances jusqu'à la réception de sa commande en France. À chaque étape, on lit ses actions, ses craintes — et les opportunités de design qu'elles ouvrent.",
+      "pc.persona.meta": "Vit en France · salarié · amateur de café curieux, sensible à la qualité et à l'environnement",
+      "pc.persona.quote": "« J'aimerais retrouver, chez moi, le café que j'ai adoré sur le bateau — sans en avoir oublié le nom. »",
+      "pc.motiv": "Motivations", "pc.frust": "Frustrations", "pc.att": "Attentes",
+      "pc.m1": "Vivre une expérience immersive", "pc.m2": "Découvrir de nouvelles variétés",
+      "pc.fr1": "Peu d'informations disponibles", "pc.fr2": "Une appli imposée en voyage",
+      "pc.a1": "Être bien conseillé sur le café", "pc.a2": "Recommander facilement ses favoris",
+      "pc.mapLabel": "Experience map — six étapes du parcours",
+      "pc.k.act": "Actions", "pc.k.pain": "Craintes", "pc.k.opp": "Opportunité",
+      "pc.s1.step": "Étape 01", "pc.s1.phase": "Dans un café à la Réunion", "pc.s1.act": "Découvre un café local, apprend l'existence du bateau, télécharge l'appli pour le localiser.", "pc.s1.emo": "Curieux mais peu informé", "pc.s1.pain": "Peu d'infos disponibles ; une appli obligatoire à télécharger en plein voyage.", "pc.s1.opp": "Mieux communiquer sur l'offre ; rendre l'appli optionnelle avec une alternative print.",
+      "pc.s2.step": "Étape 02", "pc.s2.phase": "Le lendemain matin", "pc.s2.act": "Accompagne un ami au bateau, vérifie l'appli pour confirmer l'horaire.", "pc.s2.emo": "Hésitant", "pc.s2.pain": "Les informations sur l'application sont peu claires.", "pc.s2.opp": "Ajouter une section dédiée aux horaires et à la localisation dans l'appli.",
+      "pc.s3.step": "Étape 03", "pc.s3.phase": "Arrivée sur le bateau", "pc.s3.act": "Accueilli par un conseiller, déguste un café correspondant à ses préférences.", "pc.s3.emo": "Rassuré", "pc.s3.pain": "Trop de choix, un manque d'accompagnement personnalisé.", "pc.s3.opp": "Proposer un kit « starter pack » avec plusieurs cafés à comparer.",
+      "pc.s4.step": "Étape 04", "pc.s4.phase": "Sur le bateau", "pc.s4.act": "Participe à une session de découverte, teste des cafés, note ses préférences dans l'appli.", "pc.s4.emo": "Engagé", "pc.s4.pain": "Difficulté à retenir les cafés préférés après la dégustation.", "pc.s4.opp": "Un dispositif physique pour comparer le kit ; sauvegarde et recommandations sur mesure.",
+      "pc.s5.step": "Étape 05", "pc.s5.phase": "De retour en France", "pc.s5.act": "Raconte son expérience à son entourage, cherche à commander le café qu'il a aimé.", "pc.s5.emo": "Frustré", "pc.s5.pain": "Ne se souvient plus du nom exact des cafés dégustés.", "pc.s5.opp": "Un rappel des cafés testés, assorti de suggestions de commande.",
+      "pc.s6.step": "Étape 06", "pc.s6.phase": "À la réception du colis", "pc.s6.act": "Reçoit sa commande, vérifie la qualité et la conformité des produits.", "pc.s6.emo": "Satisfait, prudent", "pc.s6.pain": "Peut oublier ce qu'il avait aimé au moment de racheter.", "pc.s6.opp": "Des fiches de dégustation dans chaque commande et un réassort automatique selon ses goûts.",
+      "pc.mapHint": "→ Faites défiler horizontalement pour suivre les six étapes.",
+      "pi.title": "Ce que l'atelier a fait émerger",
+      "pi.p1": "Au-delà des idées, l'atelier a dessiné quatre directions de conception qui répondent directement aux craintes lues dans le parcours d'Amar.",
+      "pi.r1h": "Ouvrir l'accès à l'information", "pi.r1b": "Horaires, localisation et offre clairs — et une alternative print pour ne pas dépendre de l'appli en voyage.",
+      "pi.r2h": "Guider la dégustation", "pi.r2b": "Un kit « starter pack » et un accompagnement personnalisé pour transformer le trop-plein de choix en découverte.",
+      "pi.r3h": "Garder la mémoire du goût", "pi.r3b": "Sauvegarde des préférences, rappel des cafés testés et suggestions — pour que rien ne se perde après le bateau.",
+      "pi.r4h": "Prolonger l'expérience à la maison", "pi.r4b": "Fiches de dégustation et réassort automatique pour retrouver, chez soi, le café découvert à bord.",
+      "pi.learnLabel": "Ce que je retiens de la facilitation",
+      "pi.l1t": "Un atelier réussi se prépare plus qu'il ne s'anime.", "pi.l1b": "Le canevas, le choix des participants et le board prêt à l'emploi comptent davantage que l'improvisation du jour J.",
+      "pi.l2t": "La posture du facilitateur fait l'énergie du groupe.", "pi.l2b": "Mettre à l'aise, cadrer sans brider, relancer au bon moment : c'est ce qui débloque la créativité collective.",
+      "pi.l3t": "Diverger puis converger, sans mélanger les deux.", "pi.l3b": "Le séquencement — défouloir, vote, scénario — protège les idées naissantes avant de les mettre à l'épreuve.",
+      "closer.all": "← Tous les projets"
+    },
+    en: {
+      "rail.toc": "Contents",
+      "rail.contexte": "Context", "rail.cadrage": "Framing", "rail.deroule": "Agenda",
+      "rail.jour": "The day", "rail.parcours": "Journey", "rail.pistes": "Directions",
+      "hero.eyebrow": "Case study ✦ Design Thinking ∗ Co-design workshop",
+      "hero.title": "Bringing ideas to life, together",
+      "hero.context": "Preparing and running a co-design workshop for Caféo — a travelling coffee-boat whose app doesn't yet reflect its offer. Gathering four profiles around one (virtual) table and, in two hours, imagining the ideal journey of a customer living the Caféo experience in 360°.",
+      "hero.empathy": "A good workshop isn't won on the day: it's won in the preparation. A clear goal, the right people, an atmosphere that puts everyone at ease — and the ideas come on their own.",
+      "meta.role": "Role", "meta.roleVal": "Workshop facilitator",
+      "meta.format": "Format", "meta.formatVal": "Remote · FigJam & Google Meet",
+      "meta.setup": "Setup", "meta.setupVal": "4 participants · ~2 h",
+      "meta.scope": "Agenda",
+      "scope.s1": "Framing", "scope.s2": "Ice-breaker", "scope.s3": "Brainstorming", "scope.s4": "Vote", "scope.s5": "Use scenario", "scope.s6": "User journey",
+      "sec.contexte": "Context", "sec.cadrage": "Framing", "sec.deroule": "Agenda",
+      "sec.jour": "The day", "sec.parcours": "User journey", "sec.pistes": "Directions & takeaways",
+      "ctx.title": "Caféo, from boat to app",
+      "ctx.p1": "Caféo delivers a coffee experience aboard a travelling boat. An app already exists, but it fails to convey the available offer: schedules, location, coffees on hand. Yet the experience spans a whole chain — from the app to discovering the physical shop.",
+      "ctx.p2": "Rather than designing a new interface alone, I chose a co-design workshop. The goal: to improve the customer experience of the whole Caféo journey together, and leave with an ideal user journey built by many hands.",
+      "cad.title": "The workshop canvas",
+      "cad.p1": "Before inviting anyone, I framed the workshop with a preparation canvas: why, with whom, to produce what, and which traps to avoid. This document is the real deliverable of the upstream phase — it keeps us on course on the day.",
+      "cad.k1": "Relevance", "cad.h1": "Why this workshop?", "cad.b1": "Improve the customer experience of the whole Caféo journey, from the app to discovering the travelling boat.",
+      "cad.k2": "Products", "cad.h2": "What we leave with", "cad.b2": "The ideal user journey of a customer living the Caféo experience in 360°, plus photos and short videos of the session.",
+      "cad.k3": "Preparation", "cad.h3": "Materials & tools", "cad.b3": "A ready-to-use FigJam board, Google Meet for the remote setup, and every exercise template prepared in advance.",
+      "cad.k4": "Practice", "cad.h4": "Place & follow-up", "cad.b4": "A remote session, one Friday afternoon. Results captured on the board, shared and used after the workshop.",
+      "cad.trapsLabel": "The traps anticipated — and how to answer them",
+      "cad.trapsK1": "Facilitation risks", "cad.trapsK2": "Group risks",
+      "cad.t1r": "Not knowing where to go", "cad.t1f": "Set a clear goal and keep restating it throughout the session.",
+      "cad.t2r": "Getting stuck in exercises", "cad.t2f": "Hold a good posture: put people at ease and bring energy.",
+      "cad.t3r": "Poor synergy", "cad.t3f": "Pick people who are motivated and compatible with each other.",
+      "cad.t4r": "Trouble getting immersed", "cad.t4f": "Create an atmosphere that suits the topic.",
+      "der.title": "Two hours, sequenced to the minute",
+      "der.p1": "The agenda alternates warm-up, divergence and convergence — with breaks and a little flexibility in case the running order shifts. Each block has its purpose and its timing.",
+      "der.tagOpen": "Opening", "der.tagFrame": "Framing", "der.tagDiverge": "Divergence", "der.tagBreak": "Break", "der.tagConverge": "Convergence", "der.tagClose": "Closing",
+      "der.a1t": "Kick off", "der.a1d": "Restate the goal, the frame and the rules of the game.",
+      "der.a2t": "Ice-breaker", "der.a2d": "Relax the group and build trust before producing.",
+      "der.a3t": "Warm up", "der.a3d": "Get going on the topic, activate creativity.",
+      "der.a4t": "Defining the problem", "der.a4d": "Collectively frame the “how might we…” before ideating.",
+      "der.a5t": "Brainstorming", "der.a5d": "Free-for-all, reverse brainstorming, then building on others' ideas.",
+      "der.a6t": "Break",
+      "der.a7t": "Vote", "der.a7d": "Prioritise together the ideas to carry forward.",
+      "der.a8t": "Use scenario", "der.a8d": "Put the chosen ideas into a concrete journey.",
+      "der.a9t": "Debrief", "der.a9d": "Recap, thank everyone, announce next steps.",
+      "jr.title": "The right people, invited the right way",
+      "jr.p1": "Four participants with complementary profiles — designers and a developer, heavy or occasional coffee drinkers — to cross perspectives without diluting the group's energy.",
+      "jr.panelLabel": "The panel gathered", "jr.facilitator": "Camille · facilitator",
+      "jr.inviteKey": "The invitation", "jr.inviteHead": "An email that sets the scene",
+      "jr.i1": "Goal restated in one line: improve the experience around the coffee-boat.",
+      "jr.i2": "Date, time (1–3 pm) and the remote connection link.",
+      "jr.i3": "Detailed programme attached, stated duration (~2 h).",
+      "jr.i4": "A warm tone and an open door to questions.",
+      "jr.delivKey": "The deliverables", "jr.delivHead": "What the session produces",
+      "jr.d1": "An ideal user journey of the Caféo experience in 360°.",
+      "jr.d2": "Prioritised ideas from the brainstorming and the vote.",
+      "jr.d3": "A use scenario putting the ideas into situation.",
+      "jr.d4": "Photos and short videos to keep a record.",
+      "pc.title": "From Réunion to the parcel at home",
+      "pc.p1": "The fruit of the workshop: an experience map following Amar, from the coffee tasted on holiday to receiving his order in France. At each step you read his actions, his fears — and the design opportunities they open.",
+      "pc.persona.meta": "Lives in France · employee · curious coffee lover, sensitive to quality and the environment",
+      "pc.persona.quote": "“I'd love to find, at home, the coffee I adored on the boat — without having forgotten its name.”",
+      "pc.motiv": "Motivations", "pc.frust": "Frustrations", "pc.att": "Expectations",
+      "pc.m1": "Live an immersive experience", "pc.m2": "Discover new varieties",
+      "pc.fr1": "Little information available", "pc.fr2": "An app forced on him while travelling",
+      "pc.a1": "Get good advice on the coffee", "pc.a2": "Easily reorder his favourites",
+      "pc.mapLabel": "Experience map — six steps of the journey",
+      "pc.k.act": "Actions", "pc.k.pain": "Fears", "pc.k.opp": "Opportunity",
+      "pc.s1.step": "Step 01", "pc.s1.phase": "In a café in Réunion", "pc.s1.act": "Discovers a local coffee, learns the boat exists, downloads the app to locate it.", "pc.s1.emo": "Curious but under-informed", "pc.s1.pain": "Little info available; a mandatory app to download mid-trip.", "pc.s1.opp": "Communicate the offer better; make the app optional with a print alternative.",
+      "pc.s2.step": "Step 02", "pc.s2.phase": "The next morning", "pc.s2.act": "Goes with a friend to the boat, checks the app to confirm the schedule.", "pc.s2.emo": "Hesitant", "pc.s2.pain": "The information in the app is unclear.", "pc.s2.opp": "Add a dedicated schedule and location section in the app.",
+      "pc.s3.step": "Step 03", "pc.s3.phase": "Arriving on the boat", "pc.s3.act": "Welcomed by an advisor, tastes a coffee matching his preferences.", "pc.s3.emo": "Reassured", "pc.s3.pain": "Too much choice, a lack of personalised guidance.", "pc.s3.opp": "Offer a “starter pack” kit with several coffees to compare.",
+      "pc.s4.step": "Step 04", "pc.s4.phase": "On the boat", "pc.s4.act": "Joins a discovery session, tastes coffees, notes his preferences in the app.", "pc.s4.emo": "Engaged", "pc.s4.pain": "Hard to remember favourite coffees after the tasting.", "pc.s4.opp": "A physical device to compare the kit; saved preferences and tailored recommendations.",
+      "pc.s5.step": "Step 05", "pc.s5.phase": "Back in France", "pc.s5.act": "Tells friends about it, tries to order the coffee he liked.", "pc.s5.emo": "Frustrated", "pc.s5.pain": "No longer remembers the exact names of the coffees tasted.", "pc.s5.opp": "A reminder of the coffees tested, paired with order suggestions.",
+      "pc.s6.step": "Step 06", "pc.s6.phase": "Receiving the parcel", "pc.s6.act": "Receives his order, checks quality and conformity of the products.", "pc.s6.emo": "Satisfied, cautious", "pc.s6.pain": "May forget what he had liked when reordering.", "pc.s6.opp": "Tasting notes in every order and automatic replenishment to his taste.",
+      "pc.mapHint": "→ Scroll horizontally to follow the six steps.",
+      "pi.title": "What the workshop surfaced",
+      "pi.p1": "Beyond ideas, the workshop drew four design directions that respond directly to the fears read in Amar's journey.",
+      "pi.r1h": "Open up access to information", "pi.r1b": "Clear schedules, location and offer — plus a print alternative so travellers don't depend on the app.",
+      "pi.r2h": "Guide the tasting", "pi.r2b": "A “starter pack” kit and personalised guidance to turn too much choice into discovery.",
+      "pi.r3h": "Keep the memory of taste", "pi.r3b": "Saved preferences, a reminder of coffees tested and suggestions — so nothing gets lost after the boat.",
+      "pi.r4h": "Extend the experience at home", "pi.r4b": "Tasting notes and automatic replenishment to find, at home, the coffee discovered on board.",
+      "pi.learnLabel": "What I take away from facilitating",
+      "pi.l1t": "A successful workshop is prepared more than it's run.", "pi.l1b": "The canvas, the choice of participants and a ready board matter more than improvising on the day.",
+      "pi.l2t": "The facilitator's posture makes the group's energy.", "pi.l2b": "Putting people at ease, framing without stifling, nudging at the right moment: that's what unlocks collective creativity.",
+      "pi.l3t": "Diverge then converge, without mixing the two.", "pi.l3b": "The sequencing — free-for-all, vote, scenario — protects fledgling ideas before testing them.",
+      "closer.all": "← All projects"
+    }
+  };
+
+  function applyLang(lang) {
+    var dict = I18N[lang] || I18N.fr;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] != null) el.innerHTML = dict[key];
+    });
+    document.documentElement.lang = lang;
+    if (DOC_TITLE[lang]) document.title = DOC_TITLE[lang];
+    document.querySelectorAll('.lang-switch button').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.lang-switch button');
+    if (b) { applyLang(b.getAttribute('data-lang')); }
+  });
+  (function () {
+    var saved = 'fr';
+    try { var s = localStorage.getItem(LANG_KEY); if (s === 'fr' || s === 'en') saved = s; } catch (e) {}
+    applyLang(saved);
+  })();
+
+  var OFFSET = 32;
+  function scroller() { return document.scrollingElement || document.documentElement; }
+  function goTo(id) {
+    var el = document.getElementById(id); if (!el) return;
+    var sc = scroller();
+    var y = el.getBoundingClientRect().top + sc.scrollTop - OFFSET;
+    sc.scrollTo({ top: y, behavior: 'smooth' });
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-anchor]');
+    if (a) { e.preventDefault(); goTo(a.getAttribute('data-anchor')); }
+  });
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#railnav a'));
+    var ids = links.map(function (l) { return l.getAttribute('data-anchor'); });
+    var sections = ids.map(function (id) { return document.getElementById(id); });
+    function setActive(id) { links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('data-anchor') === id); }); }
+    function onScroll() {
+      var best = ids[0], bestTop = -Infinity;
+      for (var j = 0; j < sections.length; j++) {
+        if (!sections[j]) continue;
+        var top = sections[j].getBoundingClientRect().top - OFFSET - 130;
+        if (top <= 0 && top > bestTop) { bestTop = top; best = ids[j]; }
+      }
+      setActive(best);
+    }
+    setActive(ids[0]);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+  setTimeout(function () {
+    document.querySelectorAll('.fade-up').forEach(function (el) {
+      (el.getAnimations ? el.getAnimations() : []).forEach(function (a) { try { a.finish(); } catch (e) {} });
+    });
+  }, 900);
+</script>
+</body>
+</html>
