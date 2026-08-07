@@ -508,6 +508,18 @@ nav {
 }
 .project-card:hover .visual-5-img { transform: scale(1.05); }
 
+.visual-8 { overflow: hidden; }
+.visual-8-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transform: scale(1);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.project-card:hover .visual-8-img { transform: scale(1.05); }
+
 /* Visual 7 — verbatim "voices" wall */
 .visual-7 { background: var(--color-canvas-soft); }
 .visual-7-inner {
@@ -1001,14 +1013,7 @@ footer {
       <!-- Projet — Atelier de co-conception -->
       <a href="Etude de cas - Atelier co-conception.html" class="project-card">
         <div class="project-visual visual-8">
-          <div class="visual-8-inner">
-            <div class="v8-note v8-n1"><span class="l"></span><span class="l s"></span></div>
-            <div class="v8-note v8-n2"><span class="l"></span><span class="l s"></span></div>
-            <div class="v8-note v8-n3"><span class="l"></span><span class="l s"></span></div>
-            <div class="v8-note v8-n4"><span class="l"></span><span class="l s"></span></div>
-            <div class="v8-note v8-n5"><span class="l"></span><span class="l s"></span></div>
-            <div class="v8-votes"><span></span><span></span><span></span></div>
-          </div>
+          <img src="img/atelier-coconception-card.jpg" alt="Tableau de co-conception FigJam — post-its d'idéation autour de « Avoir plus d'infos sur mon café »" class="visual-8-img">
         </div>
         <div class="project-info">
           <div class="project-tag" data-i18n="p7.tag">Design Thinking ∗ Facilitation</div>
