@@ -9,19 +9,19 @@
 <style>
 
 :root {
-  --color-canvas:          #FFF6BE;
-  --color-canvas-soft:     #FFFADC;
-  --color-surface-card:    #F5EDA0;
-  --color-surface-dark:    #1C1A14;
-  --color-surface-dark-el: #272520;
-  --color-ink:             #1C1A14;
-  --color-body:            #3D3A32;
-  --color-muted:           #6E6A60;
-  --color-muted-soft:      #9E9A90;
-  --color-hairline:        #E8E080;
-  --color-hairline-soft:   #F0ECA0;
-  --color-on-dark:         #FFF6BE;
-  --color-on-dark-soft:    #9E9A90;
+  --color-canvas:          #FFFFFF;
+  --color-canvas-soft:     #EDF6FF;
+  --color-surface-card:    #C6E3F7;
+  --color-surface-dark:    #08243B;
+  --color-surface-dark-el: #123B59;
+  --color-ink:             #08243B;
+  --color-body:            #29465A;
+  --color-muted:           #5E7788;
+  --color-muted-soft:      #8EA6B5;
+  --color-hairline:        #B8D5EA;
+  --color-hairline-soft:   #D9EBF7;
+  --color-on-dark:         #F7FBFF;
+  --color-on-dark-soft:    #A9C4D6;
 
   --font-display: 'Libre Baskerville', Georgia, serif;
   --font-body:    'DM Sans', system-ui, sans-serif;
@@ -48,7 +48,7 @@ body {
   background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -167,7 +167,7 @@ a { text-decoration: none; color: inherit; }
   gap: var(--space-xs);
   padding: 9px 0;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 400;
   color: var(--color-muted);
   transition: color 0.15s ease;
@@ -269,7 +269,7 @@ a { text-decoration: none; color: inherit; }
 }
 .meta-val {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--color-ink);
   line-height: 1.45;
@@ -334,7 +334,7 @@ a { text-decoration: none; color: inherit; }
 
 .prose {
   font-family: var(--font-body);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--color-body);
   line-height: 1.65;
@@ -393,7 +393,7 @@ a { text-decoration: none; color: inherit; }
 }
 .need-desc {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--color-muted);
   line-height: 1.55;
@@ -675,7 +675,7 @@ a { text-decoration: none; color: inherit; }
   align-items: center;
   gap: 7px;
   padding: 11px 15px;
-  background: #F3F1EA;
+  background: #EAF4FB;
   border-bottom: 1px solid rgba(28, 26, 20, 0.07);
 }
 .showcase-chrome .dot {
@@ -692,7 +692,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
-  color: #8A857B;
+  color: #5E7788;
   white-space: nowrap;
 }
 .showcase-img { display: block; width: 100%; height: auto; }
@@ -906,8 +906,8 @@ a { text-decoration: none; color: inherit; }
     <p class="hero-context fade-up fade-up-3" data-i18n="hero.context">
       Refonte du système de filtres d'Oplit, logiciel B2B de gestion industrielle, et introduction des
       vues sauvegardées. Derrière un simple besoin de filtrage plus flexible, la recherche a révélé un
-      enjeu plus large — permettre aux utilisateurs de retrouver leur contexte de travail complet en une
-      seule action — pour un résultat de deux fois plus d'utilisation des filtres et un usage adopté par
+      enjeu plus large : permettre aux utilisateurs de retrouver leur contexte de travail complet en une
+      seule action, pour un résultat de deux fois plus d'utilisation des filtres et un usage adopté par
       20 clients.
     </p>
 
@@ -956,7 +956,7 @@ a { text-decoration: none; color: inherit; }
       </p>
       <p class="prose" data-i18n="contexte.p2">
         Ce projet a été mené dans un cadre professionnel chez Oplit. Conçu de bout en bout, il a été
-        développé puis déployé en production — et utilisé chaque jour par les utilisateurs de l'outil.
+        développé puis déployé en production, et utilisé chaque jour par les utilisateurs de l'outil.
       </p>
 
       <figure class="plate">
@@ -1037,7 +1037,7 @@ a { text-decoration: none; color: inherit; }
         </div>
         <div class="verbatim">
           <p class="verbatim-text" data-i18n="recherche.v2">
-            « Je voudrais des filtres spécifiques par secteur — voir le découpage, le tournage… Je veux
+            « Je voudrais des filtres spécifiques par secteur : voir le découpage, le tournage… Je veux
             pouvoir faire des filtres différents sur chaque poste de charge. »
           </p>
           <div class="verbatim-tag" data-i18n="recherche.v2tag">Filtres par poste de charge</div>
@@ -1136,7 +1136,7 @@ a { text-decoration: none; color: inherit; }
           <div class="sol-tag" data-i18n="solution.tagFilters">◆ Côté filtres</div>
           <div class="sol-head" data-i18n="solution.headFilters">Adaptés et lisibles</div>
           <ul class="sol-list">
-            <li data-i18n="solution.f1">Champs typés — texte, nombre, date, tag — avec composants et opérateurs adaptés.</li>
+            <li data-i18n="solution.f1">Champs typés : texte, nombre, date, tag, avec composants et opérateurs adaptés.</li>
             <li data-i18n="solution.f2">Filtres actifs toujours visibles.</li>
             <li data-i18n="solution.f3">Empty state clair pour distinguer « vide » de « masqué ».</li>
           </ul>
@@ -1220,7 +1220,7 @@ a { text-decoration: none; color: inherit; }
       "rail.ideation": "Idéation", "rail.solution": "Solution", "rail.resultats": "Résultats",
       "hero.eyebrow": "Étude de cas ✦ Oplit ∗ Éditeur SaaS",
       "hero.title": "De la refonte des filtres aux vues partagées",
-      "hero.context": "Refonte du système de filtres d'Oplit, logiciel B2B de gestion industrielle, et introduction des vues sauvegardées. Derrière un simple besoin de filtrage plus flexible, la recherche a révélé un enjeu plus large — permettre aux utilisateurs de retrouver leur contexte de travail complet en une seule action — pour un résultat de deux fois plus d'utilisation des filtres et un usage adopté par 20 clients.",
+      "hero.context": "Refonte du système de filtres d'Oplit, logiciel B2B de gestion industrielle, et introduction des vues sauvegardées. Derrière un simple besoin de filtrage plus flexible, la recherche a révélé un enjeu plus large : permettre aux utilisateurs de retrouver leur contexte de travail complet en une seule action, pour un résultat de deux fois plus d'utilisation des filtres et un usage adopté par 20 clients.",
       "hero.plateCap": "Oplit en atelier ◇ pilotage des ordres de fabrication au plus près de la production",
       "meta.date": "Date", "meta.dateVal": "Mai – Juillet 2025",
       "meta.role": "Rôle", "meta.roleVal": "Product designer, en binôme avec le PM",
@@ -1230,7 +1230,7 @@ a { text-decoration: none; color: inherit; }
       "sec.ideation": "Idéation", "sec.solution": "Solution", "sec.resultats": "Résultats",
       "contexte.title": "Un outil métier utilisé au quotidien",
       "contexte.p1": "Oplit est un logiciel B2B de gestion industrielle. Les ordonnanceurs et responsables de production l'utilisent quotidiennement pour piloter les ordres de fabrication, suivre les retards et analyser la capacité.",
-      "contexte.p2": "Ce projet a été mené dans un cadre professionnel chez Oplit. Conçu de bout en bout, il a été développé puis déployé en production — et utilisé chaque jour par les utilisateurs de l'outil.",
+      "contexte.p2": "Ce projet a été mené dans un cadre professionnel chez Oplit. Conçu de bout en bout, il a été développé puis déployé en production, et utilisé chaque jour par les utilisateurs de l'outil.",
       "contexte.plateCap": "Sur le terrain ◇ Oplit affiché au poste de travail chez un client en tannerie",
       "probleme.title": "Un système de filtrage peu flexible",
       "probleme.p1": "Les filtres d'Oplit étaient trop rigides : un seul comportement possible et aucune adaptation au type de donnée manipulée. Les utilisateurs étaient bloqués. Quatre besoins sont remontés du terrain.",
@@ -1245,7 +1245,7 @@ a { text-decoration: none; color: inherit; }
       "recherche.verbatimsLabel": "∗ Ce qu'on a entendu sur le terrain",
       "recherche.v1": "« Nous filtrons aussi les numéros d'OFs pour observer plusieurs OFs en même temps selon une liste. Et pour la gestion de l'or, nous filtrons par nom de client. »",
       "recherche.v1tag": "Filtrer par liste & par client",
-      "recherche.v2": "« Je voudrais des filtres spécifiques par secteur — voir le découpage, le tournage… Je veux pouvoir faire des filtres différents sur chaque poste de charge. »",
+      "recherche.v2": "« Je voudrais des filtres spécifiques par secteur : voir le découpage, le tournage… Je veux pouvoir faire des filtres différents sur chaque poste de charge. »",
       "recherche.v2tag": "Filtres par poste de charge",
       "recherche.rkey1": "◇ Demande exprimée", "recherche.rval1": "« Sauvegarder mes filtres »",
       "recherche.rkey2": "∗ Besoin réel", "recherche.rval2": "« Retrouver tout mon contexte de travail »",
@@ -1267,7 +1267,7 @@ a { text-decoration: none; color: inherit; }
       "solution.showcaseEyebrow": "Écran clé", "solution.showcaseTab": "Oplit ∗ Ordonnancement",
       "solution.showcaseCap": "Vue « En-cours » ◇ filtre par tag ouvert, secteurs et tri appliqués sur le plan d'ordonnancement",
       "solution.tagFilters": "◆ Côté filtres", "solution.headFilters": "Adaptés et lisibles",
-      "solution.f1": "Champs typés — texte, nombre, date, tag — avec composants et opérateurs adaptés.",
+      "solution.f1": "Champs typés : texte, nombre, date, tag, avec composants et opérateurs adaptés.",
       "solution.f2": "Filtres actifs toujours visibles.",
       "solution.f3": "Empty state clair pour distinguer « vide » de « masqué ».",
       "solution.vcap1": "Démonstration ◇ Filtres adaptés au type de donnée",
@@ -1288,7 +1288,7 @@ a { text-decoration: none; color: inherit; }
       "rail.ideation": "Ideation", "rail.solution": "Solution", "rail.resultats": "Results",
       "hero.eyebrow": "Case study ✦ Oplit ∗ SaaS editor",
       "hero.title": "From redesigning filters to shared views",
-      "hero.context": "A redesign of the filtering system in Oplit, a B2B industrial-management software, and the introduction of saved views. Behind a simple need for more flexible filtering, the research revealed a broader challenge — letting users restore their entire work context in a single action — resulting in twice as much filter usage and a feature adopted by 20 clients.",
+      "hero.context": "A redesign of the filtering system in Oplit, a B2B industrial-management software, and the introduction of saved views. Behind a simple need for more flexible filtering, the research revealed a broader challenge: letting users restore their entire work context in a single action, resulting in twice as much filter usage and a feature adopted by 20 clients.",
       "hero.plateCap": "Oplit on the shop floor ◇ steering manufacturing orders right next to production",
       "meta.date": "Date", "meta.dateVal": "May – July 2025",
       "meta.role": "Role", "meta.roleVal": "End-to-end product designer, paired with the PM",
@@ -1298,7 +1298,7 @@ a { text-decoration: none; color: inherit; }
       "sec.ideation": "Ideation", "sec.solution": "Solution", "sec.resultats": "Results",
       "contexte.title": "A business tool used every day",
       "contexte.p1": "Oplit is a B2B industrial-management software. Schedulers and production managers use it daily to steer manufacturing orders, track delays and analyze capacity.",
-      "contexte.p2": "This project was carried out in a professional setting at Oplit. Designed end to end, it was developed and then shipped to production — and used every day by the tool's users.",
+      "contexte.p2": "This project was carried out in a professional setting at Oplit. Designed end to end, it was developed and then shipped to production, and used every day by the tool's users.",
       "contexte.plateCap": "In the field ◇ Oplit shown at the workstation of a tannery client",
       "probleme.title": "A filtering system that wasn't flexible",
       "probleme.p1": "Oplit's filters were too rigid: a single possible behavior and no adaptation to the type of data being handled. Users were stuck. Four needs surfaced from the field.",
@@ -1313,7 +1313,7 @@ a { text-decoration: none; color: inherit; }
       "recherche.verbatimsLabel": "∗ What we heard in the field",
       "recherche.v1": "“We also filter manufacturing-order numbers to watch several orders at once from a list. And for gold management, we filter by client name.”",
       "recherche.v1tag": "Filter by list & by client",
-      "recherche.v2": "“I'd like filters specific to each sector — see the cutting, the turning… I want to be able to apply different filters on each workstation.”",
+      "recherche.v2": "“I'd like filters specific to each sector: see the cutting, the turning… I want to be able to apply different filters on each workstation.”",
       "recherche.v2tag": "Filters per workstation",
       "recherche.rkey1": "◇ Stated request", "recherche.rval1": "“Save my filters”",
       "recherche.rkey2": "∗ Real need", "recherche.rval2": "“Restore my entire work context”",
@@ -1335,7 +1335,7 @@ a { text-decoration: none; color: inherit; }
       "solution.showcaseEyebrow": "Key screen", "solution.showcaseTab": "Oplit ∗ Scheduling",
       "solution.showcaseCap": "“In-progress” view ◇ tag filter open, sectors and sorting applied to the scheduling board",
       "solution.tagFilters": "◆ Filters side", "solution.headFilters": "Adapted and legible",
-      "solution.f1": "Typed fields — text, number, date, tag — with adapted components and operators.",
+      "solution.f1": "Typed fields: text, number, date, tag, with adapted components and operators.",
       "solution.f2": "Active filters always visible.",
       "solution.f3": "Clear empty state to tell “empty” from “hidden”.",
       "solution.vcap1": "Demo ◇ Filters adapted to the data type",
@@ -1356,7 +1356,7 @@ a { text-decoration: none; color: inherit; }
     var dict = I18N[lang] || I18N.fr;
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       var key = el.getAttribute('data-i18n');
-      if (dict[key] != null) el.textContent = dict[key];
+      if (dict[key] != null) el.textContent = dict[key].replace(/ — /g, ', ');
     });
     document.documentElement.lang = lang;
     if (DOC_TITLE[lang]) document.title = DOC_TITLE[lang];

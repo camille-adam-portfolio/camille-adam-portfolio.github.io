@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Camille Adam — Product Designer</title>
-<template id="__bundler_thumbnail" data-bg-color="#f4f2ec">
+<template id="__bundler_thumbnail" data-bg-color="#F7FBFF">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
-    <rect width="1200" height="800" fill="#f4f2ec"/>
-    <text x="600" y="380" font-family="Georgia, serif" font-size="120" fill="#1a1a1a" text-anchor="middle">Camille Adam</text>
-    <text x="600" y="470" font-family="Georgia, serif" font-size="60" fill="#8a8a82" text-anchor="middle">✦</text>
+    <rect width="1200" height="800" fill="#F7FBFF"/>
+    <text x="600" y="380" font-family="Georgia, serif" font-size="120" fill="#12304A" text-anchor="middle">Camille Adam</text>
+    <text x="600" y="470" font-family="Georgia, serif" font-size="60" fill="#8EA6B5" text-anchor="middle">✦</text>
   </svg>
 </template>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,19 +19,19 @@
    DESIGN SYSTEM TOKENS
    ============================================= */
 :root {
-  --color-canvas:          #FFF6BE;
-  --color-canvas-soft:     #FFFADC;
-  --color-surface-card:    #F5EDA0;
-  --color-surface-dark:    #1C1A14;
-  --color-surface-dark-el: #272520;
-  --color-ink:             #1C1A14;
-  --color-body:            #3D3A32;
-  --color-muted:           #6E6A60;
-  --color-muted-soft:      #9E9A90;
-  --color-hairline:        #E8E080;
-  --color-hairline-soft:   #F0ECA0;
-  --color-on-dark:         #FFF6BE;
-  --color-on-dark-soft:    #9E9A90;
+  --color-canvas:          #FFFFFF;
+  --color-canvas-soft:     #EDF6FF;
+  --color-surface-card:    #C6E3F7;
+  --color-surface-dark:    #08243B;
+  --color-surface-dark-el: #123B59;
+  --color-ink:             #08243B;
+  --color-body:            #29465A;
+  --color-muted:           #5E7788;
+  --color-muted-soft:      #8EA6B5;
+  --color-hairline:        #B8D5EA;
+  --color-hairline-soft:   #D9EBF7;
+  --color-on-dark:         #F7FBFF;
+  --color-on-dark-soft:    #A9C4D6;
 
   --font-display: 'Libre Baskerville', Georgia, serif;
   --font-body:    'DM Sans', system-ui, sans-serif;
@@ -187,7 +187,7 @@ nav {
    ============================================= */
 .hero {
   padding-top: calc(56px + var(--space-section));
-  padding-bottom: var(--space-section);
+  padding-bottom: var(--space-xxl);
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: var(--space-xxl);
@@ -197,7 +197,7 @@ nav {
 .hero-title {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: clamp(44px, 5.5vw, 72px);
+  font-size: clamp(38px, 4.8vw, 62px);
   font-weight: 400;
   line-height: 1.02;
   letter-spacing: -1.5px;
@@ -283,7 +283,7 @@ nav {
 
 .timeline-year {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.1em;
   color: var(--color-muted-soft);
@@ -304,14 +304,14 @@ nav {
 
 .timeline-company {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--color-ink);
 }
 
 .timeline-role {
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--color-muted);
 }
@@ -329,7 +329,7 @@ nav {
    PROJETS
    ============================================= */
 .projects-section {
-  padding: var(--space-section) 0;
+  padding: var(--space-xxl) 0 var(--space-section);
 }
 
 .section-header {
@@ -377,6 +377,11 @@ nav {
   position: relative;
 }
 
+.project-card:not(.project-card-large) {
+  display: flex;
+  flex-direction: column;
+}
+
 .project-card:hover { transform: translateY(-3px); }
 
 .project-card-large {
@@ -392,6 +397,11 @@ nav {
   justify-content: center;
   position: relative;
   overflow: hidden;
+}
+
+.project-card:not(.project-card-large) .project-visual {
+  aspect-ratio: 4 / 3;
+  flex: 0 0 auto;
 }
 
 .project-card-large .project-visual {
@@ -434,7 +444,7 @@ nav {
   border-color: rgba(255, 246, 190, 0.3);
 }
 
-.visual-2 { background: #E8E4D8; }
+.visual-2 { background: #DDEBF5; }
 
 .visual-2-inner {
   width: 75%;
@@ -494,9 +504,9 @@ nav {
   flex: 1;
 }
 
-.visual-3 { background: #e9ebfb; }
+.visual-3 { background: #E5F2FB; }
 .visual-3 { overflow: hidden; }
-.visual-5 { background: #cfe8dd; overflow: hidden; }
+.visual-5 { background: #D7EEF0; overflow: hidden; }
 .visual-5-img {
   width: 100%;
   height: 100%;
@@ -552,7 +562,7 @@ nav {
 .v7-text {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.4;
   letter-spacing: -0.2px;
   color: var(--color-ink);
@@ -584,10 +594,10 @@ nav {
 .v8-note .l + .l { margin-top: 4px; }
 .v8-note .l.s { width: 60%; }
 .v8-n1 { top: 4%; left: 2%; width: 34%; background: var(--color-surface-card); transform: rotate(-4deg); }
-.v8-n2 { top: 2%; right: 4%; width: 30%; background: #EFE7C6; transform: rotate(3deg); }
-.v8-n3 { top: 40%; left: 8%; width: 32%; background: #F3ECC0; transform: rotate(2deg); }
+.v8-n2 { top: 2%; right: 4%; width: 30%; background: #C8E5F5; transform: rotate(3deg); }
+.v8-n3 { top: 40%; left: 8%; width: 32%; background: #D8EEF8; transform: rotate(2deg); }
 .v8-n4 { top: 46%; right: 2%; width: 34%; background: var(--color-surface-card); transform: rotate(-3deg); }
-.v8-n5 { bottom: 2%; left: 26%; width: 34%; background: #EDE4BE; transform: rotate(-1deg); }
+.v8-n5 { bottom: 2%; left: 26%; width: 34%; background: #D3EAF5; transform: rotate(-1deg); }
 .project-card:hover .v8-n1 { transform: rotate(-4deg) translateY(-4px); }
 .project-card:hover .v8-n2 { transform: rotate(3deg) translateY(-4px); }
 .project-card:hover .v8-n4 { transform: rotate(-3deg) translateY(-4px); }
@@ -627,6 +637,11 @@ nav {
   justify-content: flex-end;
 }
 
+.project-card:not(.project-card-large) .project-info {
+  flex: 1;
+  min-height: 220px;
+}
+
 .project-card-large .project-info { padding: var(--space-xxl); justify-content: center; }
 
 .project-tag {
@@ -655,7 +670,7 @@ nav {
 
 .project-desc {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--color-muted);
   line-height: 1.55;
@@ -668,7 +683,7 @@ nav {
   gap: 6px;
   margin-top: var(--space-md);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.01em;
   color: var(--color-ink);
@@ -710,7 +725,7 @@ nav {
 
 .impact-label {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.35;
   color: var(--color-muted);
@@ -728,6 +743,11 @@ nav {
   grid-template-columns: 1fr 1fr;
   gap: var(--space-xxl);
   align-items: center;
+}
+
+.about-left {
+  align-self: start;
+  text-align: left;
 }
 
 .about-eyebrow {
@@ -753,7 +773,7 @@ nav {
 
 .about-body {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--color-on-dark-soft);
   line-height: 1.65;
@@ -767,7 +787,7 @@ nav {
   background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
   padding: 11px 20px;
   border-radius: var(--radius-md);
@@ -795,7 +815,7 @@ nav {
 
 .skill-name {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--color-on-dark);
 }
@@ -804,7 +824,7 @@ nav {
 
 .skill-tag {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--color-on-dark-soft);
   background: rgba(255,255,255,0.06);
@@ -816,7 +836,7 @@ nav {
    FOOTER
    ============================================= */
 footer {
-  background: var(--color-surface-dark);
+  background: var(--color-canvas-soft);
   padding: var(--space-xxl) 0;
 }
 
@@ -835,7 +855,7 @@ footer {
   font-family: var(--font-display);
   font-style: italic;
   font-size: 20px;
-  color: var(--color-on-dark);
+  color: var(--color-ink);
   letter-spacing: -0.3px;
 }
 
@@ -857,17 +877,17 @@ footer {
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 500;
-  color: var(--color-on-dark-soft);
+  color: var(--color-muted);
   letter-spacing: 0.05em;
   transition: color 0.15s ease;
 }
 
-.footer-links a:hover { color: var(--color-on-dark); }
+.footer-links a:hover { color: var(--color-ink); }
 
 .footer-copy {
   font-family: var(--font-body);
   font-size: 11px;
-  color: var(--color-on-dark-soft);
+  color: var(--color-muted);
   opacity: 0.5;
 }
 
@@ -895,6 +915,7 @@ footer {
       <li><a data-scroll="about" data-i18n="nav.about">À propos</a></li>
       <li><a data-scroll="contact" data-i18n="nav.contact">Contact</a></li>
       <li><a href="https://drive.google.com/file/d/1BTTyKD2TBDqA-Z4eFI9YWGJgLX60CRYh/view?usp=sharing" target="_blank" rel="noopener" data-i18n="nav.cv">CV →</a></li>
+      <li><a href="Veille.html" data-i18n="nav.watch">Veille</a></li>
       <li>
         <div class="lang-switch" role="group" aria-label="Langue / Language">
           <button type="button" data-lang="fr" class="active" aria-pressed="true">FR</button>
@@ -926,7 +947,6 @@ footer {
     </div>
 
     <div class="hero-right fade-up fade-up-5">
-      <div class="timeline-label" data-i18n="hero.expLabel">Expériences</div>
       <div class="timeline">
 
         <div class="timeline-year" data-i18n="tl0.year">Sept 2024 — Aujourd'hui</div>
@@ -947,17 +967,11 @@ footer {
   </section>
 </div>
 
-<hr class="section-divider">
-
 <!-- =============================================
    PROJETS
    ============================================= -->
 <div class="page" id="projets">
   <section class="projects-section">
-
-    <div class="section-header">
-      <h2 class="section-title" data-i18n="proj.title">Projets sélectionnés</h2>
-    </div>
 
     <div class="projects-grid">
 
@@ -992,7 +1006,7 @@ footer {
         <div class="project-info">
           <div class="project-tag" data-i18n="p4.tag">Oplit ∗ 2025</div>
           <div class="project-title" data-i18n="p4.title">Un graphe charge/capacité enfin flexible</div>
-          <div class="project-desc" data-i18n="p4.desc">Trois améliorations — axes configurables, type de graphique au choix et courbes de référence — pour transformer l'écran central des planificateurs en véritable outil de pilotage.</div>
+          <div class="project-desc" data-i18n="p4.desc">Trois améliorations : axes configurables, type de graphique au choix et courbes de référence, pour transformer l'écran central des planificateurs en véritable outil de pilotage.</div>
           <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
         </div>
       </a>
@@ -1005,7 +1019,7 @@ footer {
         <div class="project-info">
           <div class="project-tag" data-i18n="p5.tag">Praticable ∗ Recherche & design</div>
           <div class="project-title" data-i18n="p5.title">Imaginer des paramètres éco-conçus</div>
-          <div class="project-desc" data-i18n="p5.desc">Projet de recherche entre design et informatique sur l'empreinte environnementale du numérique — de la récolte de données à des maquettes de paramètres écologiques.</div>
+          <div class="project-desc" data-i18n="p5.desc">Projet de recherche entre design et informatique sur l'empreinte environnementale du numérique, de la récolte de données à des maquettes de paramètres écologiques.</div>
           <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
         </div>
       </a>
@@ -1018,7 +1032,7 @@ footer {
         <div class="project-info">
           <div class="project-tag" data-i18n="p7.tag">Design Thinking ∗ Facilitation</div>
           <div class="project-title" data-i18n="p7.title">Préparer et animer un atelier de co-conception</div>
-          <div class="project-desc" data-i18n="p7.desc">Cadrer, inviter et faciliter un atelier de co-conception pour Caféo — du canevas de préparation à une experience map construite à plusieurs mains.</div>
+          <div class="project-desc" data-i18n="p7.desc">Cadrer, inviter et faciliter un atelier de co-conception pour Caféo, du canevas de préparation à une experience map construite à plusieurs mains.</div>
           <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
         </div>
       </a>
@@ -1042,7 +1056,7 @@ footer {
         <div class="project-info">
           <div class="project-tag" data-i18n="p6.tag">Parcours UX ∗ Recherche utilisateur</div>
           <div class="project-title" data-i18n="p6.title">Comprendre les humains derrière chaque trajet</div>
-          <div class="project-desc" data-i18n="p6.desc">Étude terrain sur l'achat de billets de train — observation en gare, entretiens semi-directifs, verbatims et personas. Écouter les voyageurs avant de concevoir.</div>
+          <div class="project-desc" data-i18n="p6.desc">Étude terrain sur l'achat de billets de train : observation en gare, entretiens semi-directifs, verbatims et personas. Écouter les voyageurs avant de concevoir.</div>
           <div class="project-cta" data-i18n="proj.cta">Lire l'étude de cas →</div>
         </div>
       </a>
@@ -1063,7 +1077,7 @@ footer {
         <div class="about-eyebrow" data-i18n="about.eyebrow">À propos ✦</div>
         <h2 class="about-title" data-i18n="about.title">UX research et conception d'interfaces B2B.</h2>
         <p class="about-body" data-i18n="about.body">
-          Je suis Camille, product designer basée à Paris. Je conçois des interfaces pour des contextes complexes — SaaS industriel, outils métier — en m'appuyant sur une pratique rigoureuse de la recherche utilisateur.
+          Je suis Camille, product designer basée à Paris. Je conçois des interfaces pour des contextes complexes, comme le SaaS industriel et les outils métier, en m'appuyant sur une pratique rigoureuse de la recherche utilisateur.
         </p>
         <a href="mailto:c.adam.design@gmail.com" class="about-btn">c.adam.design@gmail.com →</a>
       </div>
@@ -1096,6 +1110,16 @@ footer {
             <span class="skill-tag">Claude</span>
           </div>
         </div>
+        <div class="skill-item">
+          <span class="skill-name" data-i18n="skill3">Soft skills</span>
+          <div class="skill-tags">
+            <span class="skill-tag" data-i18n="skill3.tag1">Pensée critique</span>
+            <span class="skill-tag" data-i18n="skill3.tag2">Empathie</span>
+            <span class="skill-tag" data-i18n="skill3.tag3">Esprit d'équipe</span>
+            <span class="skill-tag" data-i18n="skill3.tag4">Adaptabilité</span>
+            <span class="skill-tag" data-i18n="skill3.tag5">Communication</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1121,15 +1145,14 @@ footer {
   /* ---- FR / EN translations ---- */
   var I18N = {
     fr: {
-      "nav.work": "Projets", "nav.about": "À propos", "nav.contact": "Contact", "nav.cv": "CV →",
+      "nav.work": "Projets", "nav.about": "À propos", "nav.contact": "Contact", "nav.cv": "CV →", "nav.watch": "Veille",
       "hero.title": "Product designer basée à Paris.",
       "hero.sub": "UX research et conception d'interfaces B2B. Je travaille à la jonction entre la compréhension des utilisateurs et la conception de produits complexes, utiles et bien pensés.",
       "hero.ctaProjects": "Voir les projets →",
       "hero.ctaContact": "Me contacter ↗",
-      "hero.expLabel": "Expériences",
       "tl0.year": "Sept 2024 — Aujourd'hui", "tl0.role": "UX/UI Designer",
       "tl1.year": "Juin 2022 — Août 2023", "tl1.role": "UX/UI Designer & chercheuse",
-      "proj.title": "Projets sélectionnés", "proj.all": "Tous les projets →", "proj.cta": "Lire l'étude de cas →",
+      "proj.all": "Tous les projets →", "proj.cta": "Lire l'étude de cas →",
       "p1.tag": "Oplit ∗ 2025 — 2026",
       "p1.title": "De la refonte des filtres aux vues partagées",
       "p1.desc": "Refonte du système de filtres et introduction des vues sauvegardées pour permettre aux opérateurs industriels de retrouver instantanément leur contexte de travail.",
@@ -1137,42 +1160,42 @@ footer {
       "p1.kpi2": "clients équipés des vues sauvegardées",
       "p1.kpi3": "ticket de support sur le parcours",
       "p2.tag": "Recherche utilisateur ∗ 2022 — 2023",
-      "p2.title": "UX Research & conception B2B — Praticable · LIRIS",
+      "p2.title": "UX Research & conception B2B, Praticable · LIRIS",
       "p2.desc": "Recherche utilisateur et conception d'interfaces dans un contexte académique et industriel, en binôme chercheurs/designers.",
       "p3.tag": "Design system ∗ En cours",
       "p3.title": "Conception d'un design system pour interfaces industrielles",
       "p3.desc": "Tokens, composants et documentation pour une équipe produit opérant dans des contextes d'usage exigeants.",
       "p4.tag": "Oplit ∗ 2025",
       "p4.title": "Un graphe charge/capacité enfin flexible",
-      "p4.desc": "Trois améliorations — axes configurables, type de graphique au choix et courbes de référence — pour transformer l'écran central des planificateurs en véritable outil de pilotage.",
+      "p4.desc": "Trois améliorations : axes configurables, type de graphique au choix et courbes de référence, pour transformer l'écran central des planificateurs en véritable outil de pilotage.",
       "p5.tag": "Praticable ∗ Recherche & design",
       "p5.title": "Imaginer des paramètres éco-conçus",
-      "p5.desc": "Projet de recherche entre design et informatique sur l'empreinte environnementale du numérique — de la récolte de données à des maquettes de paramètres écologiques.",
+      "p5.desc": "Projet de recherche entre design et informatique sur l'empreinte environnementale du numérique, de la récolte de données à des maquettes de paramètres écologiques.",
       "p6.tag": "Parcours UX ∗ Recherche utilisateur",
       "p6.title": "Comprendre les humains derrière chaque trajet",
-      "p6.desc": "Étude terrain sur l'achat de billets de train — observation en gare, entretiens semi-directifs, verbatims et personas. Écouter les voyageurs avant de concevoir.",
+      "p6.desc": "Étude terrain sur l'achat de billets de train : observation en gare, entretiens semi-directifs, verbatims et personas. Écouter les voyageurs avant de concevoir.",
       "p6.v1": "Parfois, je voyage avec des gens qui ont payé le double de moi, sans explication.",
       "p6.v2": "Si je devais partir à la dernière minute, je prendrais le car. C'est plus long, mais moins cher.",
       "p7.tag": "Design Thinking ∗ Facilitation",
       "p7.title": "Préparer et animer un atelier de co-conception",
-      "p7.desc": "Cadrer, inviter et faciliter un atelier de co-conception pour Caféo — du canevas de préparation à une experience map construite à plusieurs mains.",
+      "p7.desc": "Cadrer, inviter et faciliter un atelier de co-conception pour Caféo, du canevas de préparation à une experience map construite à plusieurs mains.",
       "about.eyebrow": "À propos ✦",
       "about.title": "UX research et conception d'interfaces B2B.",
-      "about.body": "Je suis Camille, product designer basée à Paris. Je conçois des interfaces pour des contextes complexes — SaaS industriel, outils métier — en m'appuyant sur une pratique rigoureuse de la recherche utilisateur.",
-      "skill0": "Recherche utilisateur", "skill1": "Design d'interface", "skill2": "Outils",
+      "about.body": "Je suis Camille, product designer basée à Paris. Je conçois des interfaces pour des contextes complexes, comme le SaaS industriel et les outils métier, en m'appuyant sur une pratique rigoureuse de la recherche utilisateur.",
+      "skill0": "Recherche utilisateur", "skill1": "Design d'interface", "skill2": "Outils", "skill3": "Soft skills",
       "skill0.tag1": "Enquête de terrain", "skill0.tag2": "Entretien utilisateur", "skill0.tag3": "Scénario d'usage", "skill0.tag4": "Cadrage de problème",
-      "skill1.tag1": "Prototypage", "skill1.tag2": "Design system", "skill1.tag3": "UI"
+      "skill1.tag1": "Prototypage", "skill1.tag2": "Design system", "skill1.tag3": "UI",
+      "skill3.tag1": "Pensée critique", "skill3.tag2": "Empathie", "skill3.tag3": "Esprit d'équipe", "skill3.tag4": "Adaptabilité", "skill3.tag5": "Communication"
     },
     en: {
-      "nav.work": "Work", "nav.about": "About", "nav.contact": "Contact", "nav.cv": "CV →",
+      "nav.work": "Work", "nav.about": "About", "nav.contact": "Contact", "nav.cv": "CV →", "nav.watch": "Watch",
       "hero.title": "Product designer based in Paris.",
       "hero.sub": "UX research and B2B interface design. I work at the intersection of understanding users and designing complex, useful, well-considered products.",
       "hero.ctaProjects": "View projects →",
       "hero.ctaContact": "Get in touch ↗",
-      "hero.expLabel": "Experience",
       "tl0.year": "Sept 2024 — Present", "tl0.role": "UX/UI Designer",
       "tl1.year": "June 2022 — Aug 2023", "tl1.role": "UX/UI Designer & researcher",
-      "proj.title": "Selected projects", "proj.all": "All projects →", "proj.cta": "Read the case study →",
+      "proj.all": "All projects →", "proj.cta": "Read the case study →",
       "p1.tag": "SaaS editor ∗ 2025 — 2026",
       "p1.title": "From filter redesign to shared views",
       "p1.desc": "Redesigning the filter system and introducing saved views so industrial operators instantly recover their working context.",
@@ -1180,31 +1203,32 @@ footer {
       "p1.kpi2": "clients using saved views",
       "p1.kpi3": "support tickets on the flow",
       "p2.tag": "User research ∗ 2022 — 2023",
-      "p2.title": "UX Research & B2B design — Praticable · LIRIS",
+      "p2.title": "UX Research & B2B design, Praticable · LIRIS",
       "p2.desc": "User research and interface design in an academic and industrial context, pairing researchers and designers.",
       "p3.tag": "Design system ∗ Ongoing",
       "p3.title": "Designing a design system for industrial interfaces",
       "p3.desc": "Tokens, components and documentation for a product team operating in demanding use contexts.",
       "p4.tag": "SaaS editor ∗ 2025",
       "p4.title": "A load/capacity chart that's finally flexible",
-      "p4.desc": "Three improvements — configurable axes, switchable chart type and reference curves — turning the planners' central screen into a real steering tool.",
+      "p4.desc": "Three improvements: configurable axes, switchable chart type and reference curves, turning the planners' central screen into a real steering tool.",
       "p5.tag": "Praticable ∗ Research & design",
       "p5.title": "Designing eco-conscious settings",
-      "p5.desc": "A research project between design and computer science on the environmental footprint of digital technology — from data collection to mockups of ecological settings.",
+      "p5.desc": "A research project between design and computer science on the environmental footprint of digital technology, from data collection to mockups of ecological settings.",
       "p6.tag": "UX track ∗ User research",
       "p6.title": "Understanding the people behind each journey",
-      "p6.desc": "Field study on buying train tickets — in-station observation, semi-structured interviews, verbatims and personas. Listening to travelers before designing.",
+      "p6.desc": "Field study on buying train tickets: in-station observation, semi-structured interviews, verbatims and personas. Listening to travelers before designing.",
       "p6.v1": "Sometimes I travel with people who paid double what I did, with no explanation.",
       "p6.v2": "If I had to leave at the last minute, I'd take the coach. Longer, but cheaper.",
       "p7.tag": "Design Thinking ∗ Facilitation",
       "p7.title": "Preparing and running a co-design workshop",
-      "p7.desc": "Framing, inviting and facilitating a co-design workshop for Caféo — from the preparation canvas to an experience map built by many hands.",
+      "p7.desc": "Framing, inviting and facilitating a co-design workshop for Caféo, from the preparation canvas to an experience map built by many hands.",
       "about.eyebrow": "About ✦",
       "about.title": "UX research and B2B interface design.",
-      "about.body": "I'm Camille, a product designer based in Paris. I design interfaces for complex contexts — industrial SaaS, business tools — grounded in a rigorous user-research practice.",
-      "skill0": "User research", "skill1": "Interface design", "skill2": "Tools",
+      "about.body": "I'm Camille, a product designer based in Paris. I design interfaces for complex contexts, such as industrial SaaS and business tools, grounded in a rigorous user-research practice.",
+      "skill0": "User research", "skill1": "Interface design", "skill2": "Tools", "skill3": "Soft skills",
       "skill0.tag1": "Field research", "skill0.tag2": "User interviews", "skill0.tag3": "Usage scenarios", "skill0.tag4": "Problem framing",
-      "skill1.tag1": "Prototyping", "skill1.tag2": "Design system", "skill1.tag3": "UI"
+      "skill1.tag1": "Prototyping", "skill1.tag2": "Design system", "skill1.tag3": "UI",
+      "skill3.tag1": "Critical thinking", "skill3.tag2": "Empathy", "skill3.tag3": "Teamwork", "skill3.tag4": "Adaptability", "skill3.tag5": "Communication"
     }
   };
 
