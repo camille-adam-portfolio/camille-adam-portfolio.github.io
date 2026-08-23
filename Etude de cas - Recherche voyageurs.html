@@ -18,7 +18,7 @@
   --color-body:            #29465A;
   --color-muted:           #5E7788;
   --color-muted-soft:      #8EA6B5;
-  --color-hairline:        #B8D5EA;
+.meta-val { font-family: var(--font-body); font-size: 16px; font-weight: 500; color: var(--color-ink); line-height: 1.45; }
   --color-hairline-soft:   #D9EBF7;
   --color-on-dark:         #F7FBFF;
   --color-on-dark-soft:    #A9C4D6;
@@ -101,7 +101,7 @@ a { text-decoration: none; color: inherit; }
 .meta-cell { padding: var(--space-lg) var(--space-lg) var(--space-lg) 0; }
 .meta-cell + .meta-cell { padding-left: var(--space-lg); border-left: 1px solid var(--color-hairline); }
 .meta-key { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted-soft); margin-bottom: var(--space-xs); }
-.meta-val { font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--color-ink); line-height: 1.45; }
+.meta-val { font-family: var(--font-body); font-size: 16px; font-weight: 500; color: var(--color-ink); line-height: 1.45; }
 
 .method { border-bottom: 1px solid var(--color-hairline); padding: var(--space-lg) 0; margin-bottom: var(--space-section); }
 .method .meta-key { margin-bottom: var(--space-sm); }
@@ -114,7 +114,7 @@ a { text-decoration: none; color: inherit; }
 .section:first-of-type { padding-top: 0; }
 .sec-eyebrow { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 10px; margin-bottom: var(--space-md); }
 .sec-eyebrow .num, .sec-eyebrow .sep { color: var(--color-muted-soft); }
-.sec-title { font-family: var(--font-display); font-style: italic; font-size: clamp(28px, 3.4vw, 40px); font-weight: 400; line-height: 1.1; letter-spacing: -0.6px; color: var(--color-ink); margin-bottom: var(--space-lg); }
+.sec-title { font-family: var(--font-display); font-size: clamp(28px, 3.4vw, 40px); font-weight: 400; line-height: 1.1; letter-spacing: -0.6px; color: var(--color-ink); margin-bottom: var(--space-lg); }
 .prose { font-family: var(--font-body); font-size: 16px; font-weight: 400; color: var(--color-body); line-height: 1.65; }
 .prose + .prose { margin-top: var(--space-md); }
 
@@ -144,6 +144,10 @@ a { text-decoration: none; color: inherit; }
 
 /* Two-up cards */
 .duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-top: var(--space-xl); }
+.plate { margin-top: var(--space-xl); }
+.plate img { display: block; width: 100%; height: auto; border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); }
+.personas-image img { width: 110%; max-width: none; margin-left: -5%; }
+.method-image { margin-top: var(--space-xl); }
 .duo-card { border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); background: var(--color-canvas-soft); padding: var(--space-xl); }
 .duo-key { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-sm); }
 .duo-head { font-family: var(--font-display); font-style: italic; font-size: 20px; letter-spacing: -0.3px; color: var(--color-ink); margin-bottom: var(--space-sm); }
@@ -383,6 +387,9 @@ a { text-decoration: none; color: inherit; }
         contexte, puis approfondir en entretiens. Le tout à plusieurs moments de la journée et sur
         plusieurs jours, pour couvrir des affluences variées.
       </p>
+      <figure class="plate method-image">
+        <img src="img/grille_entretien_ux.jpg" alt="Grille d'entretien UX utilisée pour structurer les observations et les entretiens.">
+      </figure>
 
       <div class="chips-label"><span>⚙</span> <span data-i18n="m.frameLabel">Cadre du terrain</span></div>
       <div class="chips">
@@ -407,23 +414,14 @@ a { text-decoration: none; color: inherit; }
           </ul>
         </div>
         <div class="duo-card">
-          <div class="duo-key"><span>◎</span> <span data-i18n="m.guideKey">Guide d'entretien</span></div>
-          <div class="duo-head" data-i18n="m.guideHead">Ce que je demandais</div>
-          <ul class="duo-list">
-            <li data-i18n="m.i1"><strong>Comportement</strong> — habitudes, fréquence, usages numériques</li>
-            <li data-i18n="m.i2"><strong>Opinion</strong> — expérience des services et de la signalétique</li>
-            <li data-i18n="m.i3"><strong>Connaissance</strong> — mode d'achat, difficultés vécues, aide reçue</li>
-            <li data-i18n="m.i4"><strong>Contexte</strong> — accessibilité, propositions d'amélioration</li>
-          </ul>
+          <div class="duo-key"><span>◇</span> <span data-i18n="m.panelLabel">Diversité des profils rencontrés</span></div>
+          <div class="chips">
+            <span class="chip">3 jeunes (− 25 ans)</span>
+            <span class="chip">2 adultes (25–50), dont 1 en fauteuil</span>
+            <span class="chip">1 personne + 1 couple (50–60)</span>
+            <span class="chip">3 personnes âgées (+ 70 ans)</span>
+          </div>
         </div>
-      </div>
-
-      <div class="chips-label"><span>◇</span> <span data-i18n="m.panelLabel">Diversité des profils rencontrés</span></div>
-      <div class="chips">
-        <span class="chip">3 jeunes (− 25 ans)</span>
-        <span class="chip">2 adultes (25–50), dont 1 en fauteuil</span>
-        <span class="chip">1 personne + 1 couple (50–60)</span>
-        <span class="chip">3 personnes âgées (+ 70 ans)</span>
       </div>
     </section>
 
@@ -521,82 +519,9 @@ a { text-decoration: none; color: inherit; }
         moment de concevoir.
       </p>
 
-      <div class="personas">
-        <div class="persona">
-          <div class="persona-top">
-            <div class="persona-avatar">F</div>
-            <div>
-              <div class="persona-name">François · 55 ans</div>
-              <div class="persona-meta" data-i18n="p.f.meta">Paris · pragmatique, attaché à la simplicité et à l'efficacité</div>
-            </div>
-          </div>
-          <p class="persona-quote" data-i18n="p.f.quote">« L'application, c'est pour acheter mon billet ; la gare, c'est pour prendre le train. »</p>
-          <div class="persona-cols">
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.motiv">Motivations</div>
-              <ul><li data-i18n="p.f.m1">Voyager simplement</li><li data-i18n="p.f.m2">Éviter les complications numériques</li></ul>
-            </div>
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.frust">Frustrations</div>
-              <ul><li data-i18n="p.f.fr1">L'excès de fonctionnalités inutiles</li><li data-i18n="p.f.fr2">La hausse des prix liée au marketing</li></ul>
-            </div>
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.att">Attentes</div>
-              <ul><li data-i18n="p.f.a1">Une interface claire et rapide</li><li data-i18n="p.f.a2">Un service en gare efficace, sans fioritures</li></ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="persona">
-          <div class="persona-top">
-            <div class="persona-avatar">J</div>
-            <div>
-              <div class="persona-name">Jacqueline · 75 ans</div>
-              <div class="persona-meta" data-i18n="p.j.meta">Lyon · indépendante, optimiste et très organisée</div>
-            </div>
-          </div>
-          <p class="persona-quote" data-i18n="p.j.quote">« J'aime attendre à la gare… mais j'aimerais qu'il y ait plus de gens pour m'aider et me guider. »</p>
-          <div class="persona-cols">
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.motiv">Motivations</div>
-              <ul><li data-i18n="p.j.m1">Voyager de façon autonome</li><li data-i18n="p.j.m2">Apprécier l'atmosphère des gares</li></ul>
-            </div>
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.frust">Frustrations</div>
-              <ul><li data-i18n="p.j.fr1">Le manque de convivialité et de présence humaine</li><li data-i18n="p.j.fr2">La gestion des billets sur l'application</li></ul>
-            </div>
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.att">Attentes</div>
-              <ul><li data-i18n="p.j.a1">Plus d'interactions humaines en gare</li><li data-i18n="p.j.a2">Un accès plus facile aux informations</li></ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="persona">
-          <div class="persona-top">
-            <div class="persona-avatar">D</div>
-            <div>
-              <div class="persona-name">Damien · 32 ans</div>
-              <div class="persona-meta" data-i18n="p.d.meta">Marseille · déterminé, autonome, voyage seul en fauteuil roulant</div>
-            </div>
-          </div>
-          <p class="persona-quote" data-i18n="p.d.quote">« J'aimerais acheter mes billets sur internet sans devoir appeler et attendre des heures qu'on s'occupe de moi. »</p>
-          <div class="persona-cols">
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.motiv">Motivations</div>
-              <ul><li data-i18n="p.d.m1">Voyager seul, en toute indépendance</li><li data-i18n="p.d.m2">Recevoir l'aide nécessaire au bon moment</li></ul>
-            </div>
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.frust">Frustrations</div>
-              <ul><li data-i18n="p.d.fr1">Peu de visibilité sur les services handicap</li><li data-i18n="p.d.fr2">De longues attentes au téléphone</li></ul>
-            </div>
-            <div class="persona-col">
-              <div class="persona-col-key" data-i18n="p.att">Attentes</div>
-              <ul><li data-i18n="p.d.a1">Mieux organiser l'assistance handicap</li><li data-i18n="p.d.a2">Réserver ses trajets en ligne, simplement</li></ul>
-            </div>
-          </div>
-        </div>
-      </div>
+      <figure class="plate personas-image">
+        <img src="img/persona_entretien_ux.jpg" alt="Synthèse des personas issus des entretiens utilisateurs.">
+      </figure>
     </section>
 
     <!-- 06 PISTES -->
@@ -689,11 +614,6 @@ a { text-decoration: none; color: inherit; }
       "m.g3": "Emplacement & signalétique des points d'achat",
       "m.g4": "Interactions avec les agents et accessibilité",
       "m.g5": "Retours informels entendus spontanément",
-      "m.guideKey": "Guide d'entretien", "m.guideHead": "Ce que je demandais",
-      "m.i1": "<strong>Comportement</strong> — habitudes, fréquence, usages numériques",
-      "m.i2": "<strong>Opinion</strong> — expérience des services et de la signalétique",
-      "m.i3": "<strong>Connaissance</strong> — mode d'achat, difficultés vécues, aide reçue",
-      "m.i4": "<strong>Contexte</strong> — accessibilité, propositions d'amélioration",
       "m.panelLabel": "Diversité des profils rencontrés",
       "t.title": "Ce que j'ai vu, ce que j'ai entendu",
       "t.o1t": "Les bornes et guichets servent surtout en cas d'urgence.",
@@ -782,11 +702,6 @@ a { text-decoration: none; color: inherit; }
       "m.g3": "Location & signage of purchase points",
       "m.g4": "Interactions with staff and accessibility",
       "m.g5": "Informal remarks overheard spontaneously",
-      "m.guideKey": "Interview guide", "m.guideHead": "What I asked",
-      "m.i1": "<strong>Behavior</strong> — habits, frequency, digital usage",
-      "m.i2": "<strong>Opinion</strong> — experience of services and signage",
-      "m.i3": "<strong>Knowledge</strong> — purchase method, difficulties, help received",
-      "m.i4": "<strong>Context</strong> — accessibility, improvement suggestions",
       "m.panelLabel": "Diversity of the people met",
       "t.title": "What I saw, what I heard",
       "t.o1t": "Machines and counters are mostly used in emergencies.",
