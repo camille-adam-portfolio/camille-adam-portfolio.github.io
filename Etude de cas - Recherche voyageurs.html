@@ -63,7 +63,7 @@ a { text-decoration: none; color: inherit; }
   gap: var(--space-section); align-items: start;
 }
 .rail { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: var(--space-xxl) 0; }
-.rail-sig { font-family: var(--font-display); font-style: italic; font-size: 16px; color: var(--color-ink); letter-spacing: -0.3px; margin-bottom: var(--space-xl); }
+.rail-sig { font-family: var(--font-display); font-style: normal; font-size: 16px; color: var(--color-ink); letter-spacing: -0.3px; margin-bottom: var(--space-xl); }
 .rail-sig span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
 
 .pagehead { position: fixed; bottom: var(--space-lg); left: var(--space-xxl); z-index: 50; }
@@ -92,10 +92,18 @@ a { text-decoration: none; color: inherit; }
 .hero-title { font-family: var(--font-display); font-style: italic; font-size: clamp(40px, 5vw, 60px); font-weight: 400; line-height: 1.05; letter-spacing: -1.2px; color: var(--color-ink); margin-bottom: var(--space-xl); }
 .hero-context { font-family: var(--font-body); font-size: 18px; font-weight: 400; color: var(--color-body); line-height: 1.6; margin-bottom: var(--space-xxl); }
 
-/* Empathy statement (hero closer) */
-.empathy { border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); padding: var(--space-xl) 0; margin-bottom: var(--space-xxl); }
-.empathy-glyph { font-family: var(--font-display); font-style: italic; font-size: 44px; line-height: 0.4; color: var(--color-ink); opacity: 0.22; display: block; margin-bottom: var(--space-md); }
-.empathy-text { font-family: var(--font-display); font-style: italic; font-size: clamp(22px, 2.9vw, 30px); font-weight: 400; line-height: 1.4; letter-spacing: -0.4px; color: var(--color-ink); }
+/* Empathy statement (hero closer) — treated as a full illustration moment */
+.empathy {
+  background: var(--color-canvas-soft);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xxl);
+  margin-bottom: var(--space-xxl);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.empathy-glyph { font-family: var(--font-display); font-style: italic; font-size: clamp(64px, 11vw, 120px); line-height: 0.6; color: var(--color-ink); opacity: 0.15; display: block; margin-bottom: var(--space-sm); }
+.empathy-text { font-family: var(--font-display); font-style: normal; font-size: clamp(24px, 3.2vw, 34px); font-weight: 400; line-height: 1.4; letter-spacing: -0.4px; color: var(--color-ink); max-width: 620px; margin: 0 auto; position: relative; }
 
 .meta { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); }
 .meta-cell { padding: var(--space-lg) var(--space-lg) var(--space-lg) 0; }
@@ -172,7 +180,6 @@ a { text-decoration: none; color: inherit; }
 
 /* Tension spectrum (interview axes) */
 .spectrum { display: flex; flex-direction: column; gap: var(--space-lg); margin-top: var(--space-xl); }
-.spec { background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-xl); padding: var(--space-xl); }
 .spec-head { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-ink); letter-spacing: -0.3px; margin-bottom: var(--space-md); }
 .spec-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-md); }
 .spec-pole { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); }
@@ -182,6 +189,8 @@ a { text-decoration: none; color: inherit; }
 .spec-line::before { left: 0; } .spec-line::after { right: 0; }
 .spec-points { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-top: var(--space-lg); }
 .spec-points li { font-family: var(--font-body); font-size: 13px; color: var(--color-body); line-height: 1.5; padding-top: var(--space-sm); border-top: 1px solid var(--color-hairline); }
+.spec-image { background: var(--color-canvas-soft); border-radius: var(--radius-xl); padding: var(--space-lg); }
+.spec-image img { display: block; width: 100%; height: auto; border-radius: var(--radius-lg); }
 
 /* Personas */
 .personas { display: flex; flex-direction: column; gap: var(--space-lg); margin-top: var(--space-xl); }
@@ -199,7 +208,7 @@ a { text-decoration: none; color: inherit; }
 
 /* Reco (dark band) */
 .reco { margin-top: var(--space-xl); background: var(--color-surface-dark); border-radius: 24px; padding: var(--space-xxl); }
-.reco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+.reco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
 .reco-card { display: flex; flex-direction: column; gap: var(--space-sm); }
 .reco-num { font-family: var(--font-display); font-style: italic; font-size: 32px; color: var(--color-on-dark); line-height: 1; opacity: 0.55; }
 .reco-head { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--color-on-dark); letter-spacing: -0.3px; }
@@ -231,6 +240,7 @@ a { text-decoration: none; color: inherit; }
   .rail-nav a.active::before { display: none; }
   .rail-foot { display: none; }
   .content { padding-top: var(--space-xxl); }
+  .empathy { padding: var(--space-xl) var(--space-lg); }
   .meta { grid-template-columns: 1fr; }
   .meta-cell + .meta-cell { border-left: none; border-top: 1px solid var(--color-hairline); padding-left: 0; }
   .stats { grid-template-columns: 1fr; }
@@ -295,16 +305,6 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <div class="method fade-up fade-up-4">
-      <div class="meta-key" data-i18n="meta.scope">Démarche</div>
-      <div class="method-flow">
-        <span class="method-step" data-i18n="scope.s1">Recherche secondaire</span><span class="method-arrow">→</span>
-        <span class="method-step" data-i18n="scope.s2">Observation</span><span class="method-arrow">→</span>
-        <span class="method-step" data-i18n="scope.s3">Entretiens</span><span class="method-arrow">→</span>
-        <span class="method-step" data-i18n="scope.s4">Personas</span><span class="method-arrow">→</span>
-        <span class="method-step" data-i18n="scope.s5">Pistes</span>
-      </div>
-    </div>
 
     <!-- 01 CONTEXTE -->
     <section class="section" id="contexte">
@@ -332,10 +332,6 @@ a { text-decoration: none; color: inherit; }
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-num">6/10</div>
-          <div class="stat-label" data-i18n="s.stat1">Français estiment que la situation tarifaire s'est dégradée en trois ans.</div>
-        </div>
-        <div class="stat">
           <div class="stat-num">~70 %</div>
           <div class="stat-label" data-i18n="s.stat2">des ventes se font désormais via l'application ou le site.</div>
         </div>
@@ -347,31 +343,19 @@ a { text-decoration: none; color: inherit; }
           <div class="stat-num">753<span style="font-size:0.5em; letter-spacing:0;"> / 3 023</span></div>
           <div class="stat-label" data-i18n="s.stat4">gares disposent encore d'un guichet pour acheter un billet.</div>
         </div>
-        <div class="stat">
-          <div class="stat-num">~25 %</div>
-          <div class="stat-label" data-i18n="s.stat5">des paniers en ligne sont abandonnés avant l'achat.</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">46 %</div>
-          <div class="stat-label" data-i18n="s.stat6">des billets longue distance sont achetés plus d'un mois à l'avance.</div>
-        </div>
       </div>
 
       <div class="chips-label"><span>◆</span> <span data-i18n="s.pointsLabel">Points saillants</span></div>
       <div class="needs">
         <div class="need"><div class="need-num">01</div><div>
-          <div class="need-title" data-i18n="s.p1t">Prix & transparence tarifaire</div>
-          <div class="need-desc" data-i18n="s.p1d">Des variations peu compréhensibles pour des trajets identiques nourrissent un sentiment d'injustice.</div>
-        </div></div>
-        <div class="need"><div class="need-num">02</div><div>
           <div class="need-title" data-i18n="s.p2t">Digitalisation de l'achat</div>
           <div class="need-desc" data-i18n="s.p2d">Le numérique domine, mais la coexistence de plusieurs applis et les bugs excluent une partie des voyageurs.</div>
         </div></div>
-        <div class="need"><div class="need-num">03</div><div>
+        <div class="need"><div class="need-num">02</div><div>
           <div class="need-title" data-i18n="s.p3t">Anticipation & rigidité</div>
           <div class="need-desc" data-i18n="s.p3d">L'augmentation des prix à l'approche du départ pousse à réserver tôt, au prix de la flexibilité.</div>
         </div></div>
-        <div class="need"><div class="need-num">04</div><div>
+        <div class="need"><div class="need-num">03</div><div>
           <div class="need-title" data-i18n="s.p4t">Réduction des services en gare</div>
           <div class="need-desc" data-i18n="s.p4d">La fermeture des guichets touche surtout les petites gares et les publics les moins à l'aise avec le numérique.</div>
         </div></div>
@@ -387,18 +371,12 @@ a { text-decoration: none; color: inherit; }
         contexte, puis approfondir en entretiens. Le tout à plusieurs moments de la journée et sur
         plusieurs jours, pour couvrir des affluences variées.
       </p>
-      <figure class="plate method-image">
-        <img src="img/grille_entretien_ux.jpg" alt="Grille d'entretien UX utilisée pour structurer les observations et les entretiens.">
-      </figure>
-
       <div class="chips-label"><span>⚙</span> <span data-i18n="m.frameLabel">Cadre du terrain</span></div>
       <div class="chips">
         <span class="chip">2 gares</span>
         <span class="chip">Massy · Montparnasse</span>
-        <span class="chip">Jeudi matin · vendredi midi & soir</span>
         <span class="chip">9 participants</span>
-        <span class="chip is-soft">Semi-directif · 15–25 min</span>
-        <span class="chip is-soft">Observation chronométrée</span>
+        <span class="chip">Semi-directif · 15–25 min</span>
       </div>
 
       <div class="duo">
@@ -415,12 +393,13 @@ a { text-decoration: none; color: inherit; }
         </div>
         <div class="duo-card">
           <div class="duo-key"><span>◇</span> <span data-i18n="m.panelLabel">Diversité des profils rencontrés</span></div>
-          <div class="chips">
-            <span class="chip">3 jeunes (− 25 ans)</span>
-            <span class="chip">2 adultes (25–50), dont 1 en fauteuil</span>
-            <span class="chip">1 personne + 1 couple (50–60)</span>
-            <span class="chip">3 personnes âgées (+ 70 ans)</span>
-          </div>
+          <div class="duo-head" data-i18n="m.panelHead">Qui j'interrogeais</div>
+          <ul class="duo-list">
+            <li>3 jeunes (− 25 ans)</li>
+            <li>2 adultes (25–50), dont 1 en fauteuil</li>
+            <li>1 personne + 1 couple (50–60)</li>
+            <li>3 personnes âgées (+ 70 ans)</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -432,79 +411,44 @@ a { text-decoration: none; color: inherit; }
 
       <div class="learnings">
         <div class="learn"><div class="learn-glyph">✦</div><div>
-          <div class="learn-title" data-i18n="t.o1t">Les bornes et guichets servent surtout en cas d'urgence.</div>
-          <div class="learn-body" data-i18n="t.o1d">Près des voies, on les utilise pour modifier un départ ou réagir à un retard — rarement pour un achat serein préparé à l'avance.</div>
+          <div class="learn-title" data-i18n="t.o4t">Les cas particuliers demandent une information que le digital ne donne pas.</div>
+          <div class="learn-body" data-i18n="t.o4d">Billet accessible, besoin spécifique : ces situations obligent à appeler la gare, faute de réponse en ligne.</div>
         </div></div>
         <div class="learn"><div class="learn-glyph">✦</div><div>
-          <div class="learn-title" data-i18n="t.o2t">Au moment de payer, 4 personnes sur 6 abandonnent et cherchent de l'aide.</div>
-          <div class="learn-body" data-i18n="t.o2d">Le paiement en borne est le point de rupture : hésitation, blocage, puis recours à un agent d'assistance.</div>
-        </div></div>
-        <div class="learn"><div class="learn-glyph">✦</div><div>
-          <div class="learn-title" data-i18n="t.o3t">Beaucoup préfèrent l'information en gare, même disponible sur l'app.</div>
-          <div class="learn-body" data-i18n="t.o3d">L'affluence se concentre près des écrans d'horaires : le physique rassure quand le numérique intimide.</div>
+          <div class="learn-title" data-i18n="t.o5t">Garder un double de son billet, une habitude de précaution.</div>
+          <div class="learn-body" data-i18n="t.o5d">Copie papier ou capture d'écran : sans réseau, la confiance dans le billet numérique n'est jamais totale pour le contrôle.</div>
         </div></div>
       </div>
+
+      <figure class="plate method-image">
+        <img src="img/grille_entretien_ux.jpg" alt="Grille d'entretien UX utilisée pour structurer les observations et les entretiens.">
+      </figure>
 
       <div class="verbatims-label"><span>”</span> <span data-i18n="t.verbLabel">Verbatims — leurs mots, pas les miens</span></div>
       <div class="verbatim-grid">
         <div class="verbatim">
-          <div class="verbatim-text" data-i18n="t.v1">« Parfois, je voyage avec des gens qui ont payé le double de moi, sans explication. »</div>
-          <div class="verbatim-tag">F · 47 ans</div>
+          <div class="verbatim-text" data-i18n="t.v6">« Impossible d'acheter un billet accessible sur internet : je dois appeler 72h à l'avance pour savoir s'il y a un train adapté — et patienter longtemps au téléphone. »</div>
+          <div class="verbatim-tag">Mohamed · 32 ans</div>
         </div>
         <div class="verbatim">
-          <div class="verbatim-text" data-i18n="t.v2">« Il y a 2 applis. Je pensais qu'il n'y en avait qu'une, et j'ai téléchargé la mauvaise. »</div>
-          <div class="verbatim-tag">H · 56 ans</div>
-        </div>
-        <div class="verbatim">
-          <div class="verbatim-text" data-i18n="t.v3">« Si je devais partir à la dernière minute, je prendrais le car. C'est plus long, mais moins cher. »</div>
-          <div class="verbatim-tag">F · 26 ans</div>
-        </div>
-        <div class="verbatim">
-          <div class="verbatim-text" data-i18n="t.v4">« Dans ma gare, il n'y a plus de guichet, juste un automate. C'est compliqué pour ceux qui ne sont pas initiés. »</div>
-          <div class="verbatim-tag">F · 54 ans</div>
+          <div class="verbatim-text" data-i18n="t.v7">« Avec mon abonnement, je dois jongler entre plusieurs applis juste pour acheter un billet. »</div>
+          <div class="verbatim-tag">Louise · 24 ans</div>
         </div>
       </div>
 
-      <div class="chips-label"><span>◆</span> <span data-i18n="t.axesLabel">Trois tensions révélées par les entretiens</span></div>
+      <div class="chips-label"><span>◆</span> <span data-i18n="t.axesLabel">Deux tensions révélées par les entretiens</span></div>
       <div class="spectrum">
         <div class="spec">
           <div class="spec-head" data-i18n="t.a1head">Volonté d'autonomie dans l'achat</div>
-          <div class="spec-bar">
-            <span class="spec-pole" data-i18n="t.a1left">Peu autonome</span>
-            <span class="spec-line" aria-hidden="true"></span>
-            <span class="spec-pole right" data-i18n="t.a1right">Très autonome</span>
-          </div>
-          <ul class="spec-points">
-            <li data-i18n="t.a1p1">Doit appeler pour acheter un billet.</li>
-            <li data-i18n="t.a1p2">Demande à son fils d'acheter son billet.</li>
-            <li data-i18n="t.a1p3">Achète via l'app, mais regrette de ne pas avoir plus la main.</li>
-          </ul>
-        </div>
-        <div class="spec">
-          <div class="spec-head" data-i18n="t.a2head">Détourner ou accepter l'anticipation</div>
-          <div class="spec-bar">
-            <span class="spec-pole" data-i18n="t.a2left">Contourner</span>
-            <span class="spec-line" aria-hidden="true"></span>
-            <span class="spec-pole right" data-i18n="t.a2right">Accepter</span>
-          </div>
-          <ul class="spec-points">
-            <li data-i18n="t.a2p1">Prévoit un itinéraire avec tous les transports à prendre.</li>
-            <li data-i18n="t.a2p2">Utilise des astuces pour payer moins cher.</li>
-            <li data-i18n="t.a2p3">Passe par la borne pour des billets non datés.</li>
-          </ul>
+          <figure class="spec-image">
+            <img src="img/autonome_entretien_ux.png" alt="Volonté d'autonomie dans l'achat">
+          </figure>
         </div>
         <div class="spec">
           <div class="spec-head" data-i18n="t.a3head">Acheter un billet, avec ou sans les services</div>
-          <div class="spec-bar">
-            <span class="spec-pole" data-i18n="t.a3left">Juste le train</span>
-            <span class="spec-line" aria-hidden="true"></span>
-            <span class="spec-pole right" data-i18n="t.a3right">Toute la gare</span>
-          </div>
-          <ul class="spec-points">
-            <li data-i18n="t.a3p1">Achète sur son ordi et imprime, pour éviter l'app.</li>
-            <li data-i18n="t.a3p2">Aime profiter de la gare, mal servi par l'existant.</li>
-            <li data-i18n="t.a3p3">Cherche les consignes à bagages — info introuvable.</li>
-          </ul>
+          <figure class="spec-image">
+            <img src="img/billet_entretien_ux.png" alt="Acheter un billet, avec ou sans les services">
+          </figure>
         </div>
       </div>
     </section>
@@ -529,7 +473,7 @@ a { text-decoration: none; color: inherit; }
       <div class="sec-eyebrow"><span class="num">06</span><span class="sep">∗</span> <span data-i18n="sec.pistes">Pistes & recommandations</span></div>
       <h2 class="sec-title" data-i18n="r.title">Des directions ancrées dans le vécu</h2>
       <p class="prose" data-i18n="r.p1">
-        Trois pistes de conception se dégagent — non pas des fonctionnalités, mais des intentions qui
+        Deux pistes de conception se dégagent — non pas des fonctionnalités, mais des intentions qui
         répondent directement aux tensions observées sur le terrain.
       </p>
 
@@ -537,16 +481,11 @@ a { text-decoration: none; color: inherit; }
         <div class="reco-grid">
           <div class="reco-card">
             <div class="reco-num">01</div>
-            <div class="reco-head" data-i18n="r1.head">Rendre l'anticipation plus agréable</div>
-            <div class="reco-body" data-i18n="r1.body">Transformer la contrainte de réserver tôt en un moment maîtrisé et rassurant, plutôt qu'une course contre le prix.</div>
-          </div>
-          <div class="reco-card">
-            <div class="reco-num">02</div>
             <div class="reco-head" data-i18n="r2.head">Simplifier les actions possibles</div>
             <div class="reco-body" data-i18n="r2.body">Réduire la charge au moment de payer — là où quatre personnes sur six décrochent — et clarifier les parcours numériques.</div>
           </div>
           <div class="reco-card">
-            <div class="reco-num">03</div>
+            <div class="reco-num">02</div>
             <div class="reco-head" data-i18n="r3.head">Mieux répondre aux demandes ponctuelles</div>
             <div class="reco-body" data-i18n="r3.body">Garantir un accès rapide à l'aide et à l'information — humaine ou numérique — au moment précis où le voyageur en a besoin.</div>
           </div>
@@ -614,20 +553,27 @@ a { text-decoration: none; color: inherit; }
       "m.g3": "Emplacement & signalétique des points d'achat",
       "m.g4": "Interactions avec les agents et accessibilité",
       "m.g5": "Retours informels entendus spontanément",
-      "m.panelLabel": "Diversité des profils rencontrés",
+      "m.panelLabel": "Diversité des profils rencontrés", "m.panelHead": "Qui j'interrogeais",
       "t.title": "Ce que j'ai vu, ce que j'ai entendu",
       "t.o1t": "Les bornes et guichets servent surtout en cas d'urgence.",
       "t.o1d": "Près des voies, on les utilise pour modifier un départ ou réagir à un retard — rarement pour un achat serein préparé à l'avance.",
-      "t.o2t": "Au moment de payer, 4 personnes sur 6 abandonnent et cherchent de l'aide.",
-      "t.o2d": "Le paiement en borne est le point de rupture : hésitation, blocage, puis recours à un agent d'assistance.",
-      "t.o3t": "Beaucoup préfèrent l'information en gare, même disponible sur l'app.",
-      "t.o3d": "L'affluence se concentre près des écrans d'horaires : le physique rassure quand le numérique intimide.",
+      "t.o2t": "4 personnes sur 6 cherchent de l'aide au moment de payer en borne.",
+      "t.o2d": "Le parcours en libre-service ne suffit pas seul : il manque une information pour lever le dernier blocage.",
+      "t.o3t": "Où consigner ses bagages ? Une information introuvable seule.",
+      "t.o3d": "Le service existe, mais rien ne le signale : il faut le demander directement au personnel.",
+      "t.o4t": "Les cas particuliers demandent une information que le digital ne donne pas.",
+      "t.o4d": "Billet accessible, besoin spécifique : ces situations obligent à appeler la gare, faute de réponse en ligne.",
+      "t.o5t": "Garder un double de son billet, une habitude de précaution.",
+      "t.o5d": "Copie papier ou capture d'écran : sans réseau, la confiance dans le billet numérique n'est jamais totale pour le contrôle.",
       "t.verbLabel": "Verbatims — leurs mots, pas les miens",
       "t.v1": "« Parfois, je voyage avec des gens qui ont payé le double de moi, sans explication. »",
       "t.v2": "« Il y a 2 applis. Je pensais qu'il n'y en avait qu'une, et j'ai téléchargé la mauvaise. »",
       "t.v3": "« Si je devais partir à la dernière minute, je prendrais le car. C'est plus long, mais moins cher. »",
       "t.v4": "« Dans ma gare, il n'y a plus de guichet, juste un automate. C'est compliqué pour ceux qui ne sont pas initiés. »",
-      "t.axesLabel": "Trois tensions révélées par les entretiens",
+      "t.v5": "« Je cherchais où consigner mes valises pour aller en ville. Je n'ai rien trouvé dans l'app, j'ai dû demander au personnel, heureusement je sais que ce service existe. »",
+      "t.v6": "« Impossible d'acheter un billet accessible sur internet : je dois appeler 72h à l'avance pour savoir s'il y a un train adapté — et patienter longtemps au téléphone. »",
+      "t.v7": "« Avec mon abonnement, je dois jongler entre plusieurs applis juste pour acheter un billet. »",
+      "t.axesLabel": "Deux tensions révélées par les entretiens",
       "t.a1head": "Volonté d'autonomie dans l'achat", "t.a1left": "Peu autonome", "t.a1right": "Très autonome",
       "t.a1p1": "Doit appeler pour acheter un billet.", "t.a1p2": "Demande à son fils d'acheter son billet.", "t.a1p3": "Achète via l'app, mais regrette de ne pas avoir plus la main.",
       "t.a2head": "Détourner ou accepter l'anticipation", "t.a2left": "Contourner", "t.a2right": "Accepter",
@@ -653,7 +599,7 @@ a { text-decoration: none; color: inherit; }
       "p.d.fr1": "Peu de visibilité sur les services handicap", "p.d.fr2": "De longues attentes au téléphone",
       "p.d.a1": "Mieux organiser l'assistance handicap", "p.d.a2": "Réserver ses trajets en ligne, simplement",
       "r.title": "Des directions ancrées dans le vécu",
-      "r.p1": "Trois pistes de conception se dégagent — non pas des fonctionnalités, mais des intentions qui répondent directement aux tensions observées sur le terrain.",
+      "r.p1": "Deux pistes de conception se dégagent — non pas des fonctionnalités, mais des intentions qui répondent directement aux tensions observées sur le terrain.",
       "r1.head": "Rendre l'anticipation plus agréable", "r1.body": "Transformer la contrainte de réserver tôt en un moment maîtrisé et rassurant, plutôt qu'une course contre le prix.",
       "r2.head": "Simplifier les actions possibles", "r2.body": "Réduire la charge au moment de payer — là où quatre personnes sur six décrochent — et clarifier les parcours numériques.",
       "r3.head": "Mieux répondre aux demandes ponctuelles", "r3.body": "Garantir un accès rapide à l'aide et à l'information — humaine ou numérique — au moment précis où le voyageur en a besoin.",
@@ -702,20 +648,27 @@ a { text-decoration: none; color: inherit; }
       "m.g3": "Location & signage of purchase points",
       "m.g4": "Interactions with staff and accessibility",
       "m.g5": "Informal remarks overheard spontaneously",
-      "m.panelLabel": "Diversity of the people met",
+      "m.panelLabel": "Diversity of the people met", "m.panelHead": "Who I talked to",
       "t.title": "What I saw, what I heard",
       "t.o1t": "Machines and counters are mostly used in emergencies.",
       "t.o1d": "Near the platforms, they're used to change a departure or react to a delay — rarely for a calm, planned purchase.",
-      "t.o2t": "At payment, 4 out of 6 give up and look for help.",
-      "t.o2d": "Paying at the machine is the breaking point: hesitation, then a block, then turning to an assistance agent.",
-      "t.o3t": "Many prefer in-station info, even when it's on the app.",
-      "t.o3d": "Crowds gather near the schedule screens: the physical reassures where the digital intimidates.",
+      "t.o2t": "4 out of 6 people look for help when paying at the machine.",
+      "t.o2d": "The self-service journey isn't enough on its own: a missing piece of information leaves the last blocker unresolved.",
+      "t.o3t": "Where to store luggage? Information you can't find on your own.",
+      "t.o3d": "The service exists, but nothing signals it — you have to ask staff directly.",
+      "t.o4t": "Special cases need information the digital journey doesn't provide.",
+      "t.o4d": "An accessible ticket, a specific need: these situations force a phone call to the station, with no answer available online.",
+      "t.o5t": "Keeping a backup of the ticket, a habit born of precaution.",
+      "t.o5d": "A paper copy or a screenshot: without network access, trust in the digital ticket is never total when it comes to inspection.",
       "t.verbLabel": "Verbatims — their words, not mine",
       "t.v1": "“Sometimes I travel with people who paid double what I did, with no explanation.”",
       "t.v2": "“There are 2 apps. I thought there was only one, and I downloaded the wrong one.”",
       "t.v3": "“If I had to leave at the last minute, I'd take the coach. Longer, but cheaper.”",
       "t.v4": "“In my station there's no counter anymore, just a machine. It's hard for those who aren't used to it.”",
-      "t.axesLabel": "Three tensions revealed by the interviews",
+      "t.v5": "“I was looking for somewhere to store my luggage before heading into town. I couldn't find it in the app, so I had to ask staff — luckily I know that service exists.”",
+      "t.v6": "“You can't buy an accessible ticket online: I have to call 72h ahead to find out if there's an adapted train — and wait a long time on the phone.”",
+      "t.v7": "“With my subscription, I have to juggle between several apps just to buy a ticket.”",
+      "t.axesLabel": "Two tensions revealed by the interviews",
       "t.a1head": "Desire for autonomy in buying", "t.a1left": "Low autonomy", "t.a1right": "High autonomy",
       "t.a1p1": "Has to call to buy a ticket.", "t.a1p2": "Asks their son to buy the ticket.", "t.a1p3": "Buys via the app, but wishes for more control.",
       "t.a2head": "Working around or accepting anticipation", "t.a2left": "Work around", "t.a2right": "Accept",
@@ -741,7 +694,7 @@ a { text-decoration: none; color: inherit; }
       "p.d.fr1": "Little visibility on disability services", "p.d.fr2": "Long waits on the phone",
       "p.d.a1": "Better-organized disability assistance", "p.d.a2": "Book trips online, simply",
       "r.title": "Directions anchored in real experience",
-      "r.p1": "Three design directions emerge — not features, but intentions that respond directly to the tensions observed in the field.",
+      "r.p1": "Two design directions emerge — not features, but intentions that respond directly to the tensions observed in the field.",
       "r1.head": "Make anticipation more pleasant", "r1.body": "Turn the constraint of booking early into a calm, controlled moment rather than a race against the price.",
       "r2.head": "Simplify the possible actions", "r2.body": "Reduce the load at payment — where four out of six drop off — and clarify the digital journeys.",
       "r3.head": "Better answer one-off needs", "r3.body": "Guarantee fast access to help and information — human or digital — at the exact moment the traveler needs it.",
