@@ -540,50 +540,17 @@ nav {
 .project-card:hover .visual-8-img { transform: scale(1.05); }
 
 /* Visual 7 — verbatim "voices" wall */
-.visual-7 { background: var(--color-canvas-soft); }
-.visual-7-inner {
-  width: 84%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+.visual-7 { background: #A2B5FF; overflow: hidden; }
+.visual-7-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  transform: scale(1);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.v7-quote {
-  background: var(--color-canvas);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.v7-quote:nth-child(2) { transform: translateX(8%); }
-.project-card:hover .v7-quote:nth-child(1) { transform: translateX(3%); }
-.project-card:hover .v7-quote:nth-child(2) { transform: translateX(5%); }
-.v7-mark {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 22px;
-  line-height: 0.2;
-  color: var(--color-ink);
-  opacity: 0.3;
-}
-.v7-text {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 15px;
-  line-height: 1.4;
-  letter-spacing: -0.2px;
-  color: var(--color-ink);
-}
-.v7-tag {
-  font-family: var(--font-body);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-muted-soft);
-}
+.project-card:hover .visual-7-img { transform: scale(1.05); }
 .visual-3-img {
   width: 100%;
   height: 100%;
@@ -1055,18 +1022,7 @@ footer {
       <!-- Projet — Recherche voyageurs -->
       <a href="Etude de cas - Recherche voyageurs.html" class="project-card">
         <div class="project-visual visual-7">
-          <div class="visual-7-inner">
-            <div class="v7-quote">
-              <span class="v7-mark">"</span>
-              <p class="v7-text" data-i18n="p6.v1">Parfois, je voyage avec des gens qui ont payé le double de moi, sans explication.</p>
-              <span class="v7-tag">F · 47 ans</span>
-            </div>
-            <div class="v7-quote">
-              <span class="v7-mark">"</span>
-              <p class="v7-text" data-i18n="p6.v2">Si je devais partir à la dernière minute, je prendrais le car. C'est plus long, mais moins cher.</p>
-              <span class="v7-tag">F · 26 ans</span>
-            </div>
-          </div>
+          <img src="img/card_home_entretien_ux.jpg" alt="Étude terrain sur l'achat de billets de train en gare" class="visual-7-img">
         </div>
         <div class="project-info">
           <div class="project-tag" data-i18n="p6.tag">Parcours UX ∗ Recherche utilisateur</div>
