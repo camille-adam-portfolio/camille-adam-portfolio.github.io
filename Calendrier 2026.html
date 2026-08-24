@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier 2026 — Camille Adam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --color-canvas:          #FFFFFF;
+  --color-canvas-soft:     #E3F1FC;
+  --color-surface-card:    #B9DCF2;
+  --color-surface-dark:    #08243B;
+  --color-surface-dark-el: #123B59;
+  --color-ink:             #08243B;
+  --color-body:            #29465A;
+  --color-muted:            #5E7788;
+  --color-muted-soft:      #8EA6B5;
+  --color-hairline:        #B8D5EA;
+  --color-hairline-soft:   #D9EBF7;
+  --color-on-dark:         #F7FBFF;
+  --color-on-dark-soft:    #A9C4D6;
+
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --space-xs:  8px;
+  --space-sm:  12px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-xxl: 48px;
+  --space-section: 96px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+body {
+  background: var(--color-canvas); color: var(--color-ink);
+  font-family: var(--font-body); font-size: 16px; font-weight: 400; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { text-decoration: none; color: inherit; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .fade-up-1 { animation-delay: 0.05s; } .fade-up-2 { animation-delay: 0.15s; }
+  .fade-up-3 { animation-delay: 0.25s; } .fade-up-4 { animation-delay: 0.35s; }
+}
+
+/* LAYOUT */
+.shell {
+  max-width: 1400px; margin: 0 auto; padding: 0 var(--space-xl);
+  display: grid; grid-template-columns: 232px minmax(0, 1fr);
+  gap: var(--space-section); align-items: start;
+}
+.rail { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: var(--space-xxl) 0; }
+.rail-sig { font-family: var(--font-display); font-style: normal; font-size: 16px; color: var(--color-ink); letter-spacing: -0.3px; margin-bottom: var(--space-xl); }
+.rail-sig span { font-size: 0.5em; vertical-align: super; margin-left: 3px; }
+
+.pagehead { position: fixed; bottom: var(--space-lg); left: var(--space-xxl); z-index: 50; }
+.lang-switch { display: inline-flex; align-items: center; gap: 6px; }
+.lang-switch button { font-family: var(--font-body); font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: var(--color-muted-soft); background: none; border: none; padding: 2px; cursor: pointer; transition: color 0.15s ease; }
+.lang-switch button:hover { color: var(--color-muted); }
+.lang-switch button.active { color: var(--color-ink); }
+.lang-sep { color: var(--color-muted-soft); font-size: 11px; }
+
+.rail-label { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted-soft); margin-bottom: var(--space-md); }
+.rail-nav { display: flex; flex-direction: column; list-style: none; }
+.rail-nav a { display: grid; grid-template-columns: 22px 1fr; align-items: baseline; gap: var(--space-xs); padding: 9px 0; font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--color-muted); transition: color 0.15s ease; cursor: pointer; position: relative; }
+.rail-nav a .n { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--color-muted-soft); transition: color 0.15s ease; }
+.rail-nav a:hover { color: var(--color-ink); }
+.rail-nav a.active { color: var(--color-ink); font-weight: 500; }
+.rail-nav a.active .n { color: var(--color-ink); }
+.rail-nav a.active::before { content: '✦'; position: absolute; left: -20px; top: 9px; font-size: 11px; color: var(--color-ink); }
+.rail-foot { margin-top: auto; padding-top: var(--space-lg); border-top: 1px solid var(--color-hairline); }
+.rail-contact { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--color-muted); display: inline-flex; align-items: center; gap: 6px; transition: color 0.15s ease; }
+.rail-contact:hover { color: var(--color-ink); }
+
+.content { max-width: 720px; padding: var(--space-section) 0 var(--space-xxl); }
+
+/* HERO */
+.eyebrow { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: var(--space-lg); }
+.hero-title { font-family: var(--font-display); font-style: italic; font-size: clamp(40px, 5vw, 60px); font-weight: 400; line-height: 1.05; letter-spacing: -1.2px; color: var(--color-ink); margin-bottom: var(--space-xl); }
+.hero-context { font-family: var(--font-body); font-size: 18px; font-weight: 400; color: var(--color-body); line-height: 1.6; margin-bottom: var(--space-xxl); }
+
+/* SECTIONS */
+.section { padding-top: var(--space-section); scroll-margin-top: var(--space-xl); }
+.sec-eyebrow { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-muted); display: flex; align-items: center; gap: 10px; margin-bottom: var(--space-md); }
+.sec-eyebrow .num, .sec-eyebrow .sep { color: var(--color-muted-soft); }
+.sec-title { font-family: var(--font-display); font-size: clamp(28px, 3.4vw, 40px); font-weight: 400; line-height: 1.1; letter-spacing: -0.6px; color: var(--color-ink); margin-bottom: var(--space-lg); }
+.prose { font-family: var(--font-body); font-size: 16px; font-weight: 400; color: var(--color-body); line-height: 1.65; }
+.prose + .prose { margin-top: var(--space-md); }
+
+.plate { margin-top: var(--space-xl); }
+.plate img { display: block; width: 100%; height: auto; border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); }
+
+.calendar-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); margin-top: var(--space-xl); }
+.calendar-gallery img, .calendar-gallery video { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius-xl); border: 1px solid var(--color-hairline); background: var(--color-canvas-soft); }
+
+@media (max-width: 920px) {
+  .shell { grid-template-columns: 1fr; gap: 0; padding: 0 var(--space-lg); }
+  .rail { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--space-md) var(--space-lg); padding: var(--space-lg) 0; border-bottom: 1px solid var(--color-hairline); }
+  .rail-sig { margin-bottom: 0; }
+  .pagehead { bottom: var(--space-md); left: var(--space-lg); }
+  .rail-label { display: none; }
+  .rail-nav { flex-direction: row; flex-wrap: wrap; gap: 0 var(--space-md); width: 100%; }
+  .rail-nav a { padding: 6px 0; }
+  .rail-nav a.active::before { display: none; }
+  .rail-foot { display: none; }
+  .content { padding-top: var(--space-xxl); }
+  .calendar-gallery { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="rail">
+    <a href="index.html" class="rail-sig">Camille Adam<span>✦</span></a>
+    <div class="rail-label" data-i18n="rail.toc">Sommaire</div>
+    <ul class="rail-nav" id="railnav">
+      <li><a data-anchor="galerie"><span class="n">01</span><span data-i18n="rail.galerie">Galerie</span></a></li>
+    </ul>
+  </aside>
+
+  <div class="content" data-screen-label="Exploration — Calendrier 2026">
+
+    <!-- HERO -->
+    <div class="eyebrow fade-up fade-up-1" data-i18n="hero.eyebrow">Exploration ✦ Graphisme ∗ Édition</div>
+    <h1 class="hero-title fade-up fade-up-2" data-i18n="hero.title">Calendrier 2026</h1>
+    <p class="hero-context fade-up fade-up-3" data-i18n="hero.context">
+      Un calendrier mural dessiné mois par mois, chacun avec son propre univers graphique. Conçu de
+      l'illustration à la mise en page, imprimé et vendu en quelques exemplaires.
+    </p>
+
+    <figure class="plate">
+      <img src="img/card_calendrier.jpg" alt="Calendrier 2026">
+    </figure>
+
+    <!-- 01 GALERIE -->
+    <section class="section" id="galerie">
+      <div class="sec-eyebrow"><span class="num">01</span><span class="sep">∗</span> <span data-i18n="sec.galerie">Galerie</span></div>
+      <h2 class="sec-title" data-i18n="g.title">Le calendrier en images</h2>
+      <div class="calendar-gallery">
+        <img src="img/calendrier5.JPG" alt="Calendrier 2026 — Février">
+        <img src="img/calendrier4.JPG" alt="Calendrier 2026 — Mai">
+        <img src="img/calendrier3.JPG" alt="Calendrier 2026 — Août">
+        <img src="img/calendrier2.JPG" alt="Calendrier 2026 — Septembre">
+        <img src="img/calendrier1.JPG" alt="Calendrier 2026 — Décembre">
+        <video src="img/calendrier_video.MOV" controls playsinline></video>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  var LANG_KEY = 'ca-site-lang';
+  var DOC_TITLE = { fr: "Exploration — Calendrier 2026", en: "Exploration — 2026 Calendar" };
+  var I18N = {
+    fr: {
+      "rail.toc": "Sommaire",
+      "rail.galerie": "Galerie",
+      "hero.eyebrow": "Exploration ✦ Graphisme ∗ Édition",
+      "hero.title": "Calendrier 2026",
+      "hero.context": "Un calendrier mural dessiné mois par mois, chacun avec son propre univers graphique. Conçu de l'illustration à la mise en page, imprimé et vendu en quelques exemplaires.",
+      "sec.galerie": "Galerie",
+      "g.title": "Le calendrier en images"
+    },
+    en: {
+      "rail.toc": "Contents",
+      "rail.galerie": "Gallery",
+      "hero.eyebrow": "Exploration ✦ Graphic design ∗ Print",
+      "hero.title": "2026 Calendar",
+      "hero.context": "A wall calendar drawn month by month, each with its own graphic universe. Designed from illustration to layout, printed and sold in a few copies.",
+      "sec.galerie": "Gallery",
+      "g.title": "The calendar in pictures"
+    }
+  };
+
+  function applyLang(lang) {
+    var dict = I18N[lang] || I18N.fr;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] != null) el.innerHTML = dict[key].replace(/ — /g, ', ');
+    });
+    document.documentElement.lang = lang;
+    if (DOC_TITLE[lang]) document.title = DOC_TITLE[lang];
+    document.querySelectorAll('.lang-switch button').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.lang-switch button');
+    if (b) { applyLang(b.getAttribute('data-lang')); }
+  });
+  (function () {
+    var saved = 'fr';
+    try { var s = localStorage.getItem(LANG_KEY); if (s === 'fr' || s === 'en') saved = s; } catch (e) {}
+    applyLang(saved);
+  })();
+
+  var OFFSET = 32;
+  function scroller() { return document.scrollingElement || document.documentElement; }
+  function goTo(id) {
+    var el = document.getElementById(id); if (!el) return;
+    var sc = scroller();
+    var y = el.getBoundingClientRect().top + sc.scrollTop - OFFSET;
+    sc.scrollTo({ top: y, behavior: 'smooth' });
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-anchor]');
+    if (a) { e.preventDefault(); goTo(a.getAttribute('data-anchor')); }
+  });
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#railnav a'));
+    var ids = links.map(function (l) { return l.getAttribute('data-anchor'); });
+    var sections = ids.map(function (id) { return document.getElementById(id); });
+    function setActive(id) { links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('data-anchor') === id); }); }
+    function onScroll() {
+      var best = ids[0], bestTop = -Infinity;
+      for (var j = 0; j < sections.length; j++) {
+        if (!sections[j]) continue;
+        var top = sections[j].getBoundingClientRect().top - OFFSET - 130;
+        if (top <= 0 && top > bestTop) { bestTop = top; best = ids[j]; }
+      }
+      setActive(best);
+    }
+    setActive(ids[0]);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+  setTimeout(function () {
+    document.querySelectorAll('.fade-up').forEach(function (el) {
+      (el.getAnimations ? el.getAnimations() : []).forEach(function (a) { try { a.finish(); } catch (e) {} });
+    });
+  }, 900);
+</script>
+</body>
+</html>

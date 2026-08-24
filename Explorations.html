@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explorations — Camille Adam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-canvas: #FFFFFF;
+  --color-canvas-soft: #E3F1FC;
+  --color-surface-card: #B9DCF2;
+  --color-ink: #08243B;
+  --color-body: #29465A;
+  --color-muted: #5E7788;
+  --color-muted-soft: #8EA6B5;
+  --color-hairline: #B8D5EA;
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+nav { height: 56px; position: fixed; inset: 0 0 auto; z-index: 10; display: flex; align-items: center; background: rgba(255,255,255,.94); border-bottom: 1px solid var(--color-hairline); backdrop-filter: blur(10px); }
+.nav-inner { width: min(1400px, 100%); margin: auto; padding: 0 var(--space-xl); display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { font-family: var(--font-display); font-style: normal; font-size: 16px; text-decoration: none; letter-spacing: -0.3px; }
+.nav-logo span { font-size: .5em; vertical-align: super; margin-left: 3px; }
+.nav-links { display: flex; align-items: center; gap: var(--space-xl); margin: 0; padding: 0; list-style: none; }
+.nav-links a { color: var(--color-muted); font-size: 13px; font-weight: 500; text-decoration: none; white-space: nowrap; }
+.nav-links a:hover, .nav-links a.active { color: var(--color-ink); }
+.menu-toggle { display: none; border: 0; background: none; color: var(--color-ink); font: 500 12px var(--font-body); cursor: pointer; }
+.lang-switch { display: inline-flex; gap: 6px; padding-left: var(--space-sm); margin-left: calc(var(--space-xl) - var(--space-sm)); border-left: 1px solid var(--color-hairline); }
+.lang-switch button { padding: 2px; border: 0; background: none; color: var(--color-muted-soft); font: 500 12px var(--font-body); cursor: pointer; }
+.lang-switch button.active, .lang-switch button:hover { color: var(--color-ink); }
+.page { width: min(1120px, 100%); margin: auto; padding: 56px var(--space-xl) 96px; }
+.intro { max-width: 760px; padding: 112px 0 80px; }
+.eyebrow { margin-bottom: var(--space-lg); color: var(--color-muted); font-size: 11px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
+h1, h2, p { margin-top: 0; }
+h1 { max-width: 760px; margin-bottom: var(--space-lg); font-family: var(--font-display); font-size: clamp(40px, 6vw, 72px); font-style: italic; font-weight: 400; line-height: 1.05; }
+.intro p { max-width: 650px; color: var(--color-body); font-size: 18px; }
+
+.projects-grid { display: grid; grid-template-columns: 1fr; max-width: 480px; gap: var(--space-lg); padding: 56px 0; border-top: 1px solid var(--color-hairline); }
+
+.project-card { border-radius: var(--radius-xl); overflow: hidden; cursor: pointer; transition: transform 0.2s ease; position: relative; display: flex; flex-direction: column; text-decoration: none; }
+.project-card:hover { transform: translateY(-3px); }
+
+.project-visual { aspect-ratio: 16 / 10; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex: 0 0 auto; background: var(--color-surface-card); }
+.project-visual span { font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--color-ink); opacity: 0.5; }
+.project-visual-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transform: scale(1); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.project-card:hover .project-visual-img { transform: scale(1.05); }
+
+.project-info { padding: var(--space-xl); background: var(--color-canvas-soft); display: flex; flex-direction: column; justify-content: flex-end; flex: 1; min-height: 220px; }
+.project-tag { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted-soft); margin-bottom: var(--space-sm); }
+.project-title { font-family: var(--font-body); font-size: 17px; font-weight: 500; color: var(--color-ink); line-height: 1.3; margin-bottom: var(--space-xs); }
+.project-desc { font-family: var(--font-body); font-size: 16px; font-weight: 400; color: var(--color-muted); line-height: 1.55; margin-bottom: var(--space-md); }
+.project-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: var(--space-md); font-family: var(--font-body); font-size: 16px; font-weight: 500; letter-spacing: 0.01em; color: var(--color-ink); opacity: 0; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; }
+.project-card:hover .project-cta, .project-card:focus-visible .project-cta { opacity: 1; transform: translateY(0); }
+@media (hover: none) { .project-cta { opacity: 1; transform: none; } }
+
+@media (max-width: 760px) {
+  .nav-inner { padding: 0 var(--space-lg); }
+  .menu-toggle { display: inline-flex; align-items: center; gap: 8px; }
+  .menu-toggle::before { content: '☰'; font-size: 18px; line-height: 1; }
+  .nav-links { display: none; position: absolute; top: 56px; left: 0; right: 0; padding: var(--space-lg); background: var(--color-canvas); border-bottom: 1px solid var(--color-hairline); flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+  nav.is-open .nav-links { display: flex; }
+  .nav-links a { font-size: 14px; }
+  .lang-switch { margin-left: 0; padding-left: 0; border-left: 0; }
+  .page { padding-inline: var(--space-lg); }
+  .intro { padding-top: 88px; }
+  .projects-grid { max-width: none; }
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">Camille Adam<span>✦</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">Menu</button>
+    <ul class="nav-links" id="site-navigation">
+      <li><a href="index.html#projets" data-i18n="nav.work">Projets</a></li>
+      <li><a href="index.html#about" data-i18n="nav.about">À propos</a></li>
+      <li><a href="index.html#contact" data-i18n="nav.contact">Contact</a></li>
+      <li><a class="active" href="Explorations.html" data-i18n="nav.explo">Explorations</a></li>
+      <li><a href="Veille.html" data-i18n="nav.watch">Veille</a></li>
+      <li>
+        <div class="lang-switch" role="group" aria-label="Langue / Language">
+          <button type="button" data-lang="fr" class="active" aria-pressed="true">FR</button>
+          <span aria-hidden="true">·</span>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+<main class="page">
+  <header class="intro">
+    <div class="eyebrow" data-i18n="explo.eyebrow">Explorations ✦</div>
+    <h1 data-i18n="explo.title">Quelques explorations</h1>
+    <p data-i18n="explo.body">Une sélection de projets plus libres qui touchent au design sans être centrés sur la conception d'interfaces.</p>
+  </header>
+
+  <section class="projects-grid">
+    <a href="Calendrier 2026.html" class="project-card">
+      <div class="project-visual"><img src="img/card_calendrier.jpg" alt="Calendrier 2026" class="project-visual-img"></div>
+      <div class="project-info">
+        <div class="project-tag" data-i18n="explo.p1tag">Graphisme ∗ Édition</div>
+        <div class="project-title" data-i18n="explo.p1title">Calendrier 2026</div>
+        <div class="project-desc" data-i18n="explo.p1desc">Un calendrier annuel dessiné de A à Z, imprimé et vendu en quelques exemplaires.</div>
+        <div class="project-cta" data-i18n="explo.cta">Voir le projet →</div>
+      </div>
+    </a>
+  </section>
+</main>
+<script>
+var translations = {
+  fr: {
+    'nav.work': 'Projets', 'nav.about': 'À propos', 'nav.contact': 'Contact', 'nav.watch': 'Veille', 'nav.explo': 'Explorations',
+    'explo.eyebrow': 'Explorations ✦',
+    'explo.title': 'Quelques explorations',
+    'explo.body': 'Une sélection de projets plus libres qui touchent au design sans être centrés sur la conception d’interfaces.',
+    'explo.visualPlaceholder': 'Visuel à ajouter',
+    'explo.p1tag': 'Graphisme ∗ Édition', 'explo.p1title': 'Calendrier 2026', 'explo.p1desc': 'Un calendrier annuel dessiné de A à Z, imprimé et vendu en quelques exemplaires.',
+    'explo.cta': 'Voir le projet →'
+  },
+  en: {
+    'nav.work': 'Work', 'nav.about': 'About', 'nav.contact': 'Contact', 'nav.watch': 'Watch', 'nav.explo': 'Explorations',
+    'explo.eyebrow': 'Explorations ✦',
+    'explo.title': 'A few explorations',
+    'explo.body': 'A selection of freer projects that touch on design without being focused on interface design.',
+    'explo.visualPlaceholder': 'Visual to add',
+    'explo.p1tag': 'Graphic design ∗ Print', 'explo.p1title': '2026 Calendar', 'explo.p1desc': 'A yearly calendar designed from scratch, printed and sold in a few copies.',
+    'explo.cta': 'View project →'
+  }
+};
+document.addEventListener('click', function (event) {
+  var menuToggle = event.target.closest('.menu-toggle');
+  if (menuToggle) {
+    var nav = menuToggle.closest('nav');
+    var isOpen = nav.classList.toggle('is-open');
+    menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    return;
+  }
+  if (event.target.closest('.nav-links a')) {
+    var openNav = document.querySelector('nav.is-open');
+    if (openNav) openNav.classList.remove('is-open');
+    var openToggle = document.querySelector('.menu-toggle[aria-expanded="true"]');
+    if (openToggle) openToggle.setAttribute('aria-expanded', 'false');
+  }
+  var button = event.target.closest('.lang-switch button');
+  if (!button) return;
+  var lang = button.getAttribute('data-lang');
+  document.querySelectorAll('[data-i18n]').forEach(function (element) {
+    var value = translations[lang][element.getAttribute('data-i18n')];
+    if (value) element.textContent = value;
+  });
+  document.querySelectorAll('.lang-switch button').forEach(function (item) {
+    var active = item.getAttribute('data-lang') === lang;
+    item.classList.toggle('active', active);
+    item.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+  document.documentElement.lang = lang;
+});
+</script>
+</body>
+</html>
